@@ -8,13 +8,16 @@ use "run2.nc"
 use "run3.nc"
 use "run4.nc"
 
-define data/hide/F/agg fourfiles = 1,2,3,4
+define data/F/agg fourfiles = 1, 2, 3, 4
+show data
+show grid value
+list/width=180/i=1/j=1/L=1:18/n=1:4 value
 
-sh grid sst
-list/i=1/j=1/L=1:6/n=1:4 sst
+cancel data /all
 
-show att sst
-
-! Attribute _ftime2dRef pointe to the 2D time variable 
-list/L=1:6/n=1:4 `sst._ftime2d`
+let filelist = { "data/run1.nc", "data/run2.nc", "data/run3.nc", "data/run4.nc" }
+define data/F/agg fourfiles = filelist
+show data
+show grid value
+list/width=180/i=1/j=1/L=1:18/n=1:4 value
 

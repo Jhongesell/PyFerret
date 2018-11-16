@@ -6,7 +6,7 @@
 /*
  * Utility functions for reading binary data
  *
- * $Id$
+ * $Id: binaryRead.h 24230 2017-09-22 23:31:02Z ksmith $
  *
  * *acm*  5/07 v603 - fix prototype of createBinaryRead to use MAXDIMS rather 
  *                    than hardwired to 4; to match what is in .c file.

@@ -1,4 +1,4 @@
-	SUBROUTINE FIND_MEM_VAR( cx, mr, by_value, valid_search )
+	SUBROUTINE FIND_MEM_VAR( cx, mr, by_value )
 
 *  This software was developed by the Thermal Modeling and Analysis
 *  Project(TMAP) of the National Oceanographic and Atmospheric
@@ -119,7 +119,7 @@
 
 * calling argument declarations:
 	INTEGER cx, mr
-	LOGICAL by_value, valid_search
+	LOGICAL by_value
 
 * internal variable declarations:
 	LOGICAL TM_DFPEQ, REGRID_TO_SELF,
@@ -129,9 +129,6 @@
 	INTEGER HASH_CX, line,
      .		mv, defining_grid, idim, var, mline
         REAL*8  TM_WORLD, ww_hi_bound, c_cache_ptr
-
-* initialize
-	valid_search = .TRUE.
 
 * in "STUPID" mode the program cannot find anything in memory
 *  (4/99) if mode_arg is 1 we are are using "weak_cache", so do not skip out
@@ -399,6 +396,5 @@
 
 * failure exit
  5000	mr = mr_nonexist
-	valid_search = .FALSE.
 	RETURN
 	END

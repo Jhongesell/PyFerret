@@ -43,7 +43,7 @@
 *                  else we cannot aggregate the aggs (for EF and FE aggs)
 *      *sh* 4/16 - put special E and F units onto agg axes
 
-      IMPLICIT NONE
+        IMPLICIT NONE
         include 'tmap_errors.parm'
 #include "tmap_dset.parm"
         include 'tmap_dims.parm'

@@ -107,16 +107,14 @@
 * ... if not a member of some other aggregation: cancel the hidden member
 	      is_member = IS_AGG_MEMBER(membset, 1, parent, more)
 	      IF ( is_member .AND. .NOT.more ) THEN
-	         IF (ds_hide(membset)) CALL CANCEL_ONE_DATA_SET
-     .							(membset, status)
-	         IF (status .NE. ferr_ok) GOTO 5000
+	         IF (ds_hide(membset))
+     .              CALL CANCEL_ONE_DATA_SET(membset, status)
 	      ENDIF
 	   ENDDO
 	ENDIF
 
 * finally cancel the requested dataset
 	CALL CANCEL_ONE_DATA_SET(dset, status)
-	IF (status .NE. ferr_ok) GOTO 5000
 
 * success
         RETURN

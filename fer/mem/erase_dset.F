@@ -77,14 +77,6 @@
 * eliminate memory resident data
 	CALL PURGE_DSET( dset )
 
-* free any c-cached variables owned by this dataset
-	DO ii = 1, maxvars
-	   IF (ds_var_setnum(ii) .EQ. dset) THEN
-	      IF (ds_var_c_cache_ptr(ii).NE.0.0) CALL FREE_CACHED_FULL_ARRAY
-     .						(ds_var_c_cache_ptr(ii))
-	   ENDIF
-	ENDDO
-
 * delete LET-defined variables that belong to this data set
 	DO 100 ii = 1, max_uvar
 *	   IF (uvar_dset(ii) .EQ. dset) uvar_num_items(ii) =

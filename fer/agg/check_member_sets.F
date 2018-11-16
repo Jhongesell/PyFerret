@@ -1,5 +1,5 @@
-	SUBROUTINE CHECK_MEMBER_SETS (agg_dim, nsets, memb_dsetnames,
-     .				      member_sets, status)
+        SUBROUTINE CHECK_MEMBER_SETS(agg_dim, nsets, memb_dsetnames, 
+     .                          member_sets, memb_filenames, status)
 *
 *  This software was developed by the Thermal Modeling and Analysis
 *  Project(TMAP) of the National Oceanographic and Atmospheric
@@ -49,12 +49,14 @@
 *	      4/16 defer checking aggs build of aggs to OK_AS_AGG_VAR
 * V741 *acm* 5/18 Promoting global attributes to a variable in ensembles:
 *                 File extensions for member sets were not being stripped off 
+*     *kms* 11/18 Add return of actual datafile names in memb_filenames
 
 * calling arguments
 *   agg_dim             - axis of the aggregation being created
 *   nsets		- number of datasets to be aggregated (input)
 *   memb_dsetnames	- array of names of the datasets (input)
 *   member_sets		- array of open dataset numbers (output)
+*   memb_filenames      - array of dataset filenames (output)
 *   status		- return status
 
         IMPLICIT NONE
@@ -75,7 +77,7 @@
 
 * calling argument declarations:
 	INTEGER agg_dim, nsets, member_sets(nsets), status
-	CHARACTER*(*), memb_dsetnames(nsets)
+	CHARACTER*512 memb_dsetnames(nsets), memb_filenames(nsets)
 
 * local variable declarations:
 	LOGICAL TM_DIGIT, tregular, use_strict
@@ -140,6 +142,7 @@
 	      IF   ( dset .LT. 1
      .	      .OR.   dset .GT. maxdsets )	  GOTO 5200
 	      IF (ds_name(dset).EQ.char_init2048) GOTO 5200
+              memb_filenames(iset) = ds_des_name(dset)
 	      GOTO 750
 	   ENDIF
 
@@ -147,6 +150,7 @@
  740       ds_dset_type = 'CDF'   ! used and cleared in tm_init_dset
 
 * initialize a TMAP-supported data set
+           memb_filenames(iset) = buff1(:buff_len)
  	   CALL TM_INIT_DSET( buff1(:buff_len), ok_re_use_existing,
      .			      perm, dset, tregular, use_strict, status )
 	   

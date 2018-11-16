@@ -1208,6 +1208,8 @@ GO bn_data_squared
 go bn_reset bn_overlay_graticules
 GO bn_overlay_graticules
 
+go bn_reset bn_agg_given_axes
+GO bn_agg_given_axes
 
 !  *********** Always do a bn_reset  *********** 
 !  *********** make sure things clean up well **

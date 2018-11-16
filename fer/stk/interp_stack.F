@@ -334,7 +334,7 @@
         CALL COMPLETE_MISSING_LIMITS( cx )
 
 * check in memory to see if we already have the data 
-	CALL FIND_MEM_VAR_INCL_C_CACHE( cx, mr, search_by_value )
+	CALL FIND_MEM_VAR( cx, mr, search_by_value )
 	IF ( mr .GT. mr_nonexist ) THEN
 * ... yes - already in memory
 	   is_mr( isp ) = mr
@@ -518,7 +518,7 @@
  300	      CONTINUE
 	      IF ( look_again ) THEN
 * ...         check again in memory - maybe we already have it after all
-	         CALL FIND_MEM_VAR_INCL_C_CACHE( cx, mr, search_by_value)
+	         CALL FIND_MEM_VAR( cx, mr, search_by_value )
 	         IF ( mr .GT. mr_nonexist ) THEN
 * ...            yes - already in memory ... worth the trouble
 	            is_mr( isp ) = mr

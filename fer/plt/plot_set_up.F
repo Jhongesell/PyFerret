@@ -247,7 +247,7 @@
 	CHARACTER	INTERNAL_WHOI_DATE*14, VAR_UNITS*64,
      .			SECS_TO_DATE*20, LEFINT*8, MERGED_WHOI_DATE*14, 
      .			LEFT_REAL*16, TM_GET_CALENDAR_NAME*32, 
-     .			indep_ax*1, dep_ax*1, tstyle*3, xtra_lab*24,
+     .			indep_ax*1, dep_ax*1, tstyle*3, xtra_lab*32,
      .			buff1*40, buff2*16, buff3*8, t1_date*14, tref*14,
      .                  cal_name*32, cal_name_new*32, val_buff*32, fmt*4,
      .			whoimin*14, whoimax*14, 
@@ -692,9 +692,9 @@ c	   ENDIF  ! setting up time overlay information
            IF ( ITS_FMRC(grid1) ) THEN
 	      IF (GEOG_LABEL(indep_dim,grid1)) THEN
 	         IF     (indep_dim .EQ. t_dim) THEN
-	            xtra_lab = 'Verification Time ==>'
+	            xtra_lab = 'Forecasted Time (T) ==>'
 	         ELSEIF (indep_dim .EQ. f_dim) THEN
-	            xtra_lab = 'Initialization Time ==>'
+	            xtra_lab = 'Time of Forecast (F) ==>'
 	         ENDIF
 	      ENDIF
 	   ENDIF

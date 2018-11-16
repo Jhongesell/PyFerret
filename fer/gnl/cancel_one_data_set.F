@@ -1,4 +1,4 @@
-	SUBROUTINE CANCEL_ONE_DATA_SET( dset, status )
+        SUBROUTINE CANCEL_ONE_DATA_SET(dset, status)
 
 *  This software was developed by the Thermal Modeling and Analysis
 *  Project(TMAP) of the National Oceanographic and Atmospheric
@@ -52,7 +52,8 @@
 * V698 *sh* 1/16 - complexity removed to the parent routine, CANCEL_DATA_SET
 * V698  3/16 *acm* Removed Philander-Seigel code including diagnostic 
 *                  variables, pre-defined axes and grids, cat_calc_var.
-*            *sh*  deallo special E and F axes even if user has re-defined them
+*            *sh*  deallo special T and F axes even if user has re-defined them
+*      11/18 *kms* special T and F axes no longer created; remove (now unused) status return
 
 * calling arguments
 *  dset      -  (input) dataset number to be closed
@@ -60,35 +61,13 @@
 
         IMPLICIT NONE
 	include 'tmap_dims.parm'
-#	include "tmap_dset.parm"
-	include 'tmap_errors.parm'
-	include	'ferret.parm'
-	include 'errmsg.parm'
+	include 'ferret.parm'
 	include 'xprog_state.cmn'
 	include 'xdset_info.cmn_text'
 	external xdset_info_data
-	include 'xrisc.cmn'
-	include	'xtm_grid.cmn_text'
-	external xgt_grid_data
 
 * calling argument declarations:
 	INTEGER	dset, status
-
-* local variable declarations:
-	LOGICAL NC_GET_ATTRIB_STRING, got_it
-	INTEGER TM_GET_LINENUM
-	INTEGER	iclim, iclim_user, i, nmemb, imemb, membset, 
-     .          ivar, axis, varid, parent,
-     .          memb_cat, memb_dset, memb_grid, iline, memb_var,
-     .          attid, attype, attlen, attoutflag
-	CHARACTER axname*12, attname*12
-
-* local parameter declarations
-	LOGICAL do_warn
-	INTEGER max_slen
-	PARAMETER (do_warn = .TRUE.,
-     .		   max_slen = 12)
-
 
 * since ensembles create so much dataset proliferation, need a diagnostic
 * message to see what is being canceled
@@ -100,42 +79,9 @@
 *   information and possibly misleading output )
 	CALL ERASE_DSET( dset )
 
-* If canceling an F aggregation then ...
-* de-allocate special axes TF_LAG_F and TF_CAL_T
-* get the names of these special axes from the attribute pointers
-	IF (ds_type(dset).EQ.'FCT') THEN
-	   CALL CD_GET_VAR_ID (dset, '.', varid, status)
-	   CALL CD_GET_VAR_ATT_ID (dset, varid, '_cal_t_ax', attid, status)
-	   IF (status.EQ.atom_not_found) GOTO 5100
-           CALL CD_GET_VAR_ATT_INFO (dset, varid, attid, 
-     .                attname, attype, attlen, attoutflag, status )
-	   IF (status.EQ.atom_not_found) GOTO 5100
-	   got_it = NC_GET_ATTRIB_STRING (dset, varid, attname, 
-     .                                do_warn, 'global', max_slen,  
-     .                                attlen, attoutflag, axname)
-	   axis = TM_GET_LINENUM(axname)
-	   CALL TM_DEALLO_DYN_LINE(axis)
-
-	   CALL CD_GET_VAR_ATT_ID (dset, varid, '_lag_f_ax', attid, status)
-	   IF (status.EQ.atom_not_found) GOTO 5100
-           CALL CD_GET_VAR_ATT_INFO (dset, varid, attid, 
-     .                attname, attype, attlen, attoutflag, status )
-	   IF (status.EQ.atom_not_found) GOTO 5100
-	   got_it = NC_GET_ATTRIB_STRING (dset, varid, attname, 
-     .                                do_warn, 'global', max_slen, 
-     .                                attlen, attoutflag, axname)
-	   axis = TM_GET_LINENUM(axname)
-	   CALL TM_DEALLO_DYN_LINE(axis)
-	ENDIF
-
 * really close and cancel the data set
-	CALL TM_CLOSE_SET( dset, status )
-	IF ( status .NE. merr_ok ) RETURN
+        CALL TM_CLOSE_SET( dset, status )
 
         RETURN
-
-* error exits
- 5000	RETURN
- 5100	CALL ERRMSG(ferr_internal, status, 'cancel_data_set', *5000 )
 
 	END

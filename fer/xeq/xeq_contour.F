@@ -199,18 +199,13 @@
 * (e.g.so graticule lines can be overlaid on a final plot.)
 
 	noaxes    = qual_given( slash_noaxes         ).GT.0
-
         IF (overlay) THEN
 	   noaxes = .FALSE.
 	   axes = .FALSE.
 	ENDIF
-
 	axes      = qual_given( slash_cont_axes      ).GT.0
-
-	is_logh   = .FALSE.
-	is_logv   = .FALSE.
-        sp        = qual_given( slash_cont_spectrum  )
-
+        
+	sp        = qual_given( slash_cont_spectrum  )
         spectrum  = sp .GT. 0 .AND. fill
         is_shade  = .FALSE.
         use_cell  = .FALSE.

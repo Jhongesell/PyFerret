@@ -229,13 +229,15 @@
      .						CALL DEL_CX_DIM(idim, hi_cx) 
 	      ENDDO
 
-* the T axis of an F-aggregation has a single set of indices but the time
-* values differ for each axis.  Indices are inherited from the lo_cx
-	      IF (idim .EQ. f_dim) THEN
-	         cx_by_ss(t_dim, hi_cx) = .TRUE.
-	         CALL FLESH_OUT_AXIS(t_dim, hi_cx, status )
-	         IF (status .NE. ferr_ok) GOTO 5000
-	      ENDIF
+** the T axis of an F-aggregation has a single set of indices but the time
+** values differ for each axis.  Indices are inherited from the lo_cx
+* 11/2018 - KMS - T axis of an F aggregation is now complete actual time axis
+*	      IF (idim .EQ. f_dim) THEN
+*	         cx_by_ss(t_dim, hi_cx) = .TRUE.
+*	         CALL FLESH_OUT_AXIS(t_dim, hi_cx, status )
+*	         IF (status .NE. ferr_ok) GOTO 5000
+*	      ENDIF
+
 	   ENDIF
 
 * Set limits on agg-direction to be unspecified

@@ -1,6 +1,5 @@
-	SUBROUTINE SORT_TSERIES_DSETS (nmembers, nsteps, skip_edges,
-     .				       memb_nsteps, memb_order, memb_sort)
-*
+	LOGICAL FUNCTION ITS_FMRC_2DTIME (dset, fvar)
+
 *  This software was developed by the Thermal Modeling and Analysis
 *  Project(TMAP) of the National Oceanographic and Atmospheric
 *  Administration's (NOAA) Pacific Marine Environmental Lab(PMEL),
@@ -33,65 +32,71 @@
 *  CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
 *  CONNECTION WITH THE ACCESS, USE OR PERFORMANCE OF THIS SOFTWARE. 
 *
-* NOAA/PMEL, Seattle, WA - TMAP 
+* Return boolean indicating whether the passed variable is in fact
+* the 2D FMRC time matrix of the dataset
 
-* sort the time steps that have been pulled from the time series members
-*
-* V698 *sh* 1/16 
-
-* calling arguments
-*   nmembers	- number of members in aggregation (input)
-*   nsteps	- total number of time steps in agg axis (input)
-*   skip_edges	- flag to turn off cell edge processing (input)
-*   memb_nsteps	- number of time steps from each member file (input)
-*   memb_order	- ordering index of member files (input empty/output filled)
-*   memb_sort   - starting time steps as currently ordered, to be sorted (in/out)
+* V698 2/16 *sh*
 
         IMPLICIT NONE
-        include 'tmap_errors.parm'
 #include "tmap_dset.parm"
+!#include "gt_lib.parm"     ! str_match
         include 'tmap_dims.parm'
 	include	'ferret.parm'
-	include 'xdset_info.cmn_text'
-	external xdset_info_data
-        include 'xprog_state.cmn'
-	include 'xtm_grid.cmn_text'  
 	include 'errmsg.parm'
-	include 'netcdf.inc'
-	include 'xvariables.cmn'
-	include 'xcontext.cmn'
-	include 'xfr_grid.cmn'
-	include 'xdiag_ctrl.cmn_text'
+	include 'xdset_info.cmn_text'
+	include 'xdset_info.cd_equiv'
+	include 'xtm_grid.cmn_text'
 
 * calling argument declarations:
-	LOGICAL skip_edges
-	INTEGER nmembers, nsteps, memb_nsteps(nmembers), memb_order(nmembers)
-	REAL    memb_sort(nmembers)
+	INTEGER dset, fvar
 
 * local variable declarations:
-	LOGICAL sorted
-	INTEGER i
-	REAL    rorder(nmembers)
+	LOGICAL NC_GET_ATTRIB, got_it
+	INTEGER STR_CASE_BLIND_COMPARE, grid, vid, istat, status
+
+	INTEGER str_match
+        PARAMETER (str_match = 0)
+
+* Getting info back from the attribute-handling structure
+        INTEGER maxlen
+        PARAMETER (maxlen = 128)
+	CHARACTER*(maxlen) buff
+	INTEGER varid, t2did, tline, g2d, globalid, ref_id, attlen,
+     .		attype, attoutflag
+        REAL    attvals(10)
 
 * initialize
-	sorted = .FALSE.
+	grid = ds_grid_number(fvar)
 
-* ... pre-sorted indices in a REAL array
-	DO i = 1, nmembers
-	   rorder(i) = i
-	ENDDO
+* it must be 2D in the TF plane
+	IF (grid_line(x_dim,grid) .NE. mnormal
+     . .OR. grid_line(y_dim,grid) .NE. mnormal
+     . .OR. grid_line(z_dim,grid) .NE. mnormal
+     . .OR. grid_line(e_dim,grid) .NE. mnormal ) GOTO 2000
+	IF (grid_line(t_dim,grid) .EQ. mnormal
+     . .OR. grid_line(f_dim,grid) .EQ. mnormal ) GOTO 2000
 
-* sort the datasets by start date
-	CALL HEAP2(memb_sort, rorder, unspecified_val8, nmembers)
+* it must have a _CoordinateAxisType='Time' attribute
+* ... get the List id of the variable
+        CALL CD_GET_VAR_ID (dset, ds_var_code(fvar), vid, status)
+        IF (status .NE. ferr_ok) GOTO 5100
+* ... get the attribute val
+        got_it = NC_GET_ATTRIB ( dset, vid, '_CoordinateAxisType',
+     .                              .TRUE., ds_var_code(fvar), maxlen,
+     .                              attlen, attoutflag, buff, attvals )
+	IF (.NOT.got_it) GOTO 2000
+	istat = STR_CASE_BLIND_COMPARE(buff, 'time')
 
-* Return the sort order and the total number of steps
-
-	nsteps = 0.
-	DO i = 1, nmembers
-	   memb_order(i) = INT(rorder(i))
-	   IF (memb_order(i) .NE. i) sorted = .TRUE.
-	   nsteps = nsteps + memb_nsteps(i)
-	ENDDO
-
+* final test
+        ITS_FMRC_2DTIME = istat .EQ. str_match
 	RETURN
+
+* nope - this aint it
+ 2000	ITS_FMRC_2DTIME = .FALSE.
+	RETURN
+
+* error bail out
+ 5000	RETURN
+ 5100	CALL ERRMSG(ferr_internal, status, 'its_fmrc_2dtime!',
+     .		 *5000)     ! error not trapped
 	END

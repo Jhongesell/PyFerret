@@ -8,7 +8,10 @@ include ../platform_specific.mk.$(BUILDTYPE)
 
 ## Compare results from executing the RUN_TESTS.sh test suite with those saved under bench/test_results
 .PHONY: check
-check: run_tests
+check: run_tests do_diffs
+
+.PHONY: do_diffs
+do_diffs:
 	@echo 'Differences in the generated bench PDF and PNG files versus those in bench/test_results'
 	-@for img in *.pdf *.png ; \
 	do \
@@ -42,7 +45,7 @@ clean:
 	rm -f *.ps* *.eps* *.png* *.pdf* *.diff* ferret.jnl*
 	rm -f `cat TRASH_FILES`
 	rm -f all_ncdump.out fort.41 make_stream_file
-	rm -fr subdir tmp
+	rm -fr subdir tmp aggf
 
 make_stream_file: make_stream_file.F
 	$(FC) $(FFLAGS) make_stream_file.F -o make_stream_file

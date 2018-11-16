@@ -148,6 +148,5 @@
 	DATA	ds_var_off		/maxvars*0.0/
 	DATA	ds_var_scale		/maxvars*1.0/
 	DATA	ds_var_scaleit		/maxvars*.FALSE./
-	DATA	ds_var_c_cache_ptr	/maxvars*0.0/
 
 	END

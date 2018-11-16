@@ -1,7 +1,6 @@
-	SUBROUTINE INIT_T_AGG_MC_DSET
-     .		(dset_num, nagfiles, memb_order, memb_filename,
-     .		 memb_tstep_start, memb_tstep_end, memb_nstep,
-     .		 use_strict, status)
+       SUBROUTINE INIT_T_AGG_MC_DSET(dset_num, nagfiles, memb_filename,
+     .            memb_tstep_start, memb_tstep_end, memb_nstep_start, 
+     .            memb_nsteps, memb_order, status)
 
 *
 *
@@ -51,23 +50,22 @@
 * V698 *sh*   2/16 - member files may be disordered
 
 * arguments:
-*	dset_num	- number assigned to this data set (input)
-*	nagfiles	- number of files in the aggregation (input)
-*	memb_order	- sequence ordering of member (input)
-*	memb_filename	- array of filenames (input)
-*	memb_tstep_start- array of first timestep in each file (input)
-*	memb_tstep_end	- array of last  timestep in each file (input)
-*	memb_nstep	- array of N timesteps in each file (input)
-*	use_strict	- (not impl.) flag for coord micro-adjustment (input)
-*	status		- return status (output)
+*	dset_num	 - number assigned to this data set (input)
+*	nagfiles	 - number of files in the aggregation (input)
+*	memb_filename	 - array of filenames (input)
+*	memb_tstep_start - array of first timestep in each file (input)
+*	memb_tstep_end	 - array of last  timestep in each file (input)
+*       memb_nstep_start - array of time axis indices of the first step (input)
+*	memb_nsteps	 - array of N timesteps in each file (input)
+*	memb_order	 - sequence ordering of member (input)
+*	status		 - return status (output)
 
         IMPLICIT NONE
 * Argument definitions
-	LOGICAL		use_strict
-	INTEGER		nagfiles, dset_num, status
-	INTEGER		memb_nstep(nagfiles), memb_order(nagfiles)
-	REAL		memb_tstep_start(nagfiles), memb_tstep_end(nagfiles)
-	CHARACTER*512	memb_filename(nagfiles)
+        INTEGER dset_num, nagfiles, memb_order(nagfiles), 
+     .     memb_nstep_start(nagfiles), memb_nsteps(nagfiles), status
+        REAL*8 memb_tstep_start(nagfiles), memb_tstep_end(nagfiles)
+        CHARACTER*512	memb_filename(nagfiles)
 
 * Parameter and common files
 
@@ -98,8 +96,8 @@
 	INTEGER		ivar, stp_pos,
      .			istep, i, nrecperstep, epos, first_file,
      .			stp_cnt, min_pos, max_pos,istat,
-     .			lline, file_reclen, preceding_steps
-	REAL*8		file_trange, steps_in_file
+     .			lline, file_reclen
+	REAL*8		file_trange
 
 * simulate reading of step records - one per file to be aggregated
 	istep = 0
@@ -110,7 +108,6 @@
 	s_index       = ' '	! irrelevant
 	file_reclen = unspecified_int4  ! irrelevant?
 	s_delta	      = 0	! used to determine if regular time steps
-        preceding_steps = 0
 
 * * * * * * top of stepfile loop * * * * *
 	DO i = 1, nagfiles
@@ -118,8 +115,7 @@
 
 * calculate time range per file and check for even number per file
 	  file_trange = memb_tstep_end(istep)-memb_tstep_start(istep)
-	  steps_in_file = memb_nstep(istep)
-	  s_delta = file_trange / steps_in_file
+	  s_delta = file_trange / DBLE(memb_nsteps(istep))
 
 * Find the next storage position for stepfiles in common
 	  IF (i .EQ. 1) THEN
@@ -145,9 +141,8 @@
 	  sf_1step (stp_cnt) = memb_tstep_start(istep)
 	  sf_lastep(stp_cnt) = memb_tstep_end(istep)
 * sf_ndxs and sf_ndxe contain the L limits for each file on the agg T axis
-	  sf_ndxs  (stp_cnt) = preceding_steps + 1
-	  sf_ndxe  (stp_cnt) = preceding_steps + steps_in_file
-          preceding_steps = sf_ndxe(stp_cnt)
+	  sf_ndxs  (stp_cnt) = memb_nstep_start(istep)
+	  sf_ndxe  (stp_cnt) = sf_ndxs(stp_cnt) + memb_nsteps(istep) - 1
 	  sf_delta(stp_cnt) = s_delta
 !	  sf_aux_set_num(stp_cnt) = s_aux_set_num
 	  sf_lunit(stp_cnt) = file_not_open

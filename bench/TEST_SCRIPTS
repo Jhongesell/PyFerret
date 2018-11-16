@@ -298,6 +298,7 @@ bn_ens_promote_global.jnl
 bn743_bug_fixes.jnl
 bn_data_squared.jnl
 bn_overlay_graticules.jnl
+bn_agg_given_axes.jnl
 !
 ! bn_gif, bn_all_ef, and bn_startupfile at end
 !

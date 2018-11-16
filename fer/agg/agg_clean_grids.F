@@ -46,8 +46,8 @@
 * argument definitions:
 *       dset    - pointer to aggregated data set (input)
 *	agg_dim	- axis of aggregation (E_dim or F_dim)  (input)
-*	ens_ax	- aggregation axis of the ensemble (input)
-*	tlag_ax	- time axis (F aggregation, only) (input)
+*	ens_ax	- aggregation axis (input/output)
+*	tlag_ax	- time axis (F aggregation, only) (input/output)
 
         IMPLICIT NONE
 * include files
@@ -78,10 +78,12 @@
 * If the ensemble axis or the lag-time axis of an FMRC is an exact duplicate
 * of a pre-existing axis use the previous one, instead
 	prev_ens_ax = TM_FIND_LIKE_DYN_LINE( ens_ax )
-	have_prev_ens = prev_ens_ax  .NE. unspecified_int4
+	have_prev_ens = (prev_ens_ax .NE. ens_ax) .AND. 
+     .                  (prev_ens_ax  .NE. unspecified_int4)
 	IF (agg_dim .EQ. F_dim) THEN
 	   prev_tlag_ax = TM_FIND_LIKE_DYN_LINE( tlag_ax )
-	   have_prev_tlag = prev_tlag_ax .NE. unspecified_int4
+	   have_prev_tlag = (prev_tlag_ax .NE. tlag_ax) .AND.
+     .                      (prev_tlag_ax .NE. unspecified_int4)
 	ENDIF
 	IF ( have_prev_ens .OR. have_prev_tlag ) THEN
 * find the places that the new axes are in use. Replace them with pre_exist 

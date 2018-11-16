@@ -234,7 +234,7 @@ C plus those starting w/ xbox_bounds:
      .			letter*1, buff1*16, buff2*16, buff30*30,
      .                  TM_GET_CALENDAR_NAME*32, cal_name_1*32, 
      .                  cal_name_2*32, err_string*128,
-     .			xtra_xlab*24, xtra_ylab*24, t1_date*14
+     .			xtra_xlab*32, xtra_ylab*32, t1_date*14
 
         CHARACTER*1     axdir(6)
 
@@ -472,11 +472,11 @@ C   set up memory for the flag grid
      .	 .AND.  (dim1.EQ.t_dim .OR. dim1.EQ.f_dim)
      .	 .AND.  (dim2.EQ.t_dim .OR. dim2.EQ.f_dim) ) THEN
 	      IF (dim1 .EQ. t_dim) THEN
-	         xtra_xlab = 'Verification Time ==>'
-	         xtra_ylab = 'Initialization Time ==>'
+	         xtra_xlab = 'Forecasted Time (T) ==>'
+	         xtra_ylab = 'Time of Forecast (F) ==>'
 	      ELSE
-	         xtra_xlab = 'Initialization Time ==>'
-	         xtra_ylab = 'Verification Time ==>'
+	         xtra_xlab = 'Time of Forecast (F) ==>'
+	         xtra_ylab = 'Forecasted Time (T) ==>'
 	      ENDIF
 	   ENDIF
 	ENDIF

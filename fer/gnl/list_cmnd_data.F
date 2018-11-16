@@ -365,37 +365,36 @@
 
 * ... T-F plane coaching
 *    If this variable is FMRC, then add annotations to disambiguate the 2 time axes
-*      "Initialization time increases across row. Verification time increases down page."
+*      "Time of forecast increases across row. Forecasted time increases down page."
         IF ( ITS_FMRC(grid)
      . .AND. (row_ax.EQ.t_dim .OR. row_ax .EQ. f_dim
      .   .OR. col_ax.EQ.t_dim .OR. col_ax .EQ. f_dim) ) THEN
            line_buff = ' '
-           alen = 0
+           alen = 1
            IF (row_ax.EQ.t_dim .OR. row_ax .EQ. f_dim) THEN
               IF (row_ax.EQ.t_dim) THEN
-                 line_buff = 'Verification'
-                 alen = 14
+                 line_buff(alen:) = 'Forecasted time (T) '
+                 alen = alen + 20
               ELSE
-                 line_buff = 'Initialization'
-                 alen = 16
+                 line_buff(alen:) = 'Time of forecast (F) '
+                 alen = alen + 21
               ENDIF
-              line_buff(alen:) = "time increases across row."
-              alen = alen + 26
+              line_buff(alen:) = 'increases across row.  '
+              alen = alen + 23
            ENDIF
            IF (col_ax.EQ.t_dim .OR. col_ax .EQ. f_dim) THEN
-              IF (alen .GT. 0) alen = alen + 1
               IF (col_ax.EQ.t_dim) THEN
-                 line_buff(alen+1:) = 'Verification'
-                 alen = alen + 14
+                 line_buff(alen:) = 'Forecasted time (T) '
+                 alen = alen + 20
               ELSE
-                 line_buff(alen+1:) = 'Initialization'
-                 alen = alen + 16
+                 line_buff(alen:) = 'Time of forecast (F) '
+                 alen = alen + 21
               ENDIF
-              line_buff(alen:) = "time increases down page."
-              alen = alen + 25
+              line_buff(alen:) = 'increases down page.  '
+              alen = alen + 22
            ENDIF
-           CALL SPLIT_LIST(pttmode_explct,list_lun,
-     .      '             '//line_buff,alen+13)
+           CALL SPLIT_LIST(pttmode_explct, list_lun,
+     .                     '           '//line_buff, alen+10)
         ENDIF
 
 * * * * * DETERMINE LIST LIMITS * * *

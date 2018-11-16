@@ -59,7 +59,7 @@
 *	ref_fvar  - the first member file variable with an acceptable grid
 *	status	  - return status
 
-      IMPLICIT NONE
+        IMPLICIT NONE
 	include 'netcdf.inc'
 #include "tmap_dset.parm"
         include 'tmap_dims.parm'

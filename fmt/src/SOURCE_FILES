@@ -1,5 +1,4 @@
 SRCS_F = \
-cd_1d_line_from_2d.F\
 cd_abort_grids.F\
 cd_add_coord_var.F\
 cd_add_agg_var_info.F\
@@ -63,7 +62,6 @@ cd_isit_coordvar.F\
 cd_isit_epic.F\
 cd_isit_recdim.F\
 cd_load_dset_attrs.F\
-cd_make_fmrc_axes.F\
 cd_make_var.F\
 cd_ncclose.F\
 cd_ncopen.F\
@@ -90,7 +88,6 @@ cd_rename_dim.F\
 cd_rename_var.F\
 cd_replace_attr.F\
 cd_replace_attr_dp.F\
-cd_scan_aux_coords.F\
 cd_scan_vars.F\
 cd_set_att_axdir.F\
 cd_set_att_flag.F\
@@ -162,7 +159,6 @@ tm_check_box_loc.F\
 tm_check_bnds.F\
 tm_check_bnds_attrib.F\
 tm_check_coords.F\
-tm_check_fmrc_bnds_attrib.F\
 tm_check_bnds_centered.F\
 tm_check_edges_attrib.F\
 tm_check_line.F\

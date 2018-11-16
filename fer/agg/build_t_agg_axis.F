@@ -1,7 +1,6 @@
-	SUBROUTINE BUILD_T_AGG_AXIS (dset_num, nagfiles,
-     .			memb_order, memb_filename,
-     .			memb_tstep_start, memb_tstep_end,
-     .			memb_nsteps, t_regular, use_strict, status)
+        SUBROUTINE BUILD_T_AGG_AXIS(dset_num, nagfiles, memb_filename,
+     .             memb_tstep_start, memb_tstep_end, memb_nstep_start,
+     .             memb_nsteps, memb_order, status)
 
 
 *  This software was developed by the Thermal Modeling and Analysis
@@ -39,12 +38,10 @@
 
 
 *  Modify the time axis that was defined by the first file of the T-agg
-*  through the inclusion time information from all of the member files in
-*  the aggregation.
-*  If the file time metadata information was not provided (i.e. in the
-*  argument arrays memb_*), then fill in that metadata here, while creating the
-*  aggregated time axis
-*  If the files as-provided were out of order, then sort them
+*  through the inclusion time information from all of the member files
+*  in the aggregation.  Fill in the file time metadata while creating
+*  the aggregated time axis and assign the ordering of the member files
+*  according to this time axis.
 
 
 * Programmer Steve Hankin
@@ -60,11 +57,11 @@
 * V72 8/17 *acm*   For trac enhancement #767 -- dynamic coordinate storage
 * V74 1/18 *acm*   Issue 1853 correctly handle aggregations of one timestep
 
-      IMPLICIT NONE
+        IMPLICIT NONE
         include 'tmap_errors.parm'
 #include "tmap_dset.parm"
         include 'tmap_dims.parm'
-	include	'ferret.parm'
+	include 'ferret.parm'
 	include 'xdset_info.cmn_text'
 	external xdset_info_data
 	include 'xdset_info.cd_equiv'
@@ -83,36 +80,29 @@
 
 * arguments:
 
-*	dset_num	- dataset number 1st file -- to become the T agg
-*	nagfiles	- number of files in the aggregation (input)
-*	memb_order	- ordering index of files (input empty/output filled)
-*	memb_filename	- array of filenames (input)
-*	memb_tstep_start- array of first timestep in each file (input)
-*	memb_tstep_end	- array of last  timestep in each file (input)
-*	memb_nsteps	- array of N timesteps in each file (input)
-*			  (unspecified_int4 signals no metadata provided)
-*	t_regular	- flag to signal promise of regular timesteps (input)
-*	use_strict	- flag to allow micro-adjustments of T axis (input)
-*	status		- return status (output)
+*	dset_num	 - dataset number 1st file -- to become the T agg
+*	nagfiles	 - number of files in the aggregation (input)
+*	memb_filename	 - array of filenames (input)
+*	memb_tstep_start - array of first timestep in each file (output)
+*	memb_tstep_end	 - array of last  timestep in each file (output)
+*       memb_nstep_start - array of time axis indices of the first step (output)
+*	memb_nsteps	 - array of N timesteps in each file (output)
+*	memb_order	 - sorted ordering index of files (output)
+*	status		 - return status (output)
 *
 
-* Setting the argument t_regular=.TRUE. signals a promise that every
-* individual file will be regularly spaced with the identical delta,
-* including the delta between files
-
 * Argument definitions
-	LOGICAL		t_regular, use_strict
-	INTEGER		nagfiles, dset_num, status
-	INTEGER		memb_nsteps(nagfiles), memb_order(nagfiles), memb_tline(nagfiles)
-	REAL*8		memb_tstep_start(nagfiles), memb_tstep_end(nagfiles)
-	CHARACTER*512	memb_filename(nagfiles)
+        INTEGER dset_num, nagfiles, memb_nstep_start(nagfiles), 
+     .          memb_nsteps(nagfiles), memb_order(nagfiles), status
+        REAL*8  memb_tstep_start(nagfiles), memb_tstep_end(nagfiles)
+        CHARACTER*512 memb_filename(nagfiles)
 
 
 * local variable declarations:
 	LOGICAL TM_DFPEQ_TOL, ITSA_TRUEMONTH_AXIS, need_midpoints, need_T0_adjust,
      .		swap_axes, true_month, memb_true_month
 	INTEGER TM_LENSTR1, TM_GET_CALENDAR_ID, TM_FIND_LIKE_DYN_LINE,
-     .		taxis, nsteps, dtype, vlen, blen,
+     .		memb_tline(nagfiles), taxis, nsteps, dtype, vlen, blen,
      .		i, ifile, istep, ivar, TMAP_status,
      .		cdfid, vid, bounds_id, gg, ilo, ihi, l, imemb,
      .		startpts(2), numpts(2), d1s, d1e, d2s, d2e,
@@ -127,10 +117,7 @@
 	CHARACTER LEFINT*20, lname*20, vname*64, bname*12, units_str*128,
      .		  calendar_str*128, agg_t0_str*20, file_t0_str*20
 
-* local parameter declaration
-* (this definition should be in a shared declarations file)
-	REAL	depsilon_46
-	PARAMETER (depsilon_46 = 2.**(-46)) 
+	PARAMETER (depsilon = 2.**(-42)) 
 
 * initialize
 	DO i = 1, nagfiles 
@@ -168,18 +155,7 @@
 	CALL GET_LINE_DYNMEM (nsteps, iline, status)
 	IF (status .NE. ferr_ok) GOTO 5100
 
-* set up for a regular or irregular T-agg axis as requested by t_regular
-
-	IF (t_regular .AND. .NOT.line_regular(taxis)) THEN
-	   CALL WARN('/T_REGULAR NOT YET IMPLEMENTED')
-! T_REGULAR HAS NEVER BEEN TESTED
-!* ... convert the irregular t axis of 1st file into a forced-regular axis
-!	   line_start(taxis) = GET_LINE_COORD (lineedg(taxis)%ptr, 1)
-!	   line_regular(taxis) = .TRUE.
-
-!* !! TODO: cancel the dynamic line storage for taxis,...
-
-	ELSEIF (.NOT.t_regular .AND. line_regular(taxis)) THEN
+        IF ( line_regular(taxis) ) THEN
 * ... convert the so-far regular 1st file axis into a forced-irregular axis
 
 	   line_regular(taxis) = .FALSE.
@@ -199,105 +175,18 @@
 	      need_midpoints = .TRUE.
 	   ENDIF
 	
-	ELSEIF (.NOT.t_regular .AND. .NOT.line_regular(taxis)) THEN
+        ELSE
 	    CALL COPY_LINE_COORDS (linemem(taxis)%ptr, linemem(iline)%ptr, nsteps)
 	    CALL COPY_LINE_COORDS (lineedg(taxis)%ptr, lineedg(iline)%ptr, nsteps+1)
 	ENDIF
 
 **
 * Loop through the files of the aggregation, appending time step values.
-* Different logic applies if the caller passed in the time axis metadata.
-* Because the length of the aggregated T axis is not in general known until
-* all of the aggregated files have been consulted, we cannot put the cell
-* boundaries in their usual place immediately following the cell positions.
-* Instead we temporarily locate the irregular cell boundaries at the *top*
-* of the line_mem array working backwards, copying them into their proper
-* position after the cell marker coordinates are all in place.
-
-
-! dynamic coord storage:  How to do this? define temporary lines and aggregate them when all done?
-
-	IF (memb_nsteps(1) .NE. unspecified_int4) THEN
-
-!!!!! THIS LOGIC HAS NOT BEEN TESTED -- INTENDED FOR PYTHON INTERFACE
-
-
-* time metadata has been provided by caller (i.e. python program)
-* note that the metadata of the first file is ignored since already read
-* directly from the file, itself
-	   IF (t_regular) THEN
-	      CONTINUE
-!	      highest_tstep = line_start(taxis)
-!     .			    + line_dim(taxis)*line_delta(taxis)
-!	      DO ifile = 2, nagfiles
-!	         highest_tstep = memb_tstep_end(ifile)
-!	         line_dim(taxis) = line_dim(taxis) + memb_nsteps(ifile)
-!	      ENDDO
-	   ELSE
-	      DO ifile = 2, nagfiles
-
-	         IF (memb_nsteps(ifile) .GT. 1 ) THEN
-	            delta = (memb_tstep_end(ifile) - memb_tstep_start(ifile))
-     .		       / (memb_nsteps(ifile)-1)
-	         ELSE
-	            delta = 0.0
-	         ENDIF
-c	         DO istep = 0, memb_nsteps(ifile)-1
-c	            line_mem(next_line_mem_pos+line_dim(taxis)+istep) 
-c     .		         = memb_tstep_start(ifile) + delta*istep
-c  untested....
-c	            CALL PUT_LINE_COORD ( linemem(iline)%ptr, istep, line_start(taxis)
-c     .		      + (istep-1)* line_delta(taxis) )
-
-c	         ENDDO
-	         line_dim(taxis) = line_dim(taxis) + memb_nsteps(ifile)
-	      ENDDO
-	      need_midpoints = .TRUE.
-	   ENDIF
-	ELSE
-
-* time metadata has not been provided - we must read it from the files
 * insert the metadata of the first file (so far opened as netCDF dataset)
 	   ifile = 1
 	   memb_nsteps     (ifile) = nsteps
 	   memb_tstep_start(ifile) = GET_LINE_COORD (linemem(iline)%ptr, 1)
 	   memb_tstep_end  (ifile) = GET_LINE_COORD (linemem(iline)%ptr, nsteps)
-
-	   IF (t_regular) THEN
-	      CALL WARN('/T_REGULAR NOT YET IMPLEMENTED')
-!	      highest_tstep = line_start(taxis)
-!     .			    + line_dim(taxis)*line_delta(taxis)
-!	      DO ifile = 2, nagfiles
-!* ... read the length of the time axis from the file to be aggregated
-!	         CALL CD_QUIK_NCOPEN (dset_num, memb_filename(ifile),
-!     .				      vname(:vlen),
-!     .				      cdfid, vid, bounds_id,
-!     .				      units_str, calendar_str,
-!     .				      nsteps, TMAP_status)
-!	         IF (TMAP_status .NE. merr_ok) GOTO 5010
-!* user gives /T_REGULAR as a promise of file compatibility, so no checking
-!* of units and calendar attributes
-!	         memb_nsteps(ifile) = nsteps
-!* ... read the first and last time step values from the axis
-!! it's faster to compute the first and last than to read them
-!! reading last, anyway, so that if the promise of regular points is a lie
-!! at least the range of the time axis will be correct
-!!	         CALL CD_RD_R8_1(cdfid, vid,     1,dtype,vname(:vlen),
-!!     .                           memb_tstep_start(ifile), status )
-!!	         IF ( status .NE. merr_ok ) GOTO 5010
-!	         CALL CD_RD_R8_1(cdfid, vid,nsteps,dtype,vname(:vlen),
-!     .                           memb_tstep_end(ifile),   status )
-!	         IF ( status .NE. merr_ok ) GOTO 5010	         
-!	         line_dim(taxis) = line_dim(taxis) + nsteps
-!	         highest_tstep = memb_tstep_end(ifile)
-!	         line_delta(taxis) = (highest_tstep - line_start(taxis))
-!     .				   /(line_dim(taxis) - 1)
-!	         memb_tstep_start(ifile) = highest_tstep
-!     .				       - (nsteps-1)*line_delta(taxis)
-!	         CALL CD_CLOSE_SET ( cdfid, status)
-!	         IF ( status .NE. merr_ok ) GOTO 5010
-!	      ENDDO
-	   ELSE
 
 	      DO ifile = 2, nagfiles
 * ... first read the length of the time axis from the file to be aggregated
@@ -342,7 +231,7 @@ c	         ENDDO
 
 	         IF (bounds_id .EQ. unspecified_int4) THEN
 * ... cell boundaries NOT available in this file
-*     if not available in any one file, they aare effectively missing
+*     if not available in any one file, they are effectively missing
 	            need_midpoints = .TRUE.
 
 	         ELSEIF (.NOT. need_midpoints) THEN
@@ -402,33 +291,28 @@ c	         ENDDO
 	         CALL CD_CLOSE_SET ( cdfid, status)
 	         IF ( status .NE. merr_ok ) GOTO 5010
 	      ENDDO    ! end of member file loop
-	   ENDIF
-	ENDIF
 
 * START: check over and finalize the aggregation time axis
-	IF (.NOT.t_regular) THEN
 
-* if the files as provided were out of order, then sort them here
-* sort the time coordinates and bounds in line_mem to match the sort order
-* on return, memb_order has been set, and nsteps is the sum of steps in all files
-
+* Get the ordering of the files according to the start time
+           nsteps = 0
 	   DO i = 1, nagfiles
 	      memb_sort(i) = memb_tstep_start(i)
+              nsteps = nsteps + memb_nsteps(i)
 	   ENDDO
-	   CALL SORT_TSERIES_DSETS(nagfiles, nsteps, need_midpoints, 
-     .				   memb_nsteps, memb_order, memb_sort )
+           CALL SORT_TSERIES_DSETS(nagfiles, memb_order, memb_sort)
 
-* combine the coordinates for all lines in orde
+* combine the coordinates for all lines in order
  
            CALL TM_ALLO_TMP_LINE(bigline, status)
 	   CALL GET_LINE_DYNMEM (nsteps, bigline, status)
 	   IF (status .NE. ferr_ok) GOTO 5100
-	   
 	   line_dim(bigline) = nsteps
 
 	   i = 1
 	   ifile = memb_order(i)
 	   iline = memb_tline(ifile)
+           memb_nstep_start(ifile) = 1
 	   sumstep = memb_nsteps(ifile)
 
            CALL COPY_LINE_COORDS (linemem(iline)%ptr, linemem(bigline)%ptr, sumstep)
@@ -438,7 +322,7 @@ c	         ENDDO
            IF (.NOT. need_midpoints) 
      .        CALL COPY_LINE_COORDS (lineedg(iline)%ptr, lineedg(bigline)%ptr, sumstep)
 
-C check for overlap? done in the sort?
+C check for overlap?
 c	   tlast = GET_LINE_COORD (linemem(bigline)%ptr, istep)   ! last time coordinate
 c	   elast = GET_LINE_COORD (lineedg(bigline)%ptr, istep+1) ! upper gridcell edge
 C check for overlap???
@@ -446,6 +330,7 @@ C check for overlap???
 	   DO i = 2, nagfiles
 	      ifile = memb_order(i)
 	      iline = memb_tline(ifile)
+              memb_nstep_start(ifile) = sumstep + 1
 
 	      DO istep = 1, memb_nsteps(ifile)
 	         sumstep = sumstep + 1
@@ -475,7 +360,6 @@ C check for overlap???
 
 * We have now gathered all the coordinates. Re-allocate taxis and put them there,
 * so all the grid setup remains as is
-
 
 	   CALL FREE_LINE_DYNMEM (taxis)
 	   CALL GET_LINE_DYNMEM (nsteps, taxis, status)
@@ -544,7 +428,6 @@ C check for overlap???
 	   IF (nsteps .GT. 1) line_delta(taxis) = dfirst_delta
 	   CALL FREE_LINE_DYNMEM (taxis)
 
-	ENDIF
 * END: check over and finalize the time axis
 
 * does this new time axis match an existing one?
@@ -585,7 +468,8 @@ C check for overlap???
  500	   CONTINUE
 	ENDDO
 	IF (swap_axes) THEN
-	   IF (.NOT.line_regular(taxis)) CALL TM_DEALLO_DYN_LINE(taxis)
+*          ??? should be FREE_LINE_DYNMEM ??? - but already done above
+*	   IF (.NOT.line_regular(taxis)) CALL TM_DEALLO_DYN_LINE(taxis)
 	   bigline = pre_exist
 	ENDIF
 

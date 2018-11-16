@@ -32,7 +32,6 @@
      .		ds_1step(pdsetalloc),ds_lastep(pdsetalloc),
      .		ds_delstep(pdsetalloc),
      .		ds_file_info_ptr(pdsetalloc),
-     .		ds_var_c_cache_ptr(maxvars),
      .		ds_type(pdsetalloc),ds_format(pdsetalloc),
      .		ds_source_class(pdsetalloc),ds_source(pdsetalloc),
      .		ds_subsource(pdsetalloc),ds_prog_rev(pdsetalloc),
@@ -133,4 +132,3 @@
 	INTEGER*4	ds_ndataperrec,ds_nrecpervar,ds_nrecb4var,
      .			ds_var_setnum
 	INTEGER*2	ds_npospervar
-	REAL*8		ds_var_c_cache_ptr

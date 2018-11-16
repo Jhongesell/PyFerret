@@ -238,14 +238,15 @@
 	   ENDIF
 	ENDDO
 
-* the T axis of an F-aggregation has a single set of indices but the time
-* values differ for each axis.  So re-interpret the time range from the indices
-* (Indices are retained throughout from result cx)
-	IF (agg_dim .EQ. f_dim) THEN
-	   cx_by_ss(t_dim, com_cx) = .TRUE.
-	   CALL FLESH_OUT_AXIS(t_dim, com_cx, status )
-	   IF (status .NE. ferr_ok) GOTO 5000
-	ENDIF
+** the T axis of an F-aggregation has a single set of indices but the time
+** values differ for each axis.  So re-interpret the time range from the indices
+** (Indices are retained throughout from result cx)
+* 11/2018 - KMS - T axis of an F aggregation is now complete actual time axis
+*	IF (agg_dim .EQ. f_dim) THEN
+*	   cx_by_ss(t_dim, com_cx) = .TRUE.
+*	   CALL FLESH_OUT_AXIS(t_dim, com_cx, status )
+*	   IF (status .NE. ferr_ok) GOTO 5000
+*	ENDIF
 
 * set up the member variable
 	cx_data_set(com_cx) = memb_dset

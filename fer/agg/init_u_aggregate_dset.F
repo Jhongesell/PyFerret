@@ -75,7 +75,7 @@
 *	agg_dim		- axis of the aggregation (is irrelevant)
 *	status		- return status (output)
 
-      IMPLICIT NONE
+        IMPLICIT NONE
 	include 'netcdf.inc'
         include 'tmap_errors.parm'
 #include "tmap_dset.parm"
@@ -110,7 +110,8 @@
      .		num_indices, j, member, ignored_status
 	REAL	sset
 	CHARACTER TM_STRING*13
-	CHARACTER*512 GET_STRING_ELEMENT_1D_X, memb_dsetname(nsets)
+	CHARACTER*512 GET_STRING_ELEMENT_1D_X
+        CHARACTER*512 memb_dsetname(nsets), memb_filenames(nsets)
 	CHARACTER*10 TM_FMT, strset
 	CHARACTER*128 vname
 
@@ -146,8 +147,8 @@
 	ENDIF
 
 * See if requested datasets are open and if not, try to open them.
-	CALL CHECK_MEMBER_SETS (agg_dim, nsets, memb_dsetname,
-     .				member_sets, status)
+        CALL CHECK_MEMBER_SETS(agg_dim, nsets, memb_dsetname,
+     .                         member_sets, memb_filenames, status)
 	IF (status .NE. ferr_ok) GOTO 9950
 
 * Assign aggregate data set number, exiting if maximum number 

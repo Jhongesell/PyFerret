@@ -150,9 +150,9 @@
       CALL CD_CONSISTENT_AXIS_ORIENT (dset, reversed, perm, status)
       IF ( status .NE. merr_ok ) GOTO 5900
 
-* identify and set up auxiliary coordinate linkages
-      CALL CD_SCAN_AUX_COORDS( dset, cdfid, native_tax, status )
-      IF ( status .NE. merr_ok ) GOTO 5900
+** identify and set up auxiliary coordinate linkages
+*      CALL CD_SCAN_AUX_COORDS( dset, cdfid, native_tax, status )
+*      IF ( status .NE. merr_ok ) GOTO 5900
 
 * set use counts and clean up temporary grids and axes
       CALL TM_GARB_COL_GRIDS (dset)

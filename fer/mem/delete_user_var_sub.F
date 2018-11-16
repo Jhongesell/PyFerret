@@ -161,11 +161,6 @@
 * if this user variable is associated with any dynamic grids release them
 	CALL DEALLO_UVAR_GRIDS(uvar)
 
-* if there is a c cache of the full range variable, free it
-* note: this addition remained untested at the time it was entered
-	IF (uvar_c_cache_ptr(uvar) .NE. 0.0) CALL FREE_CACHED_FULL_ARRAY
-     .						(uvar_c_cache_ptr(uvar))
-
 * eliminate the named variable from the list of uvars
 *	uvar_num_items( uvar ) = uvar_deleted
         CALL deleted_list_modify(uvar_num_items_head,uvar,uvar_deleted)
