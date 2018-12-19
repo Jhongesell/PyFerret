@@ -89,12 +89,12 @@
 *       agg_dset          - number assigned to this data set (output)
 *       agg_quiet         - flag whether to report certain conditions (input)
 *       agg_hide          - flag whether to hide the component datasets (input)
-*       tline             - the forecasted-time axis to use/used (input)
-*       tmatch          - method of matching times to tline (input, can be empty);
-*                         eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
-*       fline             - the time-of-forecast axis to use/used (input)
-*       fmatch          - method of matching times to fline (input, can be empty);
-*                         eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
+*       tline             - the forecasted-time axis to use (input, can be invalid)
+*       tmatch            - method of matching times to tline (input, can be empty);
+*                           eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
+*       fline             - the time-of-forecast axis to use (input, can be invalid)
+*       fmatch            - method of matching times to fline (input, can be empty);
+*                           eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
 *       status            - return status (output)
 
         IMPLICIT NONE
@@ -130,7 +130,6 @@
      .          ii, nv, nvars, nuvars, iline, ref_fvar, num_indices,
      .          ignored, ref_fvars(pmaxvarsperset), axcalt, axcalf,
      .          findices(nsets), t1indices(nsets), tdims(nsets)
-        REAL*8  torigins(nsets)
         LOGICAL OK_AS_AGG_VAR, ITSA_TRUEMONTH_AXIS, match
         CHARACTER*512 GET_STRING_ELEMENT_1D_X
         CHARACTER*512 memb_dsetnames(nsets), memb_filenames(nsets)
@@ -182,34 +181,32 @@
      .                         member_sets, memb_filenames, status)
         IF ( status .NE. ferr_ok ) GOTO 5500
 
-* Sort the given datasets, if appropriate, using the time origin (T0) 
-* of the time axis of each dataset.  Returns the sorted datasets as 
-* well as the time origins.  An error is returned if duplicate time 
-* origins, if used, are found.
-        CALL SORT_FMRC_DSETS(nsets, member_sets, memb_filenames, 
-     .                       fmatch, torigins, status)
+* Assign the time-of-forecast (F) axis from the time origins (T0) of
+* the time axis of each dataset.  If an F-axis to use is not specified,
+* create it from these time origins using the calendar and units of
+* the time axis of the first member.  If appropriate, sort the given
+* datasets using the time origins.  Returns the sorted (if appropriate)
+* datasets, time-of-forecast axis, and locations of the datasets on
+* that axis.
+        CALL DEFINE_F_AGGREGATE_F_AXIS(nsets, member_sets,
+     .           memb_filenames, axcalf, fmatch, findices, status)
         IF (status .NE. ferr_ok) GOTO 5500
 
-* Assign the time-of-forecast (F) axis from the time origins.  If an
-* F-axis to use is not specified, create it from these time origins
-* using the calendar and units of the time axis of the first member.
-*
-* Assign the forecasted-time (T) axis from the time axes or member
-* sets.  If a T-axis to use is not specified, create it from merging
-* all the (hopefully overlapping) times given.
-*
-* An error is raised if any time does not match a time on the appropriate
-* time-of-forecast (F) or forecasted-time (T) axis.
-* At this time, an error is also raised if the forecasted times for a forecast
-* dataset are not consecutive times on the forecasted-time (T) axis.
-        CALL DEFINE_F_AGGREGATE_AXES(nsets, member_sets, torigins,
-     .                         axcalf, fmatch, axcalt, tmatch, 
-     .                         findices, t1indices, tdims, status)
+* Assign the forecasted-time (T) axis from the time axes of the member
+* datasets.  If a T-axis to use is not specified, create it from merging
+* all the (hopefully overlapping) time axis coordinates in the given
+* datasets.  Returns the forecasted-time axis, locations of datasets
+* on that axis, and number of timesteps on that axis for each set.
+        CALL DEFINE_F_AGGREGATE_T_AXIS(nsets, member_sets,
+     .           memb_filenames, axcalf, findices, axcalt,
+     .           tmatch, t1indices, tdims, status)
         IF (status .NE. ferr_ok) GOTO 5500
 
-* create (single-file) stepfile datasets on axcalt for each member set;
-* this changes the IDs in member_sets
-        CALL DEFINE_F_AGG_T_MC_DSETS(nsets, member_sets, 
+* Create forecast datasets corresponding to the given forecast dataset
+* except defined for the full forecasted time axis axcalt.  Do this by
+* create "multifile" netCDF ("MC") T-aggregated datasets for axcalt but
+* with only the single file to the appropriate section of the time axis.
+        CALL DEFINE_F_AGG_T_MC_DSETS(nsets, member_sets,
      .          memb_filenames, axcalt, t1indices, tdims, status)
 
 
@@ -221,8 +218,6 @@
      .        CALL ERRMSG(ferr_aggregate_error, status,
      .             'No slots available for aggregate dataset', *5500)
         ENDDO
-
-* ... too many data sets are open
 
 * 1st member dset sets pattern for all to follow
         dset1 = member_sets(1)

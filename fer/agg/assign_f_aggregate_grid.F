@@ -31,7 +31,7 @@
 *  SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
 *  RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
 *  CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
-*  CONNECTION WITH THE ACCESS, USE OR PERFORMANCE OF THIS SOFTWARE. 
+*  CONNECTION WITH THE ACCESS, USE OR PERFORMANCE OF THIS SOFTWARE.
 *
 * arguments:
 *       agg_dset  - aggregation dataset number (input)
@@ -53,7 +53,7 @@
         include 'xdset_info.cmn_text'
         external xdset_info_data
         include 'xdset_info.cd_equiv'
-        include 'xtm_grid.cmn_text'  
+        include 'xtm_grid.cmn_text'
         include 'xvariables.cmn'
         include 'netcdf.inc'
 
@@ -64,7 +64,7 @@
 
 * local variable declarations:
         INTEGER STR_SAME, TM_LENSTR1,
-     .          var_dset, ref_grid, igrid, agg_grid, idim, 
+     .          var_dset, ref_grid, igrid, agg_grid, idim,
      .          nv, ndim, slen, fvtype, ii, iset, numidx, idx,
      .          digrid, dnv
         CHARACTER vname*128
@@ -144,8 +144,8 @@
         ENDIF
 
 * Hook the aggregated variable into the linked list structures
-        CALL CD_ADD_VAR(agg_dset, vname, agg_fvar, ds_var_title(nv), 
-     .                  ds_var_units(nv), fvtype, .FALSE., 
+        CALL CD_ADD_VAR(agg_dset, vname, agg_fvar, ds_var_title(nv),
+     .                  ds_var_units(nv), fvtype, .FALSE.,
      .                  ds_bad_flag(nv), status)
         IF ( status .NE. ferr_ok )
      .     CALL ERRMSG(ferr_aggregate_error, status,
@@ -166,7 +166,7 @@
                  IF ( STR_SAME(ds_var_code(nv), vname) .NE. 0 ) CYCLE
                  igrid = ds_grid_number(nv)
                  fvtype = cat_file_var
-                 CALL CD_ADD_AGG_VAR_INFO(agg_dset, vname, ii, fvtype, 
+                 CALL CD_ADD_AGG_VAR_INFO(agg_dset, vname, ii, fvtype,
      .                                iset, igrid, axcalf, nv, status)
                  IF ( status .NE. ferr_ok )
      .              CALL ERRMSG(ferr_aggregate_error, status,
@@ -201,7 +201,7 @@
                  GOTO 100
               ENDDO
            ELSE
-* ... add the dummy data set as a part of this variable 
+* ... add the dummy data set as a part of this variable
 *     Note that the first member of the agg by common sense cannot be a dummy
               fvtype = cat_file_var
               CALL CD_ADD_AGG_VAR_INFO(agg_dset, vname, ii, fvtype,
@@ -210,7 +210,7 @@
      .              CALL ERRMSG(ferr_aggregate_error, status,
      .                          'Unable to add user global var info', *5000)
            ENDIF
-* ... grab information from the first dataset to reuse with dummy datasets 
+* ... grab information from the first dataset to reuse with dummy datasets
   100      IF ( ii .EQ. 1 ) THEN
 *    ... OK_AS_AGG_VAR guarantees grid is always valid -- even for LET/D vars
               IF (igrid .EQ. unspecified_int4)

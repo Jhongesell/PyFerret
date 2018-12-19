@@ -111,7 +111,7 @@
         agg_T0_str    = line_T0(given_taxis)
         agg_cal_id    = TM_GET_CALENDAR_ID(line_cal_name(given_taxis))
 
-        IF ( tmatch .EQ. '@ASN' ) THEN 
+        IF ( tmatch .EQ. '@ASN' ) THEN
            GOTO 1000
         ELSE IF ( tmatch .EQ. '@BIN' ) THEN
            epsil = -1.0
@@ -332,10 +332,10 @@
 *          Assign the time steps for this file using the given axis coordinates
            i = memb_nstep_start(ifile)
            IF ( line_regular(given_taxis) ) THEN
-              memb_tstep_start(ifile) = line_start(given_taxis) + 
-     .                   line_delta(given_taxis) * (i-1) 
-              memb_tstep_end(ifile) = line_start(given_taxis) + 
-     .                   line_delta(given_taxis) * (i+nsteps-1) 
+              memb_tstep_start(ifile) = line_start(given_taxis) +
+     .                   line_delta(given_taxis) * (i-1)
+              memb_tstep_end(ifile) = line_start(given_taxis) +
+     .                   line_delta(given_taxis) * (i+nsteps-1)
            ELSE
               memb_tstep_start(ifile) =
      .             GET_LINE_COORD(linemem(given_taxis)%ptr, i)

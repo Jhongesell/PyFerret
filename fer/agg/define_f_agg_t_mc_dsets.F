@@ -98,15 +98,15 @@
            sf_regtimes(istep)  = line_regular(axcalt)
            IF ( line_regular(axcalt) ) THEN
               sf_delta(istep)  = line_delta(axcalt)
-              sf_1step(istep)  = line_start(axcalt) + 
+              sf_1step(istep)  = line_start(axcalt) +
      .              (sf_ndxs(istep) - 1) * line_delta(axcalt)
               sf_lastep(istep) = line_start(axcalt) +
      .              (sf_ndxe(istep) - 1) * line_delta(axcalt)
            ELSE
               sf_delta(istep)  = 0.0
-              sf_1step(istep)  = 
+              sf_1step(istep)  =
      .              GET_LINE_COORD(linemem(axcalt)%ptr, sf_ndxs(istep))
-              sf_lastep(istep) = 
+              sf_lastep(istep) =
      .              GET_LINE_COORD(linemem(axcalt)%ptr, sf_ndxe(istep))
            ENDIF
 *          dataset is not open
