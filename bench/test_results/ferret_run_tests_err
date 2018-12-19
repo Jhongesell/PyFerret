@@ -1169,9 +1169,10 @@ POLYGON/KEY/LEV=0.01d/coord_ax=Z  PLMxpoly+PLMxpolymark, PLMypoly+PLMypolymark, 
  PERMANENT data cleared from memory
  TEMPORARY data cleared from memory
 ooooooooooooooooooooooooooooooooooooooooooo
-           *** NOTE: Valid calendars are GREGORIAN NOLEAP    JULIAN    360_DAY   ALL_LEAP
+           *** NOTE: Valid calendars are GREGORIAN,NOLEAP,JULIAN,360_DAY,ALL_LEAP,PROLEPTIC_GREGORIAN
            *** NOTE: calendar attribute on axis "TIME" is not recognized: BADNAME
            *** NOTE: A dummy axis of subscripts will be used
+           *** NOTE: Valid calendars are GREGORIAN,NOLEAP,JULIAN,360_DAY,ALL_LEAP,PROLEPTIC_GREGORIAN
  PERMANENT data cleared from memory
  TEMPORARY data cleared from memory
 ooooooooooooooooooooooooooooooooooooooooooo
@@ -1448,7 +1449,7 @@ def axis/t/bounds tax= {12, 12.2, 36, 36.2, 60, 60.2, 84, 84.2, 108} , {0,24, 0,
            *** NOTE: Error in bounds "TAX_bnds" or bounds do not enclose point on axis TAX
            *** NOTE: Substituting coordinate midpoints
 *** Running ferret script: bn_all_leap.jnl
- **ERROR: command syntax: Invalid calendar name. Names are, GREGORIAN, NOLEAP, JULIAN, 360_DAY, ALL_LEAP
+ **ERROR: command syntax: Invalid calendar name. Names are, GREGORIAN, NOLEAP, JULIAN, 360_DAY, ALL_LEAP, PROLEPTIC_GREGORIAN
 def axis/t/cal=nogood/t=1-jan-2000:1-jan-2010:1/units=months tax
 *** Running ferret script: bn570_bug_fixes.jnl
  PERMANENT data cleared from memory
@@ -1930,6 +1931,7 @@ SET DAT/FORM=CDF this_is_not_a_file.nc
              NetCDF: file not found (OPeNDAP/netCDF Error code -90)
              Data set: http://ferret.pmel.noaa.gov/pmel/thredds/dodsC/data/PMEL/COADS/coads_nothing.cdf
 SET DAT/FORM=CDF "http://ferret.pmel.noaa.gov/pmel/thredds/dodsC/data/PMEL/COADS/coads_nothing.cdf"
+CURL Error: Couldn't resolve host name
 curl error details: 
  **Internet Data error
              NetCDF: I/O failure (OPeNDAP/netCDF Error code -68)
@@ -2131,9 +2133,10 @@ ooooooooooooooooooooooooooooooooooooooooooo
            *** NOTE: Axis has repeated values -- micro-adjusting TIME
            *** NOTE: Error in bounds "TAX_bnds" or bounds do not enclose point on axis TAX
            *** NOTE: Substituting coordinate midpoints
-           *** NOTE: Valid calendars are GREGORIAN NOLEAP    JULIAN    360_DAY   ALL_LEAP
+           *** NOTE: Valid calendars are GREGORIAN,NOLEAP,JULIAN,360_DAY,ALL_LEAP,PROLEPTIC_GREGORIAN
            *** NOTE: calendar attribute on axis "TIME" is not recognized: BADNAME
            *** NOTE: A dummy axis of subscripts will be used
+           *** NOTE: Valid calendars are GREGORIAN,NOLEAP,JULIAN,360_DAY,ALL_LEAP,PROLEPTIC_GREGORIAN
            *** NOTE: Axis definition error on axis: TGAP
            *** NOTE: Bounds given describe non-contiguous axis cells
            *** NOTE: Using the LOWER bound specified for each axis cell
@@ -2200,6 +2203,7 @@ ooooooooooooooooooooooooooooooooooooooooooo
  TEMPORARY data cleared from memory
 ooooooooooooooooooooooooooooooooooooooooooo
 *** Running ferret script: bn_test_opendap.jnl
+CURL Error: Couldn't resolve host name
 curl error details: 
 *** Running ferret script: bn611_bug_fixes.jnl
  PERMANENT data cleared from memory
@@ -3416,6 +3420,8 @@ ooooooooooooooooooooooooooooooooooooooooooo
  PERMANENT data cleared from memory
  TEMPORARY data cleared from memory
 ooooooooooooooooooooooooooooooooooooooooooo
+           *** NOTE: Axis trajectory is of type char or string
+           *** NOTE: A dummy axis of subscripts will be used
  PERMANENT data cleared from memory
  TEMPORARY data cleared from memory
 ooooooooooooooooooooooooooooooooooooooooooo
@@ -5737,8 +5743,33 @@ Replacing definition of axis HRLY_AX
  PERMANENT data cleared from memory
  TEMPORARY data cleared from memory
 ooooooooooooooooooooooooooooooooooooooooooo
+ PERMANENT data cleared from memory
+ TEMPORARY data cleared from memory
+ooooooooooooooooooooooooooooooooooooooooooo
+Replacing definition of axis TDATA
+Replacing definition of axis TDATA
+Replacing definition of axis TDATA
 *** Running ferret script: bn_data_squared.jnl
 *** Running ferret script: bn_overlay_graticules.jnl
+*** Running ferret script: bn_mixed_gregorian.jnl
+ LISTing to file mixed_or_proleptic.nc
+ LISTing to file mixed_or_proleptic.nc
+ LISTing to file mixed_or_proleptic.nc
+*** Running ferret script: bn_int64.jnl
+ LISTing to file a.nc
+*** Running ferret script: bn_samplexyz.jnl
+*** Running ferret script: bn745_bug_fixes.jnl
+ PERMANENT data cleared from memory
+ TEMPORARY data cleared from memory
+ooooooooooooooooooooooooooooooooooooooooooo
+           *** NOTE: Axis time_dim_1 is of type char or string
+           *** NOTE: A dummy axis of subscripts will be used
+*** Running ferret script: bn_iso8601_time.jnl
+ LISTing to file a.nc
+           *** NOTE: regarding ./data/clim_axes_julian.nc ...
+           *** NOTE: JULIAN climatological axes defined
+           *** NOTE: regarding ./data/clim_axes_gregorian.nc ...
+           *** NOTE: GREGORIAN climatological axes defined
 *** Running ferret script: bn_gif.jnl
  **ERROR: dimensions improperly specified: specified data is not a line
            - its a 2D region: "plot/i=1:10/j=1:20/nolabel i+j"

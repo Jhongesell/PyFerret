@@ -2,7 +2,7 @@
      .                           loss, hiss, ax_type,  edges_flag, 
      .                           do_bounds, mode_upcase_output,  
      .                           keepax_flag, name_from_grid, dim_only, 
-     .				 status )
+     .				 date_fmt_out, status )
 
 
 *  This software was developed by the Thermal Modeling and Analysis
@@ -131,6 +131,9 @@
 *                 An axis made from a dimension-only is not written out as the 
 *                 record axis.
 * V74  *acm*  7/2018 Issue # 1882, save/nobounds on monthly axis
+* V7.44 11/18 *acm* Issue 1905: add int64 as a netcdf data type, recognize 
+*                   other newer types 
+* v745 *acm* 12/18 Issue 1909, option to write dates in ISO8601 format
 
 * argument definitions:
 *     dset    - dset (if netcdf file, for getting name and attribute 
@@ -170,7 +173,7 @@
 * argument declarations
       LOGICAL recdim, mode_upcase_output, name_from_grid
       INTEGER cdfid, dset, grid, idim, loss, hiss, ax_type, 
-     .        edges_flag, keepax_flag, do_bounds, status
+     .        edges_flag, keepax_flag, do_bounds, date_fmt_out, status
 
 * local variable declarations:
 * *kob* explicit definitions not allowed on decl line in linux...
@@ -401,6 +404,16 @@
 	    outtype = vartype
          ENDIF
       ENDIF
+
+* For now anyway write an axis that came in as INT64 using NF_DOUBLE instead.
+* The NF_DEF_VAR below fails if the type is set to int64. 
+* The unsigned integer types are defined but also not currently allowed by 
+* NF_DEF_VAR, so switch to the signed versions.
+
+      IF (outtype .EQ. NF_INT64 .OR. 
+     .    outtype .EQ. NF_UINT64) outtype = NF_DOUBLE  
+      IF (outtype .EQ. NF_USHORT) outtype = NF_SHORT  
+      IF (outtype .EQ. NF_UINT) outtype = NF_INT  
 
 * If axis came in packed we are not going to re-pack it on output (for now).
 * write it as double and add a note.
@@ -714,6 +727,11 @@
             ELSE 
                attoutflag = 1
             ENDIF
+
+* If they have set MODE DATE_FORMAT:ISO then convert the date string
+            CALL TM_DATE_REFORMAT(datebuff, pdate_vax, cal_id,
+     .                            datebuff, date_fmt_out,
+     .                            .TRUE., status )
 
             IF (attoutflag .EQ. 1) 
 #ifdef usingDODSf2cUnderscore

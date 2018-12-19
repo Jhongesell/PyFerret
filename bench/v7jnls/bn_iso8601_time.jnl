@@ -1,0 +1,83 @@
+! bn_iso8601_time.jnl
+! test output when MODE DATE_FORMAT is set to ISO
+!
+! 12/11/2018  ACM
+!  By the way, xml output that shows time info, and dates that
+!  are part of time-axis units written to netcdf files have
+!  already been converted to yyyy-mm-dd dates
+
+show mode date_format
+set mode date:iso
+show mode date_format
+
+! Time in headers and listings shown in yyyy-mm-dd form
+
+use gt4d011
+list/i=100/j=40/k=1/l=1:4 temp
+! multi-var
+list/i=100/j=40/k=1/l=5:12  u,v
+
+save/clobber/file=a.nc/k=1 temp
+use a.nc
+show att (`temp,return=taxis`)
+
+cancel data 2
+
+! time label on a plot
+shade/l=2/k=2 temp
+show symbol lab($labnum_t)
+
+cancel data/all
+
+! For modulo axes list the year as defined in the axis.
+! ISO-8601 date formatting must include a year.
+
+use coads_climatology
+list/x=301/y=-47 sst
+
+cancel data/all
+
+! The seasonal axes in clim_axes_gregorian, clim_axes_julian etc start
+! in year 0001 and extend into year 0002.  Show the acutal year.
+use clim_axes_julian; can data clim_axes_julian
+let tt = t[gt=JFM_IRREG_JUL]
+list tt
+let tt = t[gt=NDJ_REG_JUL]
+list tt
+
+! The date string shows year 0002.  Not the most intuitive thing,
+! but we are stuck with it.
+use gtsa056_2
+use clim_axes_gregorian; can data clim_axes_gregorian
+let temp_seas = temp[gt=NDJ_REG_GRG@mod]
+shade/L=2/K=2 temp_seas
+show symbol lab($labnum_t)
+
+cancel data/all
+
+! Define a high-resolution time axis. Dates on the row-headers 
+! as well as output shown by TAX_DATESTRING are ISO-8601 formatted and 
+! include fractional part.
+
+define axis/t="4-dec-2018:02:20":"4-dec-2018:02:22"/t0=1-dec-2018/units=seconds/npoints=411 tfrac
+let tt = t[gt=tfrac]
+list/l=30:36/prec=12 tt, tax_datestring(tt,tt,"sec")
+
+
+! tax_ functions 
+
+use gt4d011
+
+list/L=15:20 tax_datestring(t[gt=temp],temp,"hour")
+list/L=15:20 tax_datestring(t[gt=temp],temp,"day")
+list/L=15:20 tax_dayfrac(t[gt=temp],temp), tax_dayfrac(t[gt=temp],temp)*24.
+list/L=15:20 tax_day(t[gt=temp],temp), tax_jday(t[gt=temp],temp) 
+list/L=15:20 tax_month(t[gt=temp],temp), tax_yearfrac(t[gt=temp],temp)
+list/L=15:20 tax_year(t[gt=temp],temp)
+list tax_units(temp)
+
+! Return to default format. The mode is never set to false
+! Alternatively can SET MODE DATE_FORMAT:DEFAULT
+
+cancel mode date_format
+show mode date_format

@@ -1,6 +1,6 @@
         SUBROUTINE INIT_F_AGGREGATE_DSET(memb_dsetname_var,
      .     nsets, have_expr, dname, dpath, dtitle, agg_dset,
-     .     agg_quiet, agg_hide, tline, fline, status)
+     .     agg_quiet, agg_hide, tline, tmatch, fline, fmatch, status)
 *
 *  This software was developed by the Thermal Modeling and Analysis
 *  Project(TMAP) of the National Oceanographic and Atmospheric
@@ -90,7 +90,11 @@
 *       agg_quiet         - flag whether to report certain conditions (input)
 *       agg_hide          - flag whether to hide the component datasets (input)
 *       tline             - the forecasted-time axis to use/used (input)
+*       tmatch          - method of matching times to tline (input, can be empty);
+*                         eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
 *       fline             - the time-of-forecast axis to use/used (input)
+*       fmatch          - method of matching times to fline (input, can be empty);
+*                         eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
 *       status            - return status (output)
 
         IMPLICIT NONE
@@ -111,7 +115,7 @@
         include 'xfr_grid.cmn'
 
 * calling argument declarations:
-        CHARACTER*(*) dname, dpath, dtitle
+        CHARACTER*(*) dname, dpath, dtitle, tmatch, fmatch
         INTEGER nsets, agg_dset, tline, fline, status
         LOGICAL have_expr, agg_quiet, agg_hide
         REAL memb_dsetname_var(*)
@@ -178,11 +182,12 @@
      .                         member_sets, memb_filenames, status)
         IF ( status .NE. ferr_ok ) GOTO 5500
 
-* Sort the given datasets using the time origin (T0) of the time axis
-* of each dataset.  Returns the sorted datasets as well as the time
-* origins.  An error is returned if duplicate time origins are found.
+* Sort the given datasets, if appropriate, using the time origin (T0) 
+* of the time axis of each dataset.  Returns the sorted datasets as 
+* well as the time origins.  An error is returned if duplicate time 
+* origins, if used, are found.
         CALL SORT_FMRC_DSETS(nsets, member_sets, memb_filenames, 
-     .                       torigins, status)
+     .                       fmatch, torigins, status)
         IF (status .NE. ferr_ok) GOTO 5500
 
 * Assign the time-of-forecast (F) axis from the time origins.  If an
@@ -198,7 +203,8 @@
 * At this time, an error is also raised if the forecasted times for a forecast
 * dataset are not consecutive times on the forecasted-time (T) axis.
         CALL DEFINE_F_AGGREGATE_AXES(nsets, member_sets, torigins,
-     .             axcalf, axcalt, findices, t1indices, tdims, status)
+     .                         axcalf, fmatch, axcalt, tmatch, 
+     .                         findices, t1indices, tdims, status)
         IF (status .NE. ferr_ok) GOTO 5500
 
 * create (single-file) stepfile datasets on axcalt for each member set;

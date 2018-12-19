@@ -266,6 +266,8 @@
 * V740 *acm* 2/18 Issue 966: LET/LIKE= Get attributes from an existing variable
 * V740 *acm* 2/18 Issue 966: DEFINE AXIS/LIKE= Get attributes from an existing axis
 * V740 *acm* 3/18 More on DEF AX/LIKE, getting T0, modulo axis characteristics set correctly.
+* v744 11/2011 *acm* Issue 1906: If PROLEPTIC_GREGORIAN is given then 
+*                  override mixed-gregorian calendar handling.
 
         IMPLICIT NONE
 	include	'tmap_errors.parm'
@@ -430,7 +432,7 @@
      .            dset_to_add, dir, type, attype, attid, ibuff, i0,  
      .            agg_dim, nagfiles, ivar, item, nlab, ierr, nlen,  
      .            llen, line, dstart, units, npts, ipt1, ipte, iline_b,
-     .            tline, fline
+     .            tline, fline, idx, vaxcode
 
 	REAL	  rbuff, bad_flag, yeardays, 
      .            val, dummy, val_buf, xloc, yloc, halign, angle, size,
@@ -451,7 +453,8 @@
      .            new_att_units*128, new_att_calendar*128,
      .            new_att_t0*128, dcode*2, axdir*1, t0string*128, 
      .            ustring*128, reserved_flow_name(3)*4, is_nan*3,
-     .            buff4*16, buff5*16, datestr*11, likename*64
+     .            buff4*16, buff5*16, datestr*11, likename*64,
+     .            tmatch*32, fmatch*32
 
         CHARACTER*1 tab
 #ifdef NO_INTRINSIC_IN_PARAMETER
@@ -1153,7 +1156,8 @@ c	IF ( .NOT.TM_LEGAL_NAME( buff3 ) ) GOTO 5100
 
 	ENDIF
 
-* *acm* other calendar names* /CALENDAR = GREGORIAN, NOLEAP, JULIAN, 360_DAY, ALL_LEAP
+* *acm* other calendar names* /CALENDAR = GREGORIAN, PROLEPTIC_GREGORIAN, 
+*        NOLEAP, JULIAN, 360_DAY, ALL_LEAP
 *       Gregorian is the default, also may be called STANDARD.
 *       NOLEAP may also be called 365_DAY.
 *       ALL_LEAP may also be called 366_DAY
@@ -1182,6 +1186,7 @@ c	IF ( .NOT.TM_LEGAL_NAME( buff3 ) ) GOTO 5100
         IF (cal_name .EQ. '360') cal_name = '360_DAY' 
         IF (cal_name .EQ. 'D360') cal_name = '360_DAY' 
         IF (cal_name .EQ. 'STANDARD') cal_name = 'GREGORIAN' 
+        IF (cal_name(1:6) .EQ. 'PROLEP') cal_name = 'PROLEPTIC_GREGORIAN' 
         IF (cal_name(1:6) .EQ. 'COMMON') cal_name = 'NOLEAP' 
         IF (cal_name(1:6) .EQ. '365_DA') cal_name = 'NOLEAP' 
         IF (cal_name(1:6) .EQ. '366_DA') cal_name = 'ALL_LEAP' 
@@ -2718,6 +2723,14 @@ c	ENDIF
            ENDIF
            CALL EQUAL_STRING(cmnd_buff(qual_start(iqual):qual_end(iqual)), buff1, status)
            IF ( status .NE. ferr_ok ) RETURN
+* ... check if a method of matching was specified
+           idx = INDEX(buff1, '@')
+           IF ( idx .GT. 0 ) THEN
+              vaxcode = STR_UPCASE(fmatch, buff1(idx:))
+              buff1(idx:) = ' '
+           ELSE
+              fmatch = ' '
+           ENDIF
            fline = TM_GET_LINENUM(buff1)
            IF ( fline .NE. unspecified_int4 ) THEN
 * ... line given by name - don't allow inappropriate units
@@ -2744,6 +2757,14 @@ c	ENDIF
            ENDIF
            CALL EQUAL_STRING(cmnd_buff(qual_start(iqual):qual_end(iqual)), buff1, status)
            IF ( status .NE. ferr_ok ) RETURN
+* ... check if a method of matching was specified
+           idx = INDEX(buff1, '@')
+           IF ( idx .GT. 0 ) THEN
+              vaxcode = STR_UPCASE(tmatch, buff1(idx:))
+              buff1(idx:) = ' '
+           ELSE
+              tmatch = ' '
+           ENDIF
            tline = TM_GET_LINENUM(buff1)
            IF ( tline .NE. unspecified_int4 ) THEN
 * ... line given by name - don't allow inappropriate units
@@ -2863,7 +2884,7 @@ c	ENDIF
         IF (agg_dim .EQ. t_dim) THEN
            CALL INIT_T_AGGREGATE_DSET(memry(mr)%ptr,
      .              nagfiles, have_expr, buff1, buff3, buff2, dset,
-     .              tline, status)
+     .              tline, tmatch, status)
         ELSEIF ( agg_dim .EQ. e_dim ) THEN
            CALL INIT_E_AGGREGATE_DSET (memry(mr)%ptr,
      .              nagfiles, have_expr, buff1, buff3, buff2, dset,
@@ -2871,7 +2892,8 @@ c	ENDIF
         ELSEIF ( agg_dim .EQ. f_dim ) THEN
            CALL INIT_F_AGGREGATE_DSET (memry(mr)%ptr,
      .              nagfiles, have_expr, buff1, buff3, buff2, dset,
-     .              agg_quiet, agg_hide, tline, fline, status)
+     .              agg_quiet, agg_hide, tline, tmatch, 
+     .              fline, fmatch, status)
         ELSE
 	   agg_dim = unspecified_int4
 	   CALL INIT_U_AGGREGATE_DSET (memry(mr)%ptr,

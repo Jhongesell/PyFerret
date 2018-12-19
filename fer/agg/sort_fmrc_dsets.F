@@ -1,5 +1,5 @@
       SUBROUTINE SORT_FMRC_DSETS(nsets, member_sets, member_filenames,
-     .                           torigins, status)
+     .                           fmatch, torigins, status)
 *
 *  This software was developed by the Thermal Modeling and Analysis
 *  Project(TMAP) of the National Oceanographic and Atmospheric
@@ -35,14 +35,17 @@
 *
 * NOAA/PMEL, Seattle, WA - TMAP
 
-* Sort the given datasets using the time origin (T0) of the time axis
-* of each dataset.  Returns the sorted datasets as well as the time
-* origins.  An error is returned if duplicate time origins are found.
+* If appropriate, sort the given datasets using the time origin (T0) 
+* of the time axis of each dataset.  Returns the sorted datasets as 
+* well as the time origins.  An error is returned if duplicate time 
+* origins, if used, are found.
 
 * calling arguments
 *   nsets            - number of datasets given to be aggregated (input)
 *   member_sets      - array of open dataset numbers (input-output)
 *   member_filenames - array of dataset filenames (input-output)
+*   fmatch           - method of matching times to fline (input, can be empty);
+*                      eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
 *   torigins         - array of sorted time origins (output)
 *   status           - return status (output)
 
@@ -57,6 +60,7 @@
 * calling argument declarations:
         INTEGER nsets, member_sets(nsets), status
         CHARACTER*512 member_filenames(nsets)
+        CHARACTER*(*) fmatch
         REAL*8  torigins(nsets)
 
 * local variable declarations:
@@ -66,6 +70,8 @@
         CHARACTER calname*32, torigin_str*20
         REAL*8  SECS_FROM_BC, rindices(nsets)
         LOGICAL TM_DFPEQ
+
+* TODO: use fmatch to decide what to do here
 
 * extract the T0 time from each dataset
         DO iset = 1, nsets

@@ -1,5 +1,6 @@
-        SUBROUTINE DEFINE_T_AGG_MC_DSET(dset_name, dset_path, 
-     .    dset_title, nagfiles, memb_filename, tline, dset_num, status)
+        SUBROUTINE DEFINE_T_AGG_MC_DSET(dset_name, dset_path,
+     .                   dset_title, nagfiles, memb_filename,
+     .                   tline, tmatch, dset_num, status)
 
 *
 *  This software was developed by the Thermal Modeling and Analysis
@@ -32,7 +33,7 @@
 *  INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
 *  RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
 *  CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
-*  CONNECTION WITH THE ACCESS, USE OR PERFORMANCE OF THIS SOFTWARE. 
+*  CONNECTION WITH THE ACCESS, USE OR PERFORMANCE OF THIS SOFTWARE.
 *
 *
 * Define and initialize a MC (T-aggregated netCDF) dataset from a list
@@ -54,6 +55,8 @@
 *	nagfiles	- number of files in the aggregation (input)
 *	memb_filename	- array of filenames (input)
 *       tline           - user-provided time axis to use (input, can be unspecified)
+*       tmatch          - method of matching times to tline (input, can be empty);
+*                         eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
 *	dset_num	- number assigned to this data set (output)
 *	status		- return status (output)
 *
@@ -61,7 +64,7 @@
         IMPLICIT NONE
 * Argument definitions
 	INTEGER		nagfiles, dset_num, tline, status
-	CHARACTER*(*)	dset_name, dset_path, dset_title
+	CHARACTER*(*)	dset_name, dset_path, dset_title, tmatch
 	CHARACTER*512	memb_filename(nagfiles)
 
 * Parameter and common files
@@ -82,7 +85,7 @@
         include 'xrisc_buff.cmn'
 
 * Internal declarations
-        INTEGER memb_nstep_start(nagfiles), memb_nsteps(nagfiles), 
+        INTEGER memb_nstep_start(nagfiles), memb_nsteps(nagfiles),
      .          member_order(nagfiles)
 	REAL*8  memb_tstep_start(nagfiles), memb_tstep_end(nagfiles)
         LOGICAL	match
@@ -119,7 +122,7 @@
 
         IF ( tline .NE. unspecified_int4 ) THEN
 * Verify and assign the given time axis for the aggregration
-           CALL ASSIGN_T_AGG_AXIS(tline, dset_num, nagfiles,
+           CALL ASSIGN_T_AGG_AXIS(tline, tmatch, dset_num, nagfiles,
      .             memb_filename, memb_tstep_start, memb_tstep_end,
      .             memb_nstep_start, memb_nsteps, memb_order, status)
         ELSE
@@ -139,7 +142,7 @@
 * change the dataset metadata to make this into an aggregation
 	ds_type(dset_num) = '  MC'
 	ds_name(dset_num) = dset_name
-	ds_des_name(dset_num) = dset_path 
+	ds_des_name(dset_num) = dset_path
 	IF (dset_title .NE. char_init) ds_title(dset_num) = dset_title
 	buff = LEFINT(nagfiles, slen)
 	ds_mod_title(dset_num)      = 'T-aggregation of '
@@ -160,7 +163,7 @@
  5100   CALL ERRMSG( ferr_invalid_command,status,
      .		'given aggregation dataset name already in use: '
      .		//dset_name(:dlen), *5000 )
-      
+
 * get out from error
  9900	CALL TM_PURGE_TMP_GRIDS(TMAP_status)
 	CALL TM_CLOSE_SET ( dset_num, TMAP_status )

@@ -1,6 +1,6 @@
-        SUBROUTINE ASSIGN_T_AGG_AXIS(given_taxis, dset_num, nagfiles,
-     .             memb_filename, memb_tstep_start, memb_tstep_end,
-     .             memb_nstep_start, memb_nsteps, memb_order, status)
+        SUBROUTINE ASSIGN_T_AGG_AXIS(given_taxis, tmatch, dset_num,
+     .     nagfiles, memb_filename, memb_tstep_start, memb_tstep_end,
+     .     memb_nstep_start, memb_nsteps, memb_order, status)
 
 *  This software was developed by the Thermal Modeling and Analysis
 *  Project(TMAP) of the National Oceanographic and Atmospheric
@@ -63,6 +63,8 @@
 * arguments:
 
 *       given_taxis      - time axis number to use (input)
+*       tmatch           - method of matching times to given_taxis (input, can be empty);
+*                          eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
 *       dset_num         - dataset number 1st file -- to become the T agg (input)
 *       nagfiles         - number of files in the aggregation (input)
 *       memb_filename    - array of filenames (input)
@@ -79,23 +81,24 @@
      .          memb_nsteps(nagfiles), memb_order(nagfiles), status
         REAL*8  memb_tstep_start(nagfiles), memb_tstep_end(nagfiles)
         CHARACTER*512 memb_filename(nagfiles)
-
+        CHARACTER*(*) tmatch
 
 * local variable declarations:
-        LOGICAL TM_DFPEQ_TOL, need_T0_adjust
+        LOGICAL TM_DFPEQ_TOL, TM_DIGIT, need_T0_adjust
         INTEGER TM_LENSTR1, TM_GET_CALENDAR_ID,
      .          taxis, agg_nsteps, nsteps, dtype, vlen,
      .          i, ifile, istep, ivar, iline,
      .          cdfid, vid, bounds_id, gg,
      .          agg_unit_code, file_unit_code, agg_cal_id
         REAL*8  TM_WORLD_AX, T0_ADJUST, GET_LINE_COORD,
-     .          depsilon, aggstep, tstep, memb_sort(nagfiles)
-        CHARACTER LEFINT*20, vname*64, units_str*128, 
+     .          depsilon, epsil, aggstep, tstep, lobnd, upbnd,
+     .          memb_sort(nagfiles)
+        CHARACTER LEFINT*20, vname*64, units_str*128,
      .            calendar_str*128, agg_t0_str*20, file_t0_str*20
 
         PARAMETER( depsilon = 2.0**(-42) )
 
-*       Get the time axis name from the first file 
+*       Get the time axis name from the first file
 *       (assumes rest of the files use the same name for the axis)
         taxis          = ds_time_axis(dset_num)
         IF (taxis .EQ. mnormal) GOTO 5020  ! no time axis?
@@ -108,103 +111,299 @@
         agg_T0_str    = line_T0(given_taxis)
         agg_cal_id    = TM_GET_CALENDAR_ID(line_cal_name(given_taxis))
 
-*       Since putting this on a given time axis, treat the first file same as others
+        IF ( tmatch .EQ. '@ASN' ) THEN 
+           GOTO 1000
+        ELSE IF ( tmatch .EQ. '@BIN' ) THEN
+           epsil = -1.0
+        ELSE IF ( tmatch .EQ. '@XACT' ) THEN
+           epsil = depsilon
+        ELSE IF ( tmatch(1:6) .EQ. '@XACT:' ) THEN
+           READ(tmatch(7:), *, ERR=5050) epsil
+           IF ( epsil .LT. 0.0 ) GOTO 5050
+        ELSE IF ( tmatch .EQ. ' ' ) THEN
+           epsil = depsilon
+*          Default is to try @XACT; if not successful, try @BIN; if not successful, use @ASN
+        ELSE
+           GOTO 5050
+        ENDIF
+
         DO ifile = 1, nagfiles
-* ... first read the length of the time axis from the file to be aggregated
-           CALL CD_QUIK_NCOPEN(dset_num, memb_filename(ifile), 
-     .                    vname(:vlen), cdfid, vid, bounds_id, 
-     .                    units_str, calendar_str, nsteps, status)
+*          Read the length of the time axis from the file to be aggregated
+           CALL CD_QUIK_NCOPEN(dset_num, memb_filename(ifile),
+     .                         vname(:vlen), cdfid, vid, bounds_id,
+     .                         units_str, calendar_str, nsteps, status)
            IF (status .NE. merr_ok) GOTO 5010
-* ... check to see if calendar, units, and T0 are consistent with the agg axis
-           CALL CD_GET_T0(memb_filename(ifile), units_str, calendar_str,
-     .                    agg_cal_id, file_unit_code, file_t0_str, status)
-           IF (status .NE. merr_ok) GOTO 5010
+
+*          Check to see if calendar, units, and T0 are consistent with the agg axis
+           CALL CD_GET_T0(memb_filename(ifile), units_str,
+     .                    calendar_str, agg_cal_id,
+     .                    file_unit_code, file_t0_str, status)
+           IF (status .NE. merr_ok) THEN
+*             Only @ASN can be used
+              IF ( tmatch .EQ. ' ' ) GOTO 1000
+              GOTO 5010
+           ENDIF
            need_T0_adjust = (file_unit_code .NE. agg_unit_code)
      .                 .OR. (file_T0_str .NE. agg_T0_str)
            IF (need_t0_adjust) THEN
-              CALL T0_ADJUST_INIT(agg_cal_id, file_unit_code, 
-     .                 file_t0_str, agg_unit_code, agg_t0_str, status)
-              IF (status .NE. ferr_ok) GOTO 5020
+              CALL T0_ADJUST_INIT(agg_cal_id, file_unit_code,
+     .                file_t0_str, agg_unit_code, agg_t0_str, status)
+              IF (status .NE. ferr_ok) THEN
+*                Only @ASN can be used
+                 IF ( tmatch .EQ. ' ' ) GOTO 1000
+                 GOTO 5020
+              ENDIF
            ENDIF
 
-* grab a temporary dynamic axis slot for it
+*          Grab a temporary dynamic axis slot for the file time axis
            CALL TM_ALLO_TMP_LINE(iline, status)
            CALL GET_LINE_DYNMEM(nsteps, iline, status)
            IF (status .NE. ferr_ok) GOTO 5010
 
-* ... read the array of time steps from the file
+*          Read the array of time steps from the file
            CALL CD_RD_R8_ARR(cdfid, vid, 1, nsteps, dtype,
      .              vname(:vlen), linemem(iline)%ptr, status)
-           IF ( status .NE. merr_ok ) GOTO 5010
+           IF ( status .NE. merr_ok ) THEN
+              CALL FREE_LINE_DYNMEM(iline)
+              GOTO 5010
+           ENDIF
 
-* ... adjust the time step values to the agg-chosen "<units> since <T0>"
+*          Adjust the time step values to the agg-chosen "<units> since <T0>"
            IF ( need_T0_adjust ) THEN
               DO istep = 1, nsteps
                  tstep = GET_LINE_COORD(linemem(iline)%ptr, istep)
-                 CALL PUT_LINE_COORD(linemem(iline)%ptr, istep, 
+                 CALL PUT_LINE_COORD(linemem(iline)%ptr, istep,
      .                               T0_ADJUST(tstep))
               ENDDO
            ENDIF
 
-* Verify all the time steps for this file are found and are contiguous on the given axis
-           status = ferr_out_of_range
-           tstep = GET_LINE_COORD(linemem(iline)%ptr, 1)
-           IF ( line_regular(given_taxis) ) THEN
-              DO i = 1, agg_nsteps
-                 aggstep = line_start(given_taxis) + (i-1)*line_delta(given_taxis)
-                 IF ( ABS(tstep - aggstep) .LT. depsilon ) THEN
-                    memb_nstep_start(ifile) = i
+  100      tstep = GET_LINE_COORD(linemem(iline)%ptr, 1)
+           IF ( epsil .GE. 0.0 ) THEN
+*             Match the time axis coordinates "exactly", with a tolerance of epsil
+
+              IF ( line_regular(given_taxis) ) THEN
+                 DO i = 1, agg_nsteps
+                    aggstep = line_start(given_taxis) +
+     .                        (i-1) * line_delta(given_taxis)
+                    IF ( ABS(tstep - aggstep) .LE. epsil ) THEN
+                       memb_nstep_start(ifile) = i
+                       GOTO 200
+                    ENDIF
+                 ENDDO
+                 IF ( tmatch .EQ. ' ' ) THEN
+*                   Try @BIN; previous file matches still valid
+                    epsil = -1.0
                     GOTO 100
                  ENDIF
-              ENDDO
-              GOTO 5020
- 100          DO istep = 2, nsteps
-                 tstep = GET_LINE_COORD(linemem(iline)%ptr, istep)
-                 i = i + 1
-                 IF ( i .GT. agg_nsteps ) GOTO 5020
-                 aggstep = line_start(given_taxis) + (i-1)*line_delta(given_taxis)
-                 IF ( ABS(tstep - aggstep) .GE. depsilon ) GOTO 5020
-              ENDDO
-           ELSE
-              DO i = 1, agg_nsteps
-                 aggstep = GET_LINE_COORD(linemem(given_taxis)%ptr, i)
-                 IF ( ABS(tstep - aggstep) .LT. depsilon ) THEN
-                    memb_nstep_start(ifile) = i
-                    GOTO 200
+                 CALL FREE_LINE_DYNMEM(iline)
+                 GOTO 5020
+  200            DO istep = 2, nsteps
+                    tstep = GET_LINE_COORD(linemem(iline)%ptr, istep)
+                    i = i + 1
+                    IF ( i .GT. agg_nsteps ) THEN
+*                      Only @ASN can be used
+                       CALL FREE_LINE_DYNMEM(iline)
+                       IF ( tmatch .EQ. ' ' ) GOTO 1000
+                       GOTO 5040
+                    ENDIF
+                    aggstep = line_start(given_taxis) +
+     .                        (i-1) * line_delta(given_taxis)
+                    IF ( ABS(tstep - aggstep) .GT. epsil ) THEN
+                       IF ( tmatch .EQ. ' ' ) THEN
+*                         Try @BIN; previous file matches still valid
+                          epsil = -1.0
+                          GOTO 100
+                       ENDIF
+                       CALL FREE_LINE_DYNMEM(iline)
+                       GOTO 5020
+                    ENDIF
+                 ENDDO
+              ELSE
+                 DO i = 1, agg_nsteps
+                    aggstep = GET_LINE_COORD(linemem(given_taxis)%ptr,i)
+                    IF ( ABS(tstep - aggstep) .LE. epsil ) THEN
+                       memb_nstep_start(ifile) = i
+                       GOTO 300
+                    ENDIF
+                 ENDDO
+                 IF ( tmatch .EQ. ' ' ) THEN
+*                   Try @BIN; previous file matches still valid
+                    epsil = -1.0
+                    GOTO 100
                  ENDIF
-              ENDDO
-              GOTO 5020
- 200          DO istep = 2, nsteps
-                 tstep = GET_LINE_COORD(linemem(iline)%ptr, istep)
-                 i = i + 1
-                 IF ( i .GT. agg_nsteps ) GOTO 5020
-                 aggstep = GET_LINE_COORD(linemem(given_taxis)%ptr, i)
-                 IF ( ABS(tstep - aggstep) .GE. depsilon ) GOTO 5020
-              ENDDO
-           ENDIF
-           status = ferr_ok
+                 CALL FREE_LINE_DYNMEM(iline)
+                 GOTO 5020
+  300            DO istep = 2, nsteps
+                    tstep = GET_LINE_COORD(linemem(iline)%ptr, istep)
+                    i = i + 1
+                    IF ( i .GT. agg_nsteps ) THEN
+*                      Only @ASN can be used
+                       CALL FREE_LINE_DYNMEM(iline)
+                       IF ( tmatch .EQ. ' ' ) GOTO 1000
+                       GOTO 5040
+                    ENDIF
+                    aggstep = GET_LINE_COORD(linemem(given_taxis)%ptr,i)
+                    IF ( ABS(tstep - aggstep) .GT. epsil ) THEN
+                       IF ( tmatch .EQ. ' ' ) THEN
+*                         Try @BIN; previous file matches still valid
+                          epsil = -1.0
+                          GOTO 100
+                       ENDIF
+                       CALL FREE_LINE_DYNMEM(iline)
+                       GOTO 5020
+                    ENDIF
+                 ENDDO
+              ENDIF
 
-* Assign the time steps for this file
-           memb_tstep_start(ifile) = 
-     .        GET_LINE_COORD(linemem(iline)%ptr, 1)
-           memb_tstep_end(ifile) = 
-     .        GET_LINE_COORD(linemem(iline)%ptr, nsteps)
+           ELSE
+*             Match the time axis coordinates by cell boundaries
+
+              IF ( line_regular(given_taxis) ) THEN
+                 DO i = 1, agg_nsteps
+                    lobnd = line_start(given_taxis) +
+     .                      (i-1.5) * line_delta(given_taxis)
+                    upbnd = line_start(given_taxis) +
+     .                      (i-0.5) * line_delta(given_taxis)
+                    IF ( (tstep.GE.lobnd) .AND. (tstep.LT.upbnd) ) THEN
+                       memb_nstep_start(ifile) = i
+                       GOTO 400
+                    ENDIF
+                 ENDDO
+*                Only @ASN can be used
+                 CALL FREE_LINE_DYNMEM(iline)
+                 IF ( tmatch .EQ. ' ' ) GOTO 1000
+                 GOTO 5020
+  400            DO istep = 2, nsteps
+                    tstep = GET_LINE_COORD(linemem(iline)%ptr, istep)
+                    i = i + 1
+                    IF ( i .GT. agg_nsteps ) THEN
+*                      Only @ASN can be used
+                       CALL FREE_LINE_DYNMEM(iline)
+                       IF ( tmatch .EQ. ' ' ) GOTO 1000
+                       GOTO 5040
+                    ENDIF
+                    lobnd = line_start(given_taxis) +
+     .                      (i-1.5) * line_delta(given_taxis)
+                    upbnd = line_start(given_taxis) +
+     .                      (i-0.5) * line_delta(given_taxis)
+                    IF ( (tstep.LT.lobnd) .OR. (tstep.GE.upbnd) ) THEN
+*                      Only @ASN can be used
+                       CALL FREE_LINE_DYNMEM(iline)
+                       IF ( tmatch .EQ. ' ' ) GOTO 1000
+                       GOTO 5020
+                    ENDIF
+                 ENDDO
+              ELSE
+                 DO i = 1, agg_nsteps
+                    lobnd = GET_LINE_COORD(lineedg(given_taxis)%ptr,i)
+                    upbnd = GET_LINE_COORD(lineedg(given_taxis)%ptr,i+1)
+                    IF ( (tstep.GE.lobnd) .AND. (tstep.LT.upbnd) ) THEN
+                       memb_nstep_start(ifile) = i
+                       GOTO 500
+                    ENDIF
+                 ENDDO
+*                Only @ASN can be used
+                 CALL FREE_LINE_DYNMEM(iline)
+                 IF ( tmatch .EQ. ' ' ) GOTO 1000
+                 GOTO 5020
+  500            DO istep = 2, nsteps
+                    tstep = GET_LINE_COORD(linemem(iline)%ptr, istep)
+                    i = i + 1
+                    IF ( i .GT. agg_nsteps ) THEN
+*                      Only @ASN can be used
+                       CALL FREE_LINE_DYNMEM(iline)
+                       IF ( tmatch .EQ. ' ' ) GOTO 1000
+                       GOTO 5040
+                    ENDIF
+                    lobnd = GET_LINE_COORD(lineedg(given_taxis)%ptr,i)
+                    upbnd = GET_LINE_COORD(lineedg(given_taxis)%ptr,i+1)
+                    IF ( (tstep.LT.lobnd) .OR. (tstep.GE.upbnd) ) THEN
+*                      Only @ASN can be used
+                       CALL FREE_LINE_DYNMEM(iline)
+                       IF ( tmatch .EQ. ' ' ) GOTO 1000
+                       GOTO 5020
+                    ENDIF
+                 ENDDO
+              ENDIF
+
+           ENDIF
+           CALL FREE_LINE_DYNMEM(iline)
+
+*          Assign the time steps for this file using the given axis coordinates
+           i = memb_nstep_start(ifile)
+           IF ( line_regular(given_taxis) ) THEN
+              memb_tstep_start(ifile) = line_start(given_taxis) + 
+     .                   line_delta(given_taxis) * (i-1) 
+              memb_tstep_end(ifile) = line_start(given_taxis) + 
+     .                   line_delta(given_taxis) * (i+nsteps-1) 
+           ELSE
+              memb_tstep_start(ifile) =
+     .             GET_LINE_COORD(linemem(given_taxis)%ptr, i)
+              memb_tstep_end(ifile) =
+     .             GET_LINE_COORD(linemem(given_taxis)%ptr, i+nsteps-1)
+           ENDIF
            memb_nsteps(ifile) = nsteps
+
         ENDDO
 
-* Get the ordering of the files according to the start time
+*       Get the ordering of the files according to the start time
         DO i = 1, nagfiles
            memb_sort(i) = memb_tstep_start(i)
         ENDDO
         CALL SORT_TSERIES_DSETS(nagfiles, memb_order, memb_sort)
-* Check that the files do not overlap in time
+
+*       Check that the files do not overlap in time
         DO i = 2, nagfiles
            IF ( memb_tstep_start(memb_order(i)) .LE.
-     .          memb_tstep_end(memb_order(i-1)) ) GOTO 5030
+     .          memb_tstep_end(memb_order(i-1)) ) THEN
+*             Only @ASN can be used
+              IF ( tmatch .EQ. ' ' ) GOTO 1000
+              GOTO 5030
+           ENDIF
         ENDDO
 
-* correct all time-dependent variables in this aggregate dataset
-        ds_time_axis(dset_num) = given_taxis
+        IF ( tmatch .EQ. ' ' ) THEN
+           IF ( epsil .LT. 0.0 ) THEN
+              CALL WARN('Time axis coordinates matched using @BIN')
+           ELSE
+              CALL WARN('Time axis coordinates matched using @XACT')
+           ENDIF
+        ENDIF
+        GOTO 4000
+
+*       Blindly associate the time steps contiguously onto the given time axis
+*       in the order the data files were provided
+ 1000   istep = 0
+        DO ifile = 1, nagfiles
+*          Read the length of the time axis from the file to be aggregated
+           CALL CD_QUIK_NCOPEN(dset_num, memb_filename(ifile),
+     .                         vname(:vlen), cdfid, vid, bounds_id,
+     .                         units_str, calendar_str, nsteps, status)
+           IF (status .NE. merr_ok) GOTO 5010
+           IF ( (istep + nsteps) .GT. agg_nsteps ) GOTO 5040
+           memb_nstep_start(ifile) = istep + 1
+*          Record times from the given time axis
+           IF ( line_regular(given_taxis) ) THEN
+              memb_tstep_start(ifile) = line_start(given_taxis) +
+     .                   line_delta(given_taxis) * istep
+              memb_tstep_end(ifile) = line_start(given_taxis) +
+     .                   line_delta(given_taxis) * (istep+nsteps-1)
+           ELSE
+              memb_tstep_start(ifile) =
+     .            GET_LINE_COORD(linemem(given_taxis)%ptr, istep+1)
+              memb_tstep_end(ifile) =
+     .            GET_LINE_COORD(linemem(given_taxis)%ptr, istep+nsteps)
+           ENDIF
+           memb_nsteps(ifile) = nsteps
+           istep = istep + nsteps
+           memb_order(ifile) = ifile
+        ENDDO
+        IF ( tmatch .EQ. ' ' ) THEN
+           CALL WARN('Time axis coordinates matched using @ASN')
+        ENDIF
+
+*       Correct all time-dependent variables in this aggregate dataset
+ 4000   ds_time_axis(dset_num) = given_taxis
         DO ivar = 1, maxvars
            IF ( ds_var_setnum(ivar) .EQ. dset_num ) THEN
               gg = ds_grid_number(ivar)
@@ -213,30 +412,36 @@
                  ds_grid_end(t_dim,ivar) = agg_nsteps
               ENDIF
               IF ( grid_line(t_dim,gg) .EQ. taxis ) THEN
-* ... was this grid modified in this loop an instant ago?
-*     note: Should use the dset var LIST!   Super-inefficient nested loop
+*                Was this grid modified in this loop an instant ago?
+*                Note: Should use the dset var LIST!   Super-inefficient nested loop
                  DO i = 1, ivar-1
                     IF ( ds_var_setnum(i) .EQ. dset_num ) THEN
-                       IF (ds_grid_number(i) .EQ. gg) GOTO 500
-!already done
+                       IF (ds_grid_number(i) .EQ. gg) GOTO 4100
                     ENDIF
                  ENDDO
                  grid_line(t_dim,gg) = given_taxis
-* ... "use" the given time axis; "un-use" the one from the file
+*                "use" the given time axis; "un-use" the one from the file
                  CALL TM_USE_LINE(given_taxis)
                  CALL TM_DEALLO_DYN_LINE(taxis)
               ENDIF
            ENDIF
- 500       CONTINUE
+ 4100      CONTINUE
         ENDDO
-        IF (.NOT.line_regular(taxis)) CALL FREE_LINE_DYNMEM(taxis)
+        IF ( .NOT.line_regular(taxis) ) CALL FREE_LINE_DYNMEM(taxis)
 
+        status = ferr_ok
  5000   RETURN
+
  5010   CALL ERRMSG(ferr_TMAP_error, status, ' ', *5000)
- 5020   CALL ERRMSG(ferr_grid_definition, status,
-     .              'invalid time axis for the aggregation', *5000)
- 5030   CALL ERRMSG(ferr_grid_definition, status,
+ 5020   CALL ERRMSG(ferr_aggregate_error, status,
+     .   'Given time axis invalid for the aggregation', *5000)
+ 5030   CALL ERRMSG(ferr_aggregate_error, status,
      .   'Time axes overlap for files '//memb_filename(memb_order(i-1))
      .   //' and '//memb_filename(memb_order(i)), *5000)
+ 5040   CALL ERRMSG(ferr_aggregate_error, status,
+     .   'Given time axis not long enough for the aggregation', *5000)
+ 5050   i = TM_LENSTR1(tmatch)
+        CALL ERRMSG(ferr_aggregate_error, status,
+     .   'Invalid time axis assocation "'//tmatch(1:i)//'"', *5000)
 
         END

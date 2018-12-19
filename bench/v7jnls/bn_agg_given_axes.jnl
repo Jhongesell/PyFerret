@@ -1,6 +1,20 @@
 ! bn_agg_given_axes.jnl
 !
 
+!  master forecasted times axis - monthly near the middle of the months
+DEFINE AXIS/UNITS=DAYS/T0=01-JAN-1900/EDGES/T=01-JAN-2001:31-DEC-2024:`365.25/12,prec=12` tax
+
+! dates on which forecasts were made
+LET forecast_dates = { \
+   "01-JAN-2001", "01-JUL-2001", "01-JAN-2002", "01-JUL-2002", "01-JAN-2003", "01-JUL-2003", \
+   "01-JAN-2004", "01-JUL-2004", "01-JAN-2005", "01-JUL-2005", "01-JAN-2006", "01-JUL-2006", \
+   "01-JAN-2007", "01-JUL-2007", "01-JAN-2008", "01-JUL-2008", "01-JAN-2009", "01-JUL-2009", \
+   "01-JAN-2010", "01-JUL-2010", "01-JAN-2011", "01-JUL-2011", "01-JAN-2012", "01-JUL-2012", \
+   "01-JAN-2013", "01-JUL-2013", "01-JAN-2014", "01-JUL-2014", "01-JAN-2015", "01-JUL-2015", \
+   "01-JAN-2016", "01-JUL-2016", "01-JAN-2017", "01-JUL-2017", "01-JAN-2018", "01-JUL-2018", \
+   "01-JAN-2019", "01-JUL-2019" \
+}
+
 ! see if the test file already exists
 SPAWN "/bin/ls -1 aggf/forecast_??.nc"
 
@@ -17,20 +31,6 @@ ELSE
    DEFINE AXIS/Y=15S:10S:1 yax
    DEFINE AXIS/Z=0:10:10/EDGES/UNITS=m zax
 
-   !  master forecasted times axis - monthly near the middle of the months
-   DEFINE AXIS/UNITS=DAYS/T0=01-JAN-1900/EDGES/T=01-JAN-2001:31-DEC-2024:`365.25/12,prec=12` tax
-
-   ! dates on which forecasts were made
-   LET forecast_dates = { \
-      "01-JAN-2001", "01-JUL-2001", "01-JAN-2002", "01-JUL-2002", "01-JAN-2003", "01-JUL-2003", \
-      "01-JAN-2004", "01-JUL-2004", "01-JAN-2005", "01-JUL-2005", "01-JAN-2006", "01-JUL-2006", \
-      "01-JAN-2007", "01-JUL-2007", "01-JAN-2008", "01-JUL-2008", "01-JAN-2009", "01-JUL-2009", \
-      "01-JAN-2010", "01-JUL-2010", "01-JAN-2011", "01-JUL-2011", "01-JAN-2012", "01-JUL-2012", \
-      "01-JAN-2013", "01-JUL-2013", "01-JAN-2014", "01-JUL-2014", "01-JAN-2015", "01-JUL-2015", \
-      "01-JAN-2016", "01-JUL-2016", "01-JAN-2017", "01-JUL-2017", "01-JAN-2018", "01-JUL-2018", \
-      "01-JAN-2019", "01-JUL-2019", \
-   }
-
    REPEAT /NAME=idx /RANGE=1:38:1 ( \
       LET tzero_val = forecast_dates[I=`idx`]; \
       DEFINE SYMBOL tzero_str = `tzero_val`; \
@@ -42,8 +42,6 @@ ELSE
       SET GRID fcstgrid; \
       LET /TITLE="forecasted value" value = X + Y + Z + cos(1.618 * 3.14159 * (T + `tzero,prec=12`) / 365.25) * log(12.0 * T / 365.25); \
       SAVE/CLOBBER/FILE="aggf/forecast_`idx,zw=2`.nc" value; \
-      SAY "Expected values for /N=`idx`"; \
-      LIST value; \
       CANCEL VAR value; \
       SET GRID ABSTRACT; \
       CANCEL GRID fcstgrid; \
@@ -55,36 +53,43 @@ ELSE
       CANCEL VAR tzero_val \
    )
 
-   CANCEL AXIS tax
-   CANCEL VAR forecast_dates
    CANCEL AXIS zax
    CANCEL AXIS yax
    CANCEL AXIS xax
 ENDIF
 SET MODE VERIFY
 
-!  master forecasted times axis - monthly near the middle of the months
-DEFINE AXIS/UNITS=DAYS/T0=01-JAN-1900/EDGES/T=01-JAN-2001:31-DEC-2024:`365.25/12,prec=12` tax
-
-! custom time axis with exactly the same timestamps
+! custom time axis with exactly the same timestamps as the master forecasted time axis
 DEFINE SYMBOL tzero_str = "01-JAN-2001"
 LET tzero = date1900(($tzero_str))
 LET tstart = T[gt=tax,L=1] - tzero
 LET tend = T[gt=tax,L=288] - tzero
 DEFINE AXIS/UNITS=DAYS/T0=($tzero_str)/T=`tstart,prec=12`:`tend,prec=12`:`365.25/12,prec=12` ftax
 
+! forecast axis with exactly the same timestamps as the time-of-forecasts
+LET fdates = DATE1900(forecast_dates) - tzero
+DEFINE AXIS/UNITS=DAYS/T0=($tzero_str)/F ffax=fdates
+CANCEL VAR tzero, tstart, tend, fdates, forecast_dates
+CANCEL SYMBOL tzero_str
+CANCEL AXIS tax
+
 ! test time aggregation on this custom time axis, leaving gaps around each
-LET taggfiles = { "aggf/forecast_02.nc", "aggf/forecast_13.nc", "aggf/forecast_24.nc", "aggf/forecast_35.nc"  }
-DEFINE DATA /AGGREGATE /T /TAXIS=ftax timeagg = taggfiles
-LIST /PREC=6 value
+LET aggfiles = { "aggf/forecast_02.nc", "aggf/forecast_13.nc", "aggf/forecast_24.nc", "aggf/forecast_35.nc"  }
+DEFINE DATA /AGGREGATE /T /TAXIS=ftax timeagg = aggfiles
+LIST /PREC=6 /X=12E /Y=12S /Z=5.0 value
 CANCEL DATA timeagg
-CANCEL VAR taggfiles
+CANCEL VAR aggfiles
 
 ! test forecast aggregation using default axes
-LET faggfiles = SPAWN("/bin/ls -1 aggf/forecast_??.nc")
-DEFINE DATA /AGGREGATE /F forecasts = faggfiles
-LIST /PREC=6 /I=1 /J=1 /K=1 value
-SET REGION /I=1 /J=1 /K=1
-SHADE value
+LET aggfiles = SPAWN("/bin/ls -1 aggf/forecast_??.nc")
+DEFINE DATA /AGGREGATE /F /TAXIS=ftax /FAXIS=ffax forecasts = aggfiles
+LIST /ORDER=TF /PREC=6 /X=12E /Y=12S /Z=5.0 value
+LIST /ORDER=FT /PREC=6 /X=12E /Y=12S /Z=5.0 value
+SHADE /X=12E /Y=12S /Z=5.0 value
 FRAME /FILE=bn_agg_given_axes.gif
+
+CANCEL DATA forecasts
+CANCEL VAR aggfiles
+CANCEL AXIS ffax
+CANCEL AXIS ftax
 

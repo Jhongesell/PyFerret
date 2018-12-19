@@ -75,7 +75,7 @@
 	INTEGER		agg_dset, nsets, dset1, agg_dim, iline, status
 
 * local variable declarations:
-	INTEGER TM_LENSTR, TM_LENSTR1, ALLO_MANAGED_AXIS,
+	INTEGER TM_LENSTR, TM_LENSTR1,
      .		type, coordvar, varid, big_cx, nlen, istep
 	CHARACTER LEFINT*20, ntext*20
 	REAL	bad_flag

@@ -209,6 +209,9 @@
 *                 initialize an aggregation. If given w/o .agg, a hack will look for it.
 * v743  7/18 *acm Issue 1887, numeric dataset names w/o extension, better test 
 *                 for whether it's just a digit, "use n".
+* v743  12/18 *acm* Issue 1803, New command-line switch -verify for set mode ver:always behavior
+* v745 *acm* 12/18 Issue 1909, option to write dates in ISO8601 format
+*                  new mode datefmt for formatted date output
 
         IMPLICIT NONE
 	include 'tmap_dims.parm'
@@ -676,7 +679,7 @@ c *kob* 4/97
 	      IF ( mode.EQ.pmode_GKS .AND. gksopn ) GOTO 5820
 * ... ignore MODE VERIFY from a GO file if MODE VERIFY:ALWAYS is set
 	      IF ( mode.EQ.pmode_verify
-     .	     .AND. mode_arg(mode,1).EQ.3
+     .	     .AND. mode_arg(mode,1).EQ.mode_set_always
      .	     .AND. csp .GT. 0 ) GOTO 820
 	      iarg = unspecified_int4
 	      CALL GET_MODE_ARG( mode, buff2, iarg, status )
@@ -788,6 +791,10 @@ c *kob* 4/97
 
               ELSEIF ( mode .EQ. pmode_desperate ) THEN
 	         CALL WARN("MODE DESPERATE is deprecated. Use MODE FRUGAL")
+
+* ... mode mode_datefmt sets the default output format for dates
+              ELSEIF ( mode .EQ. pmode_datefmt ) THEN
+                 date_fmt_out = mode_arg(pmode_datefmt, 1)
 
 	      ENDIF
 	      GOTO 820

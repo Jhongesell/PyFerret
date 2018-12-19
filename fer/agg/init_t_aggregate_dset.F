@@ -1,7 +1,7 @@
 	SUBROUTINE INIT_T_AGGREGATE_DSET(mem_filename_list,
      .			nagfiles, have_expr,
      .			dset_name, dset_path, dset_title,
-     .			dset_num, tline, status)
+     .			dset_num, tline, tmatch, status)
 *
 *  This software was developed by the Thermal Modeling and Analysis
 *  Project(TMAP) of the National Oceanographic and Atmospheric
@@ -33,11 +33,11 @@
 *  INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
 *  RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
 *  CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
-*  CONNECTION WITH THE ACCESS, USE OR PERFORMANCE OF THIS SOFTWARE. 
+*  CONNECTION WITH THE ACCESS, USE OR PERFORMANCE OF THIS SOFTWARE.
 *
 *
 * Assemble the needed arguments and call DEFINE_T_AGG_MC_DSET
-* The time axis, if not provided, is generated from the time axis metadata 
+* The time axis, if not provided, is generated from the time axis metadata
 * read from each file to be aggregated.
 
 * the incoming command syntax may be
@@ -52,7 +52,7 @@
 *                ==> BUILD_T_AGG_AXIS
 *                ==> INIT_T_AGG_MC_DSET
 
-* V695+ *sh* 11/15 new routine 
+* V695+ *sh* 11/15 new routine
 * V698 *sh* 1/16  pass explicit path name (for "USE file.agg" compatibility)
 * V71 12/16 *acm* For ticket 2158: working with true monthly time axes.
 
@@ -64,6 +64,8 @@
 *	dset_path	- path name to assign to the aggregation (input)
 *	dset_title	- dataset title (input)
 *       tline           - user-provided time axis to use (input, can be unspecified)
+*       tmatch          - method of matching times to tline (input, can be empty);
+*                         eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
 *	dset_num	- number assigned to this data set (output)
 *	status		- return status (output)
 *
@@ -78,7 +80,7 @@
 * Argument definitions
 	LOGICAL		have_expr
 	INTEGER		nagfiles, dset_num, tline, status
-	CHARACTER*(*)	dset_name, dset_path, dset_title
+	CHARACTER*(*)	dset_name, dset_path, dset_title, tmatch
 	REAL		mem_filename_list(*)
 
 * Internal declarations
@@ -105,8 +107,8 @@
 	ENDIF
 
 * now call the "real" routine
-        CALL DEFINE_T_AGG_MC_DSET(dset_name, dset_path, dset_title, 
-     .                    nagfiles, memb_filename, tline, dset_num, status)
+        CALL DEFINE_T_AGG_MC_DSET(dset_name, dset_path, dset_title,
+     .       nagfiles, memb_filename, tline, tmatch, dset_num, status)
 
 * done
 	RETURN

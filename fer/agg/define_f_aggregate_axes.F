@@ -1,5 +1,6 @@
         SUBROUTINE DEFINE_F_AGGREGATE_AXES(nsets, member_sets,
-     .     torigins, fline, tline, findices, t1indices, tdims, status)
+     .                      torigins, fline, fmatch, tline, tmatch,
+     .                      findices, t1indices, tdims, status)
 
 *  This software was developed by the Thermal Modeling and Analysis
 *  Project(TMAP) of the National Oceanographic and Atmospheric
@@ -51,7 +52,11 @@
 *       member_sets - dataset numbers for each forecast dataset (input)
 *       torigins    - time axis origin (in SECS_FROM_BC) for each forecast dataset (input)
 *       fline       - time-of-forecast (F) axis to use/used (input/output)
+*       fmatch      - method of matching times to fline (input, can be empty);
+*                     eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
 *       tline       - forecasted-times (T) axis to use/used (input/output)
+*       tmatch      - method of matching times to tline (input, can be empty);
+*                     eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
 *       findices    - index of each time-axis-origin on the time-of-forecast (F) axis (output)
 *       t1indices   - index of each first-forecasted-time on the forecasted-time (T) axis (output)
 *       tdims       - number of forecasted times for each forecast dataset (output)
@@ -73,6 +78,7 @@
         INTEGER nsets, member_sets(nsets), fline, tline,
      .          findices(nsets), t1indices(nsets), tdims(nsets), status
         REAL*8  torigins(nsets)
+        CHARACTER*(*) fmatch, tmatch
 
 * local variable declarations:
         REAL*8  GET_LINE_COORD, TM_WORLD_AX, SECS_FROM_BC,
@@ -88,6 +94,8 @@
 
         axcalf = fline
         axcalt = tline
+
+* TODO: use fmatch and tmatch to decide how to match times
 
 *       Find the indices of the time origins on the forecast (F) axis
 *       (creating it if not given)
