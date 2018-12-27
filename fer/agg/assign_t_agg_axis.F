@@ -84,7 +84,7 @@
         CHARACTER*(*) tmatch
 
 * local variable declarations:
-        LOGICAL TM_DFPEQ_TOL, TM_DIGIT, need_T0_adjust
+        LOGICAL need_t0_adjust
         INTEGER TM_LENSTR1, TM_GET_CALENDAR_ID,
      .          taxis, agg_nsteps, nsteps, dtype, vlen,
      .          i, ifile, istep, ivar, iline,
@@ -111,6 +111,7 @@
         agg_T0_str    = line_T0(given_taxis)
         agg_cal_id    = TM_GET_CALENDAR_ID(line_cal_name(given_taxis))
 
+*       The allowed difference for an exact match (epsil) is in units of the given time axis
         IF ( tmatch .EQ. '@ASN' ) THEN
            GOTO 1000
         ELSE IF ( tmatch .EQ. '@BIN' ) THEN
@@ -143,7 +144,7 @@
               IF ( tmatch .EQ. ' ' ) GOTO 1000
               GOTO 5010
            ENDIF
-           need_T0_adjust = (file_unit_code .NE. agg_unit_code)
+           need_t0_adjust = (file_unit_code .NE. agg_unit_code)
      .                 .OR. (file_T0_str .NE. agg_T0_str)
            IF (need_t0_adjust) THEN
               CALL T0_ADJUST_INIT(agg_cal_id, file_unit_code,
@@ -169,7 +170,7 @@
            ENDIF
 
 *          Adjust the time step values to the agg-chosen "<units> since <T0>"
-           IF ( need_T0_adjust ) THEN
+           IF ( need_t0_adjust ) THEN
               DO istep = 1, nsteps
                  tstep = GET_LINE_COORD(linemem(iline)%ptr, istep)
                  CALL PUT_LINE_COORD(linemem(iline)%ptr, istep,

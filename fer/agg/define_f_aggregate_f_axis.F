@@ -141,8 +141,7 @@
 *       Make sure the time origins are unique
         epsil = depsilon
         DO setidx = 2, nsets
-           IF ( TM_DFPEQ_TOL(torigins(setidx-1),
-     .                       torigins(setidx), epsil) ) THEN
+           IF ( TM_DFPEQ_TOL(torigins(setidx-1), torigins(setidx), epsil) ) THEN
 *             @ASN only valid option
               IF ( (axcalf .GE. 0 ) .AND. (fmatch .EQ. ' ') ) GOTO 200
               dset  = itmp_memb(setidx)
@@ -278,8 +277,9 @@
      .                 'number of dataset exceeds '//
      .                 'the size of the provided F axis', *5000)
 
+*       The allowed difference for an exact match (epsil) is in units of the given time axis
         IF ( fmatch .EQ. '@ASN' ) THEN
-           GOTO 500
+           GOTO 900
         ELSEIF ( fmatch .EQ. '@BIN' ) THEN
            epsil = -1.0
         ELSEIF ( fmatch .EQ. '@XACT' ) THEN
@@ -298,7 +298,7 @@
         calid = TM_GET_CALENDAR_ID(calname)
         IF ( calid .LE. 0 ) THEN
 *          @ASN only valid option
-           IF ( fmatch .EQ. ' ' ) GOTO 500
+           IF ( fmatch .EQ. ' ' ) GOTO 900
            slen = TM_LENSTR1(calname)
            CALL ERRMSG(ferr_aggregate_error, status,
      .                 'unknown calendar "'//calname(1:slen)//
@@ -308,7 +308,7 @@
         forigin = SECS_FROM_BC(torigin_str, calid, status)
         IF ( status .NE. ferr_ok ) THEN
 *          @ASN only valid option
-           IF ( fmatch .EQ. ' ' ) GOTO 500
+           IF ( fmatch .EQ. ' ' ) GOTO 900
            slen = TM_LENSTR1(torigin_str)
            CALL ERRMSG(ferr_aggregate_error, status,
      .                 'invalid time origin "'//torigin_str(1:slen)//
@@ -317,6 +317,13 @@
 
         IF ( epsil .GE. 0.0 ) THEN
 *          Match time origins exactly with a tolerance of epsil
+
+*          Convert epsil from units of given forecast axis to seconds (for SECS_FROM_BC comparisons)
+           IF ( ITSA_TRUEMONTH_AXIS(axcalf) ) THEN
+              epsil = epsil * un_convert(pun_day)
+           ELSE
+              epsil = epsil * line_tunit(axcalf)
+           ENDIF
 
            setidx = 1
            DO axidx = 1,axlen
@@ -327,7 +334,7 @@
                  fcoord = fcoord * line_tunit(axcalf)
               ENDIF
               fcoord = fcoord + forigin
-              IF ( TM_DFPEQ_TOL(fcoord, torigins(setidx), epsil) ) THEN
+              IF ( ABS(fcoord - torigins(setidx)) .LE. epsil ) THEN
 *                found this t0; go to the next t0, or quit if all found
                  findices(setidx) = axidx
                  setidx = setidx + 1
@@ -415,7 +422,7 @@
 
 *       Blindly associate the datasets, as given, contiguously
 *       onto the given forecast axis.  Do NOT reorder.
-  500   DO setidx = 1,nsets
+  900   DO setidx = 1,nsets
            findices(setidx) = setidx
         ENDDO
         IF ( fmatch .EQ. ' ' )
