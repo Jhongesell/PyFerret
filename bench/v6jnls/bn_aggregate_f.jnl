@@ -1,172 +1,156 @@
 ! bn_aggregate_f.F
-! 12/2015 *sh*
-! 1/2016 *sh* added implicit naming of aggregation from script filename
-! 6/2018 *acm*Note SHOW DATA output changes slightly
-!              Forecast series of... patterned on fcst_1 (not fcst_1.nc)
-!              also auto-generated grid names change
-
 ! exercise FMRC aggregations
 
-spawn "mkdir -p tmp"     ! tmp directory t store files
+SPAWN "rm -fr aggf"
+SPAWN "mkdir aggf"
 
-! *** create an artificial forecast model run collection ***
+! *** Create an artificial forecast model run collection ***
 
 ! a 20x20 lat-long region
-DEFINE AXIS/X=140E:160E:1 xax
-DEFINE AXIS/Y=20N:40N:1 yax
+DEFINE AXIS /X=140E:160E:1 xax
+DEFINE AXIS /Y=20N:40N:1 yax
 
-! a 20 year regular monthly axis starting in Jan 1950
-DEFINE AXIS/UNITS=DAYS/T0=01-JAN-1900/EDGES/T=01-JAN-1950:31-DEC-1970:`365.2425/12` monthly
+! regular mid-monthly axis Jan 1950 to Dec 1960
+DEFINE AXIS /UNITS=DAYS /T0=01-JAN-1900 /EDGES /T=01-JAN-1950:31-DEC-1960:`365.2425/12` monthly
 
-! define a moving field with errors increasing from a given forecast date
-let vy = 1/500      ! speed that forecast structure deviates from truth
-let vx = (1+(T[gt=monthly]-tstart)/2000)* 1/300
-let xt = x[gx=xax]-vx*T[gt=monthly]
-let yt = y[gy=yax]-vy*T[gt=monthly]
-let field = COS((xt-150)/5)*COS((yt-30)/5)
-let fcst = field + fcst_error
-let static_error = SIN((x[gx=xax]-140)/5)*SIN((y[gy=yax]-20)/5) + RANDU(x[gx=xax]+y[gy=yax])
-let structure_drift = (t[gt=monthly]-tstart)/5000 * static_error
-let random_error = (t[gt=monthly]-tstart)/2000 * RANDU(t[gt=monthly]+x[gx=xax]+y[gy=yax])
-let fcst_error = structure_drift + random_error
-let/title="another variable" fcst_2 = fcst + 2
+! beginning-of-the-month quarter-annual dates Jan 1950 to OCT 1953
+LET quarterly_dates = { \
+   "01-JAN-1950", "01-APR-1950", "01-JUL-1950", "01-OCT-1950", \
+   "01-JAN-1951", "01-APR-1951", "01-JUL-1951", "01-OCT-1951", \
+   "01-JAN-1952", "01-APR-1952", "01-JUL-1952", "01-OCT-1952" \
+}
+LET quarterly_times = DATE1900(quarterly_dates)
 
-! every 3 months another 2-year forecast
-repeat/name=fdate/range=1:31:3 (let tstart = t[gt=monthly,l=`fdate`];save/clobber/file="tmp/fcst_`(fdate-1)/3+1`.nc"/l=`fdate`:`fdate+23` fcst,  fcst_2)
+! define a predictable value with errors increasing from a given forecast date
+! ftaxis is defined with T0 = time-of-forecast
+LET thirdpi = `4.0 * ATAN(1.0) / 3.0`
+LET final_val = Y[gy=yax] - 0.1 * X[gx=xax]
+LET /TITLE="first" fcst = final_val + fcst_error
+LET /TITLE="second" fcst_2 = fcst + 2.0
 
-! a couple of long (3-year) forecasts
-let tstart = t[gt=monthly,l=1]
-save/clobber/file="tmp/long_fcst_1.nc"/l=1:36 fcst,fcst_2   ! replaces file 1
-let tstart = t[gt=monthly,l=16]
-save/clobber/file="tmp/long_fcst_6.nc"/l=16:52 fcst,fcst_2  ! replaces file 6 
+! every three months a two-year forecast in fcst_<n>.nc,
+! a three-year forecast in long_fcst_<n>.nc, and a two-year
+! single_variable forecast in one_var_fcst_<n>.nc
+REPEAT /NAME=fdate /RANGE=1:12 ( \
+   LET t0date = quarterly_dates[I=`fdate`] ;\
+   LET tzero = quarterly_times[I=`fdate`] ;\
+   LET tstart = T[gt=monthly,L=`3 * fdate - 2`] - `tzero` ;\
+   LET tend = T[gt=monthly,L=`3 * fdate + 33`] - `tzero` ;\
+   DEFINE AXIS /UNIT=DAYS /T0=`t0date` /T=`tstart`:`tend`:`365.2425/12` ftaxis ;\
+   LET fcst_error = COS((final_val + `fdate`) * thirdpi) * T[gt=ftaxis] / 100 ;\
+   SAVE /CLOBBER /FILE="aggf/fcst_`fdate`.nc" /L=1:24 fcst, fcst_2 ;\
+   SAVE /CLOBBER /FILE="aggf/long_fcst_`fdate`.nc" fcst, fcst_2 ;\
+   SAVE /CLOBBER /FILE="aggf/one_var_fcst_`fdate`.nc" /L=1:24 fcst \
+)
 
-! files lacking the second variable
-let tstart = t[gt=monthly,l=1]
-save/clobber/file="tmp/one_var_fcst_1.nc"/l=1:24 fcst   ! alternative of file 1
-let tstart = t[gt=monthly,l=16]
-save/clobber/file="tmp/one_var_fcst_6.nc"/l=16:39 fcst  ! alternative of file 6
+CANCEL VARIABLES/ALL
 
-! files that violate the sequence
-save/clobber/file="tmp/consecutive_month_fcst.nc"/l=5:28 fcst, fcst_2
-! shift the time interpretation by 3 days through altered T0
-DEFINE AXIS/UNITS=DAYS/T0=04-JAN-1900/EDGES/T=01-JAN-1950:31-DEC-1970:`365.2425/12` monthly
-save/clobber/file="tmp/irregular_start_time_fcst.nc"/l=6:29 fcst, fcst_2
+! ***** End of FMRC file creation ****************
 
-cancel variables/all
-
-! ***** end of FMRC file creation ****************
+LET files = SPAWN("ls -1 aggf/fcst_*.nc")
 
 ! define a complete FMRC aggregation
-let files = SPAWN("ls -1 tmp/fcst_*.nc")
-list files  ! notice that they are not properly ordered
-fmrc my_fmrc = files
-show data/brief    ! note that member files are hidden
-show data/members my_fmrc
-show data/attr my_fmrc
+LIST files  ! notice that they are not properly ordered
+FMRC my_fmrc = files
+SHOW DATA ! note that member files are hidden
+SHOW DATA /MEMBERS
 
 ! plot and list the aggregation
 GO bn_aggregate_f.sub
 
-cancel data my_fmrc
-show data/hidden   ! note that all member files were canceled, too
+CANCEL DATA my_fmrc
+SHOW DATA /HIDDEN   ! note that all member files were canceled, too
 
-! agg with 2nd, 3rd, 9th and 10th forecasts missing 
-use tmp/fcst_1.nc, tmp/fcst_2.nc, tmp/fcst_3.nc, tmp/fcst_9.nc, tmp/fcst_10.nc, tmp/fcst_11.nc
-let files = SPAWN("ls -1 tmp/fcst_*.nc")
-fmrc/hide my_fmrc = XCAT(files[I=6:10],{"6","1"})           ! double-wide gaps
-!fmrc my_fmrc = XCAT(files[I=6:10],{"6","1","2","5"})  ! single-wide gaps
-show data/members my_fmrc
-show data/brief
-LIST TF_TIMES
+! agg with 2nd, 3rd, 9th and 10th forecasts missing
+USE aggf/fcst_1.nc, aggf/fcst_2.nc, aggf/fcst_3.nc, aggf/fcst_9.nc, aggf/fcst_10.nc, aggf/fcst_11.nc
+FMRC /HIDE my_fmrc = XCAT(files[I=7:11],{"6","1"})      ! _4,_5,_6,_7,_8,_11,_1
+SHOW DATA /MEMBERS
 
 GO bn_aggregate_f.sub
 
-cancel data my_fmrc
-show data/brief/hidden
-cancel data/all
+CANCEL DATA my_fmrc
+SHOW DATA /HIDDEN
+CANCEL DATA /ALL
 
 ! agg with the first forecast of longer time range than the others
-let files = SPAWN("ls -1 tmp/fcst_*.nc")
-fmrc/hide my_fmrc = XCAT(files[I=4:11],{"tmp/long_fcst_1.nc"}) ! first member is long
-show data/members my_fmrc
+FMRC /HIDE my_fmrc = XCAT(files[I=5:11],{"aggf/long_fcst_1.nc"}) ! first member is long
+SHOW DATA /MEMBERS
 GO bn_aggregate_f.sub
-cancel data my_fmrc
+CANCEL DATA my_fmrc
 
 ! agg with the sixth forecast of longer time range than the others
-fmrc/hide my_fmrc = tmp/fcst_1.nc, tmp/fcst_2.nc, tmp/fcst_3.nc, tmp/fcst_4.nc, tmp/fcst_5.nc, tmp/long_fcst_6.nc, tmp/fcst_7.nc, tmp/fcst_8.nc
-show data/members my_fmrc
+FMRC /HIDE my_fmrc = aggf/fcst_1.nc, aggf/fcst_2.nc, aggf/fcst_3.nc, aggf/fcst_4.nc, \
+                     aggf/fcst_5.nc, aggf/long_fcst_6.nc, aggf/fcst_7.nc, aggf/fcst_8.nc
+SHOW DATA /MEMBERS
 GO bn_aggregate_f.sub
-cancel data my_fmrc
+CANCEL DATA my_fmrc
+
+! dataset name pulled implicitly from the script name
+FMRC /HIDE aggf/fcst_7.nc, aggf/fcst_4.nc, aggf/fcst_5.nc, aggf/fcst_6.nc, aggf/fcst_3.nc
+SHOW DATA /MEMBERS
+CANCEL DATA /ALL
 
 ! agg where one dataset lacks one of the variables
-fmrc/hide my_fmrc = tmp/fcst_7.nc, tmp/fcst_4.nc, tmp/fcst_5.nc, tmp/one_var_fcst_6.nc, tmp/fcst_3.nc
-show data/members
-stat/l=1:20 fcst
-cancel data my_fmrc
+LET onevarlist = { "aggf/fcst_7.nc", "aggf/fcst_4.nc", "aggf/fcst_5.nc", "aggf/one_var_fcst_6.nc" }
+FMRC /HIDE my_fmrc = onevarlist
+SHOW DATA /MEMBERS
+STAT fcst
 
-! ... added 1/28/2016
-! the same agg, but the dataset name pulled implicitly from the script name
-fmrc/hide tmp/fcst_7.nc, tmp/fcst_4.nc, tmp/fcst_5.nc, tmp/one_var_fcst_6.nc, tmp/fcst_3.nc
-show data/brief
+! TODO: jointly using one dataset no longer possible, but should be hidden
+! so the same data file can be used again under a different ID
+!
+! cancel a component datafile used to two aggregations
+! cancel both dataset instances, and thus both aggregations - or can differentiate?
+! FMRC /HIDE other_fmrc = onevarlist
+! CANCEL DATA aggf/fcst_4.nc
+! SHOW DATA
 
-! the same agg using the very same files under a different name
-fmrc/hide my_fmrc = tmp/fcst_7.nc, tmp/fcst_4.nc, tmp/fcst_5.nc, tmp/one_var_fcst_6.nc, tmp/fcst_3.nc
-show data/full
+CANCEL DATA /ALL
 
-! cancel a component dataset -- used in two aggregations
-cancel data tmp/fcst_4.nc
-show data
+! TODO: jointly using one dataset no longer possible, but should be hidden
+! so the same data file can be used again under a different ID
+!
+! cancel one of two aggregations using the same datafiles
+! cancel only the one aggregation and its datasets, leaving the other
+! FMRC /HIDE my_fmrc = onevarlist
+! FMRC /HIDE other_fmrc = onevarlist
+! CANCEL DATA my_fmrc
+! SHOW DATA
+! CANCEL DATA other_fmrc
+! SHOW DATA
 
-! re-define the same aggs again. 
-! then cancel one of them only and note that the hidden files remain
-fmrc/hide tmp/fcst_7.nc, tmp/fcst_4.nc, tmp/fcst_5.nc, tmp/one_var_fcst_6.nc, tmp/fcst_3.nc
-fmrc/hide my_fmrc = tmp/fcst_7.nc, tmp/fcst_4.nc, tmp/fcst_5.nc, tmp/one_var_fcst_6.nc, tmp/fcst_3.nc
-cancel data my_fmrc
-show data/br/hidden
-cancel data bn_aggregate_f.jnl   ! 3/16 bug fix (was "...sub")
-show data
+! TODO: the following crashes
+! agg where a LET/D variable is used to fill in a missing variable in the first dataset
+! USE aggf/one_var_fcst_1.nc
+! LET/D=one_var_fcst_1.nc fcst_2 = fcst + 2  ! compute same value as file vars
+! SHOW DATA
+! FMRC /HIDE my_fmrc = aggf/one_var_fcst_1.nc, aggf/fcst_2.nc, aggf/fcst_3.nc, \
+!                      aggf/fcst_4.nc, aggf/fcst_5.nc, aggf/fcst_6.nc
+! SHOW DATA /MEMBERS
+! GO bn_aggregate_f.sub
+! CANCEL DATA /ALL
 
-! agg where a LET/D variable is used to fill in a missing variable
-use tmp/one_var_fcst_1.nc, tmp/one_var_fcst_6.nc
-let/d=one_var_fcst_1.nc fcst_2 = fcst + 2  ! compute same value as file vars
-let/d=one_var_fcst_6.nc fcst_2 = fcst + 2  ! compute same value as file vars
-FMRC/hide my_fmrc_letd_6 = tmp/fcst_1.nc, tmp/fcst_2.nc, tmp/fcst_3.nc, tmp/fcst_4.nc, tmp/fcst_5.nc, tmp/one_var_fcst_6.nc, tmp/fcst_7.nc
-FMRC/hide my_fmrc_letd_1 = tmp/one_var_fcst_1.nc, tmp/fcst_2.nc, tmp/fcst_3.nc, tmp/fcst_4.nc, tmp/fcst_5.nc, tmp/fcst_6.nc, tmp/fcst_7.nc
-FMRC/hide my_fmrc = tmp/fcst_1.nc, tmp/fcst_2.nc, tmp/fcst_3.nc, tmp/fcst_4.nc, tmp/fcst_5.nc, tmp/fcst_6.nc, tmp/fcst_7.nc
-show data/members
-show data
-! should be all 0's:
-list/i=10/j=10/order=ft/l=1:20/width=200 fcst_2[d=my_fmrc_letd_6] - fcst_2[d=my_fmrc]
-! should be all 0's:
-list/i=10/j=10/order=ft/l=1:20/width=200 fcst_2[d=my_fmrc_letd_6] - fcst_2[d=my_fmrc_letd_1]
-cancel data my_fmrc
-cancel data my_fmrc_letd_1, my_fmrc_letd_6
-
-! files already opened and not hidden remain open after aggregation
-use tmp/fcst_1.nc, tmp/fcst_2.nc, tmp/fcst_3.nc, tmp/fcst_9.nc, tmp/fcst_10.nc, tmp/fcst_11.nc
-fmrc my_fmrc = XCAT(files[I=6:10],{"6","1"})           ! without /HIDE
-cancel data my_fmrc
-show data/brief
-cancel data/all
+! agg where a LET/D variable is used to fill in a missing variable in a middle dataset
+USE aggf/one_var_fcst_5.nc
+LET/D=one_var_fcst_5.nc fcst_2 = fcst + 2  ! compute same value as file vars
+SHOW DATA
+FMRC/HIDE my_fmrc = aggf/fcst_1.nc, aggf/fcst_2.nc, aggf/fcst_3.nc, \
+                    aggf/fcst_4.nc, aggf/one_var_fcst_5.nc, aggf/fcst_6.nc
+SHOW DATA /MEMBERS
+GO bn_aggregate_f.sub
+CANCEL DATA /ALL
 
 ! *************************************
 ! deliberate errors
-set mode ignore
+SET MODE IGNORE
 
+! TODO: the following crashes
 ! error - duplicate file
-fmrc my_fmrc = tmp/fcst_1.nc, tmp/fcst_2.nc,tmp/fcst_2.nc,tmp/fcst_3.nc
-SH DATA/BR/HIDDEN
+! FMRC my_fmrc = XCAT(files, "aggf/fcst_2.nc")
+! SHOW DATA /HIDDEN
 
 ! error - unknown dataset
-fmrc my_fmrc = XCAT(files,"tmp/no_exist.nc")
-SH DATA/BR/HIDDEN
+FMRC my_fmrc = XCAT(files, "aggf/no_exist.nc")
+SHOW DATA /HIDDEN
 
-! error - inserting forecasts at two consecutive steps implies too many gaps
-fmrc my_fmrc = XCAT(files,"tmp/consecutive_month_fcst.nc")
-SH DATA/BR/HIDDEN
-
-! error - inserting out of sequence forecast 
-fmrc my_fmrc = XCAT(files,"tmp/irregular_start_time_fcst.nc")
-SH DATA/BR/HIDDEN
-
-set mode/last ignore
+SET MODE /LAST IGNORE

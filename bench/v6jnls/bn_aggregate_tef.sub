@@ -1,68 +1,77 @@
 ! bn_aggregate_tef.sub
 ! Write the files used by bn_aggregate_tef.jnl
-! 6/2018
 
-! Give the operator something to look at while we write all the data 
+! Give the operator something to look at while we write all the data
 plot/noax/nolab/vlim=0:1/i=4:5 i
 annotate/norm/x=0/y=0.5 "...writing data files for the TEF aggregation tests"
 
-! *** create an artificial file collection ***
-spawn "mkdir -p tmp"     ! tmp directory to store files
+SPAWN "rm -fr aggtef"
+SPAWN "mkdir aggtef"
 
-! a 20x20 lat-long region
-define axis/x=140e:160e:1 xax
-define axis/y=10n:20n:1 yax
-define axis/Z=0:500:500/EDGES/units=m zax   ! a single point axis
+! a 20x20x1 lat-lon-depth region
+DEFINE AXIS /X=140E:160E:1 xax
+DEFINE AXIS /Y=20N:40N:1 yax
+DEFINE AXIS /UNITS=m /Z=0:500:500 /EDGES zax   ! a single point axis
 
-! a 20 year regular monthly axis starting in Jan 1950
-DEFINE AXIS/UNITS=DAYS/T0=01-JAN-1900/EDGES/T=01-JAN-1950:31-DEC-1970:`365.2425/12` monthly
+! regular mid-monthly axis Jan 1950 to Dec 1960
+DEFINE AXIS /UNITS=DAYS /T0=01-JAN-1900 /EDGES /T=01-JAN-1950:31-DEC-1960:`365.2425/12` monthly
 
-! define a moving field with errors increasing from a given forecast date
-let vy = 1/500      ! speed that forecast structure deviates from truth
-!let vx = 1/300
-let vx = (1+(T[gt=monthly]-tstart)/2000)* 1/300
-let xt = x[gx=xax]-vx*T[gt=monthly]
-let yt = y[gy=yax]-vy*T[gt=monthly]
-let field = COS((xt-150)/5)*COS((yt-30)/5) + Z[gz=zax]
-let fcst = ensemble_variation * (field + fcst_error)
-define attribute fcst.im_everywhere = "so promote me"
-set variable/title="some variable" fcst
-let static_error = SIN((x[gx=xax]-140)/5)*SIN((y[gy=yax]-20)/5) + RANDU(x[gx=xax]+y[gy=yax])
-let structure_drift = (t[gt=monthly]-tstart)/5000 * static_error
-let random_error = (t[gt=monthly]-tstart)/2000 * RANDU(t[gt=monthly]+x[gx=xax]+y[gy=yax])
-let fcst_error = structure_drift + random_error
-let/title="another variable" fcst_2 = fcst + 2
+! beginning-of-the-month quarter-annual dates Jan 1950 to OCT 1953
+LET quarterly_dates = { \
+   "01-JAN-1950", "01-APR-1950", "01-JUL-1950", "01-OCT-1950", \
+   "01-JAN-1951", "01-APR-1951", "01-JUL-1951", "01-OCT-1951", \
+   "01-JAN-1952", "01-APR-1952", "01-JUL-1952", "01-OCT-1952" \
+}
+LET quarterly_times = DATE1900(quarterly_dates)
 
-
-
-let investigator = "Ferret developers"
-
+! define a predictable value with errors increasing from a given forecast date
+! ftaxis is defined with T0 = time-of-forecast
+LET thirdpi = `4.0 * ATAN(1.0) / 3.0`
+LET final_val = Y[gy=yax] - 0.1 * X[gx=xax] + Z[gz=zax] / 250.0
+LET /TITLE="first" fcst = final_val + ensemble_variation * fcst_error
+DEFINE ATTRIBUTE fcst.im_everywhere = "so promote me"
+LET /TITLE="second" fcst_2 = fcst + 2.0
+LET investigator = "Ferret developers"
 
 ! every 3 months another 3-year 5-ensemble forecast, saved as 3 1-year files
-! the average of the ensembles is equal to the middel ensemble member (3)
-repeat/name=fdate/range=1:31:3 (\
-  let tstart = t[gt=monthly,l=`fdate`];\
-  repeat/name=ens/range=1:5:1 (\
-    let ensemble_variation = 1 + (ens-3)/20;\  
-    let realization = `ens`;\
-    let description = "Data in tseries aggregations T=1, Fdate=`fdate`, Ens=`ens`";\
-    save/clobber/file="tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_t1.nc"/l=`fdate`:`fdate+11` fcst,  fcst_2, realization;\
-    save/append/file="tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_t1.nc"/asglobal investigator;\
-    save/append/file="tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_t1.nc"/asglobal description;\
-    save/clobber/file="tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_t2.nc"/l=`fdate+12`:`fdate+23` fcst,  fcst_2, realization;\
-    save/clobber/file="tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_t3.nc"/l=`fdate+24`:`fdate+35` fcst,  fcst_2, realization))
+! the average of the ensembles is equal to the middle ensemble member (3)
+REPEAT /NAME=fdate /RANGE=1:12 ( \
+   LET t0date = quarterly_dates[I=`fdate`] ;\
+   LET tzero = quarterly_times[I=`fdate`] ;\
+   LET tstart = T[gt=monthly,L=`3 * fdate - 2`] - `tzero` ;\
+   LET tend = T[gt=monthly,L=`3 * fdate + 33`] - `tzero` ;\
+   DEFINE AXIS /UNIT=DAYS /T0=`t0date` /T=`tstart`:`tend`:`365.2425/12` ftaxis ;\
+   LET fcst_error = COS((final_val + `fdate`) * thirdpi) * T[gt=ftaxis] / 1000 ;\
+   REPEAT /NAME=ens /RANGE=1:5 ( \
+      LET ensemble_variation = 1 + (ens-3)/10 ;\
+      LET realization = `ens` ;\
+      LET description = "Data in tseries aggregations T=1, Fdate=`fdate`, Ens=`ens`" ;\
+      SAVE /CLOBBER /FILE="aggtef/f`fdate,zw=2`_e`ens`_t1.nc" /L=1:12  fcst, fcst_2, realization ;\
+      SAVE /APPEND  /FILE="aggtef/f`fdate,zw=2`_e`ens`_t1.nc" /ASGLOBAL investigator ;\
+      SAVE /APPEND  /FILE="aggtef/f`fdate,zw=2`_e`ens`_t1.nc" /ASGLOBAL description ;\
+      SAVE /CLOBBER /FILE="aggtef/f`fdate,zw=2`_e`ens`_t2.nc" /L=13:24 fcst, fcst_2, realization ;\
+      SAVE /CLOBBER /FILE="aggtef/f`fdate,zw=2`_e`ens`_t3.nc" /L=25:36 fcst, fcst_2, realization  \
+   ) \
+)
 
-! the middle ensemble time series of the 4th forecast, but lacking fcst_2
-define attribute fcst.im_not_everywhere = "so don't promote me"
-repeat/name=fdate/range=10:10:3 (\
-  let tstart = t[gt=monthly,l=`fdate`];\
-  repeat/name=ens/range=3:3:1 (\
-    let ensemble_variation = 1 + (ens-3)/20;\  
-    let realization = `ens`;\
-    save/clobber/file="tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_t1_1v.nc"/l=`fdate`:`fdate+11` fcst, realization;\
-    save/clobber/file="tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_t2_1v.nc"/l=`fdate+12`:`fdate+23` fcst, realization;\
-    save/clobber/file="tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_t3_1v.nc"/l=`fdate+24`:`fdate+35` fcst, realization))
+! repeat the middle ensemble time series of the 4th forecast, but lacking fcst_2
+DEFINE ATTRIBUTE fcst.im_not_everywhere = "so don't promote me"
+REPEAT /NAME=fdate /RANGE=4:4 ( \
+   LET t0date = quarterly_dates[I=`fdate`] ;\
+   LET tzero = quarterly_times[I=`fdate`] ;\
+   LET tstart = T[gt=monthly,L=`3 * fdate - 2`] - `tzero` ;\
+   LET tend = T[gt=monthly,L=`3 * fdate + 33`] - `tzero` ;\
+   DEFINE AXIS /UNIT=DAYS /T0=`t0date` /T=`tstart`:`tend`:`365.2425/12` ftaxis ;\
+   LET fcst_error = COS((final_val + `fdate`) * thirdpi) * T[gt=ftaxis] / 1000 ;\
+   REPEAT /NAME=ens /RANGE=3:3 ( \
+      LET ensemble_variation = 1 + (ens-3)/20 ;\
+      LET realization = `ens` ;\
+      LET description = "Data in tseries aggregations T=1, Fdate=`fdate`, Ens=`ens`" ;\
+      SAVE /CLOBBER /FILE="aggtef/f`fdate,zw=2`_e`ens`_t1_1v.nc" /L=1:12  fcst, realization ;\
+      SAVE /CLOBBER /FILE="aggtef/f`fdate,zw=2`_e`ens`_t2_1v.nc" /L=13:24 fcst, realization ;\
+      SAVE /CLOBBER /FILE="aggtef/f`fdate,zw=2`_e`ens`_t3_1v.nc" /L=25:36 fcst, realization \
+   ) \
+)
 
-
-cancel variables/all
+CANCEL VARIABLES/ALL
 

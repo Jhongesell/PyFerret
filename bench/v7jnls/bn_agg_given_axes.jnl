@@ -163,7 +163,7 @@ CANCEL AXIS ftax
 ! test forecast aggregation using close-but-not-matching-times axes
 DEFINE AXIS /UNITS=DAYS /T0=01-JAN-1970 /F=01-JAN-2001:01-JAN-2020:`365.2425/2,prec=12` ffax
 DEFINE AXIS /UNITS=DAYS /T0=01-JAN-1970 /EDGES /T=01-JAN-2001:31-DEC-2024:`365.2425/12,prec=12` ftax
-DEFINE DATA /AGGREGATE /F /TAXIS=ftax /FAXIS=ffax forecasts = aggfiles
+DEFINE DATA /AGGREGATE /HIDE /F /TAXIS=ftax /FAXIS=ffax forecasts = aggfiles
 LIST /ORDER=TF /PREC=6 /X=12E /Y=12S /Z=5.0 value
 LIST /ORDER=FT /PREC=6 /X=12E /Y=12S /Z=5.0 value
 
@@ -177,7 +177,7 @@ CANCEL AXIS ftax
 ! test forecast aggregation using totally-different-times axes
 DEFINE AXIS /UNITS=DAYS /T0=01-JAN-1970 /F=01-JAN-1971:01-JAN-1990:`365.2425/2,prec=12` ffax
 DEFINE AXIS /UNITS=DAYS /T0=01-JAN-1970 /EDGES /T=01-JAN-1971:31-DEC-1994:`365.2425/12,prec=12` ftax
-DEFINE DATA /AGGREGATE /F /TAXIS=ftax /FAXIS=ffax forecasts = aggfiles
+DEFINE DATA /AGGREGATE /HIDE /F /TAXIS=ftax /FAXIS=ffax forecasts = aggfiles
 LIST /ORDER=TF /PREC=6 /X=12E /Y=12S /Z=5.0 value
 LIST /ORDER=FT /PREC=6 /X=12E /Y=12S /Z=5.0 value
 

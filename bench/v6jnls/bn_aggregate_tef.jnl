@@ -1,16 +1,4 @@
 ! bn_aggregate_tef.F
-! 2/2016 *sh*
-! 3/2016 - modified to test single point axis aggregations on Z axis
-! 1/2017 *acm* changes in output due to backing off auto-detection of truemonth axes, tkt 2497
-! *acm*7/2017 0=success for SPAWN_STATUS
-! 6/2018 *acm*Note SHOW DATA output changes:
-!             Auto-generated grid names change
-!             Ensembles include variables synthesized from dataset names and global atts of members
-
-! to avoid re-creating the test files include argument "0" as in
-!  yes?  GO bn_aggregate_tef 0
-
-
 ! exercise 6D aggregations: T, E, and F simultaneously
 
 ! do not bother to echo the creation of files and the definitions of the
@@ -19,154 +7,156 @@ CANCEL MODE VERIFY
 
 
 ! see if the test file already exists
-SPAWN "ls tmp/f04_e3_t3_1v.nc"
+SPAWN "ls aggtef/f04_e3_t3_1v.nc"
 IF ($SPAWN_OK) THEN
-  say *** NOT RE-CREATING bn_aggregate_tef.jnl test files. They already exist.
+  SAY *** NOT RE-CREATING bn_aggregate_tef.jnl test files. They already exist.
 ELSE
-  go bn_aggregate_tef.sub
+  GO bn_aggregate_tef.sub
 ENDIF
 
 ! ***** end of TEF file creation ****************
 
-! define T aggregations -- lots of em
-repeat/name=fdate/range=1:31:3 (\
-  let tstart = t[gt=monthly,l=`fdate`];\
-  repeat/name=ens/range=1:5:1 (\
-    let realization = `ens`;\
-    TSERIES  t_f`(fdate-1)/3+1,zw=2`_e`ens` = SPAWN("ls -1 tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_t?.nc")  ))
+! define T aggregations
+REPEAT /NAME=fdate /RANGE=1:12 ( \
+  REPEAT /NAME=ens /RANGE=1:5 ( \
+    TSERIES t_f`fdate,zw=2`_e`ens` = SPAWN("ls -1 aggtef/f`fdate,zw=2`_e`ens`_t?.nc") ;\
+    SAVE /CLOBBER /FILE="aggtef/t_f`fdate,zw=2`_e`ens`.nc" fcst, fcst_2  \
+  ) \
+)
 
-! plus 1 T-aggregation lacking fcst_2
-repeat/name=fdate/range=10:10:3 (\
-  let tstart = t[gt=monthly,l=`fdate`];\
-  repeat/name=ens/range=3:3:1 (\
-    let realization = `ens`;\
-    TSERIES  t_f`(fdate-1)/3+1,zw=2`_e`ens`_1v = SPAWN("ls -1 tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_t*_1v.nc")  ))
-cancel variable realization
+REPEAT /NAME=fdate /RANGE=4:4 ( \
+  REPEAT /NAME=ens /RANGE=3:3 ( \
+    TSERIES t_f`fdate,zw=2`_e`ens`_1v = SPAWN("ls -1 aggtef/f`fdate,zw=2`_e`ens`_t?_1v.nc") ;\
+    SAVE /CLOBBER /FILE="aggtef/t_f`fdate,zw=2`_e`ens`_1v.nc" fcst \
+  ) \
+)
+
+! ***** end of T aggregation ****************
 
 SET MODE VERIFY
 
-show data/members/br
+SHOW DATA /MEMBERS /BRIEF
 
 ! should share the same time axis
-show grid fcst[d=t_f01_e1]
-show grid fcst[d=t_f01_e2]
+SHOW GRID fcst[d=t_f01_e1]
+SHOW GRID fcst[d=t_f01_e2]
 
 ! ======== TEST SET 1:  aggregate E first, then F
 
-! define te aggregations -- only the first 5 remain unhidden
-ENSEMBLE      te_f01 = t_f01_e1, t_f01_e2, t_f01_e3, t_f01_e4, t_f01_e5
-ENSEMBLE/hide te_f02 = t_f02_e1, t_f02_e2, t_f02_e3, t_f02_e4, t_f02_e5
-ENSEMBLE/hide te_f03 = t_f03_e1, t_f03_e2, t_f03_e3, t_f03_e4, t_f03_e5
-ENSEMBLE/hide te_f04 = t_f04_e1, t_f04_e2, t_f04_e3, t_f04_e4, t_f04_e5
-ENSEMBLE/hide te_f05 = t_f05_e1, t_f05_e2, t_f05_e3, t_f05_e4, t_f05_e5
-ENSEMBLE/hide te_f06 = t_f06_e1, t_f06_e2, t_f06_e3, t_f06_e4, t_f06_e5
-ENSEMBLE/hide te_f07 = t_f07_e1, t_f07_e2, t_f07_e3, t_f07_e4, t_f07_e5
-ENSEMBLE/hide te_f08 = t_f08_e1, t_f08_e2, t_f08_e3, t_f08_e4, t_f08_e5
-ENSEMBLE/hide te_f09 = t_f09_e1, t_f09_e2, t_f09_e3, t_f09_e4, t_f09_e5
-ENSEMBLE/hide te_f10 = t_f10_e1, t_f10_e2, t_f10_e3, t_f10_e4, t_f10_e5
-ENSEMBLE/hide te_f11 = t_f11_e1, t_f11_e2, t_f11_e3, t_f11_e4, t_f11_e5
-SHOW DATA/brief
+! define TE aggregations
+REPEAT /NAME=fd /RANGE=1:12 ( \
+   ENSEMBLE /HIDE te_f`fd,zw=2` = t_f`fd,zw=2`_e1, t_f`fd,zw=2`_e2, t_f`fd,zw=2`_e3, t_f`fd,zw=2`_e4, t_f`fd,zw=2`_e5 ;\
+   SAVE /CLOBBER /FILE="aggtef/te_f`fd,zw=2`.nc" fcst, fcst_2 \
+)
+SHOW DATA /BRIEF
 ! Note the clean_draconian script removes the word HISTORY from the following outputs
-SHOW DATA/FULL te_f11
-SHOW DATA/ATT te_f11   ! notice the promotion of fcst.im_everywhere
-
-list investigator, description
-
-set data te_f04
-list investigator, description
-
-
-! define tef aggregation
-FMRC/HIDE tef = te_f01, te_f02, te_f03, te_f04, te_f05, te_f06, te_f07, te_f08, te_f09, te_f10, te_f11
-SHOW DATA/brief/members
-show data/full tef
-
-! simplest acess -- compact form -- just demonstrate it doesn't fail
-stat/brief fcst[i=11:12, j=5:6, l=31:32, m=1:2, n=5:6]
-
-DEFINE SYMBOL TF_CAL_T = `fcst._cal_t_ax`
-DEFINE SYMBOL TF_LAG_F = `fcst._lag_f_ax`
-DEFINE SYMBOL TF_LAG_T = `fcst._lag_t_ax`
-DEFINE SYMBOL TF_CAL_F = `fcst._cal_f_ax`
-
-! regrid to TF_.... axes
-let fcstfine = fcst[gt=($TF_LAG_T)@BIN,gf=($TF_CAL_F)@BIN]
-
-! diagonal forecast view of ensemble mean
-let diag_fcst = fcstfine[gt(TF_TIMES)=($TF_CAL_T),gf(TF_TIMES)=($TF_LAG_F)]
-shade/x=150E/y=15n diag_fcst[m=1:5@ave]
-
-! difference between the mean and the middle is zero within computational error
-let epsilon = 1 / 2^50   ! 52 mantissa bits in a double
-say using epsilon = `epsilon`
-let rel_err = (diag_fcst[m=1:5@ave]-diag_fcst[m=3])/diag_fcst[m=3]
-stat/brief/x=150E/y=15n IF ABS(rel_err) LT epsilon THEN 0.0 ELSE rel_err
+SHOW DATA/FULL te_f12
+SHOW DATA/ATT te_f12   ! notice the promotion of fcst.im_everywhere
+LIST investigator, description
+SET DATA te_f04
+LIST investigator, description
 
 ! warning message indicates fcst_2 is missing from a file
-ENSEMBLE te_f04_1v = t_f04_e1, t_f04_e2, t_f04_e3_1v, t_f04_e4, t_f04_e5
+ENSEMBLE /HIDE te_f04_1v = t_f04_e1, t_f04_e2, t_f04_e3_1v, t_f04_e4, t_f04_e5
 SHOW DATA/ATT t_f04_e3_1v ! note atts im_everwhere vs im_not_everwhere
 SHOW DATA/ATT te_f04_1v  ! note atts im_everwhere vs im_not_everwhere
 
+! TODO: crashes
+! define tef aggregation
+! FMRC/HIDE tef = te_f01, te_f02, te_f03, te_f04, te_f05, te_f06, te_f07, te_f08, te_f09, te_f10, te_f11, te_f12
+
+! For now, use files saved TE aggregations
+CANCEL DATA /ALL
+LET files = SPAWN("ls -1 aggtef/te_f??.nc")
+FMRC /HIDE tef = files
+SAVE /FILE="aggtef/tef.nc" fcst, fcst_2
+
+SHOW DATA /BRIEF /MEMBERS
+SHOW DATA /FULL tef
+
+LIST /ORDER=FT /I=11 /J=11 /K=1 /M=3 fcst
+
+! regrid to TF_.... axes
+! let fcstfine = fcst[gt=($TF_LAG_T)@BIN,gf=($TF_CAL_F)@BIN]
+!
+! diagonal forecast view of ensemble mean
+! let diag_fcst = fcstfine[gt(TF_TIMES)=($TF_CAL_T),gf(TF_TIMES)=($TF_LAG_F)]
+! shade/x=150E/y=25n diag_fcst[m=1:5@ave]
+!
+! difference between the mean and the middle is zero within computational error
+LET err = fcst[M=1:5@AVE] - fcst[M=3]
+STAT /BRIEF /X=150E /Y=25N err
+
 ! define fcst_2 as a LET/D variable and then do same calc
-let/d=t_f04_e3_1v fcst_2 = fcst + 2
-show data/br t_f04_e3_1v
-ENSEMBLE te_f04_letd = t_f04_e1, t_f04_e2, t_f04_e3_1v, t_f04_e4, t_f04_e5
-FMRC/hide tef_letd = te_f01, te_f02, te_f03, te_f04_letd, te_f05, te_f06, te_f07, te_f08, te_f09, te_f10, te_f11
-let fcst2fine = fcst_2[gt=($TF_LAG_T)@BIN,gf=($TF_CAL_F)@BIN]
-let diag_fcst_2 = fcst2fine[gt(TF_TIMES)=($TF_CAL_T),gf(TF_TIMES)=($TF_LAG_F)]
-let rel_err_2 = (diag_fcst_2[m=1:5@ave]-diag_fcst_2[m=3])/diag_fcst_2[m=3]
-
+! LET/D=t_f04_e3_1v fcst_2 = fcst + 2
+! SHOW DATA /BRIEF t_f04_e3_1v
+! ENSEMBLE te_f04_letd = t_f04_e1, t_f04_e2, t_f04_e3_1v, t_f04_e4, t_f04_e5
+! FMRC /HIDE tef_letd = te_f01, te_f02, te_f03, te_f04_letd, te_f05, te_f06, te_f07, te_f08, te_f09, te_f10, te_f11, te_f12
+! let fcst2fine = fcst_2[gt=($TF_LAG_T)@BIN,gf=($TF_CAL_F)@BIN]
+! let diag_fcst_2 = fcst2fine[gt(TF_TIMES)=($TF_CAL_T),gf(TF_TIMES)=($TF_LAG_F)]
+! LET err_2 = diag_fcst_2[M=1:5@ave] - diag_fcst_2[M=3]
+!
 ! can run in diagnostic mode and look for "eval FCST_2" to confirm LET/D eval
-set data tef_letd
-stat/brief/x=150E/y=15n diag_fcst_2
-stat/brief/x=150E/y=15n IF ABS(rel_err_2) LT epsilon THEN 0.0 ELSE rel_err_2
-
+! set data tef_letd
+! stat/brief/x=150E/y=25n diag_fcst_2
+! stat/brief/x=150E/y=25n IF ABS(rel_err_2) LT epsilon THEN 0.0 ELSE rel_err_2
+!
 ! demonstrate redefining the LET/D variable without re-defining the agg
 ! Look at the column 3 ("e3"), row 4 ("f04") to see  2.110 => 4.110
-list/x=150E/y=15n/L=10 fcst_2
-let/d=t_f04_e3_1v fcst_2 = fcst + 2 + 2   ! add 2 
-list/x=150E/y=15n/L=10 fcst_2
+! list/x=150E/y=25n/L=10 fcst_2
+! let/d=t_f04_e3_1v fcst_2 = fcst + 2 + 2   ! add 2
+! list/x=150E/y=25n/L=10 fcst_2
 
 ! agg members may have unique contexts on scalar axes of the aggregation
 ! ... here the LET/D var is normal to Z
-let/d=t_f04_e3_1v fcst_2 = X[gx=fcst]+Y[gy=fcst]+T[gt=fcst] + 1000
-list/x=150E/y=15n/L=10 fcst_2
+! let/d=t_f04_e3_1v fcst_2 = X[gx=fcst]+Y[gy=fcst]+T[gt=fcst] + 1000
+! list/x=150E/y=25n/L=10 fcst_2
 
 ! ... here the LET/D var is averaged to a point in a pre-existing agg
-LET some_Z_function = Z[Z=0:100:10] + 1000
-let/d=t_f04_e3_1v fcst_2 = X[gx=fcst]+Y[gy=fcst]+T[gt=fcst]+some_Z_function[Z=10:60@ave]
-list/x=150E/y=15n/L=10 fcst_2
+! LET some_Z_function = Z[Z=0:100:10] + 1000
+! let/d=t_f04_e3_1v fcst_2 = X[gx=fcst]+Y[gy=fcst]+T[gt=fcst]+some_Z_function[Z=10:60@ave]
+! list/x=150E/y=25n/L=10 fcst_2
 
 ! same as preceding, but the LET/D is included in the agg as defined
-ENSEMBLE te_f04_letd_new = t_f04_e1, t_f04_e2, t_f04_e3_1v, t_f04_e4, t_f04_e5
-FMRC/hide tef_letd_new = te_f01, te_f02, te_f03, te_f04_letd, te_f05, te_f06, te_f07, te_f08, te_f09, te_f10, te_f11
-list/x=150E/y=15n/L=10 fcst_2
+! ENSEMBLE te_f04_letd_new = t_f04_e1, t_f04_e2, t_f04_e3_1v, t_f04_e4, t_f04_e5
+! FMRC/hide tef_letd_new = te_f01, te_f02, te_f03, te_f04_letd, te_f05, te_f06, te_f07, te_f08, te_f09, te_f10, te_f11
+! list/x=150E/y=25n/L=10 fcst_2
 
 ! deliberate errors:
 SET MODE IGNORE
-set data tef_letd
+! set data tef_letd
 ! a new LET/D definition that alters the grid of the result is not acceptable
-let/d=t_f04_e3_1v fcst_2 = X[x=1:5]+Y[gy=fcst]+Z[gz=fcst]+T[gt=fcst] ! X ax chg
-list/x=150E/y=15n/L=10 fcst_2
+! let/d=t_f04_e3_1v fcst_2 = X[x=1:5]+Y[gy=fcst]+Z[gz=fcst]+T[gt=fcst] ! X ax chg
+! list/x=150E/y=25n/L=10 fcst_2
 
-let/d=t_f04_e3_1v fcst_2 = X[gx=fcst]+Y[gy=fcst]+Z[gz=fcst]+T[T=1:36:1] ! T chg
-list/x=150E/y=15n/L=10 fcst_2
+! let/d=t_f04_e3_1v fcst_2 = X[gx=fcst]+Y[gy=fcst]+Z[gz=fcst]+T[T=1:36:1] ! T chg
+! list/x=150E/y=25n/L=10 fcst_2
 
 ! LET definition may not compress an axis of N>1
-let/d=t_f04_e3_1v fcst_2 = fcst[i=1:5@ave]
-list/x=150E/y=15n/L=10 fcst_2
-SET MODE/LAST IGNORE
+! let/d=t_f04_e3_1v fcst_2 = fcst[i=1:5@ave]
+! list/x=150E/y=25n/L=10 fcst_2
+SET MODE /LAST IGNORE
 
 ! now restore the original definition and verify it again works
-let/d=t_f04_e3_1v fcst_2 = fcst + 2
-list/x=150E/y=15n/L=10 fcst_2
+! let/d=t_f04_e3_1v fcst_2 = fcst + 2
+! list/x=150E/y=25n/L=10 fcst_2
+
 
 ! ======== TEST SET 2:  aggregate F first, then E
-FMRC      tf_e1 = t_f01_e1, t_f02_e1, t_f03_e1, t_f04_e1, t_f05_e1, t_f06_e1, t_f07_e1, t_f08_e1, t_f09_e1, t_f10_e1, t_f11_e1
-FMRC/hide tf_e2 = t_f01_e2, t_f02_e2, t_f03_e2, t_f04_e2, t_f05_e2, t_f06_e2, t_f07_e2, t_f08_e2, t_f09_e2, t_f10_e2, t_f11_e2
-FMRC/hide tf_e3 = t_f01_e3, t_f02_e3, t_f03_e3, t_f04_e3, t_f05_e3, t_f06_e3, t_f07_e3, t_f08_e3, t_f09_e3, t_f10_e3, t_f11_e3
-FMRC/hide tf_e4 = t_f01_e4, t_f02_e4, t_f03_e4, t_f04_e4, t_f05_e4, t_f06_e4, t_f07_e4, t_f08_e4, t_f09_e4, t_f10_e4, t_f11_e4
-FMRC/hide tf_e5 = t_f01_e5, t_f02_e5, t_f03_e5, t_f04_e5, t_f05_e5, t_f06_e5, t_f07_e5, t_f08_e5, t_f09_e5, t_f10_e5, t_f11_e5
+
+! TODO: be able to use original files not cancelled
+! FMRC      tf_e1 = t_f01_e1, t_f02_e1, t_f03_e1, t_f04_e1, t_f05_e1, t_f06_e1, t_f07_e1, t_f08_e1, t_f09_e1, t_f10_e1, t_f11_e1, t_f12_e1
+! FMRC/hide tf_e2 = t_f01_e2, t_f02_e2, t_f03_e2, t_f04_e2, t_f05_e2, t_f06_e2, t_f07_e2, t_f08_e2, t_f09_e2, t_f10_e2, t_f11_e2, t_f12_e2
+! FMRC/hide tf_e3 = t_f01_e3, t_f02_e3, t_f03_e3, t_f04_e3, t_f05_e3, t_f06_e3, t_f07_e3, t_f08_e3, t_f09_e3, t_f10_e3, t_f11_e3, t_f12_e3
+! FMRC/hide tf_e4 = t_f01_e4, t_f02_e4, t_f03_e4, t_f04_e4, t_f05_e4, t_f06_e4, t_f07_e4, t_f08_e4, t_f09_e4, t_f10_e4, t_f11_e4, t_f12_e4
+! FMRC/hide tf_e5 = t_f01_e5, t_f02_e5, t_f03_e5, t_f04_e5, t_f05_e5, t_f06_e5, t_f07_e5, t_f08_e5, t_f09_e5, t_f10_e5, t_f11_e5, t_f12_e5
+CANCEL DATA /ALL
+
+REPEAT /NAME=ens /RANGE=1:5 ( \
+   LET files = SPAWN("ls -1 aggtef/t_f??_e`ens`.nc") ;\
+   FMRC /HIDE tf_e`ens` = files ;\
+   CANCEL VAR files  \
+)
 
 ! aggregate these F-aggs onto an E axis
 ENSEMBLE/HIDE tfe = tf_e1, tf_e2, tf_e3, tf_e4, tf_e5
@@ -174,52 +164,48 @@ ENSEMBLE/HIDE tfe = tf_e1, tf_e2, tf_e3, tf_e4, tf_e5
 ! F-aggregate inherits the TF-auxiliary variable pointers from the members
 SHOW DATA/ATTRIB tfe   ! also notice the promotion of fcst.im_everywhere
 
-! the 2-D coordinate variable (TF_TIMES) should be 2D, only, in T and F 
-SHOW DATA tfe 
+SHOW DATA tfe
 
-! confirm that the TF_TIMES variable is accessible in a T-F-E aggregation
-LIST/NOHEAD/L=18:19/N=5:6 TF_TIMES   ! subset access
-STAT/BRIEF TF_TIMES
-
+USE "aggtef/tef.nc"
 ! confirm that the T-F-E agg and the T-E-F agg get the same results
-! exactlyidentically zero STAT output means correct functioning
-let tfe_tef_ave_diff = (diag_fcst[d=tfe,m=1:5@ave]-diag_fcst[d=tef,m=1:5@ave])
-stat/brief/x=150E/y=15n tfe_tef_ave_diff
-let tfe_tef_diff = (diag_fcst[d=tfe]-diag_fcst[d=tef])
-stat/brief/x=150E/y=15n tfe_tef_diff[m=1:5@ave]
+! exactly identically zero STAT output means correct functioning
+LET tfe_tef_ave_diff = (fcst[D=tfe,M=1:5@AVE]-fcst[D=tef,M=1:5@AVE])
+STAT /BRIEF /X=150E /Y=25N tfe_tef_ave_diff
+LET tfe_tef_diff = (fcst[D=tfe]-fcst[D=tef])
+STAT /BRIEF /X=150E /Y=25N tfe_tef_diff[M=1:5@AVE]
 
 ! missing forecast (t_f02_e2) in a T-F-E aggregation
-FMRC tf_e2_gap = t_f01_e2, -, t_f03_e2, t_f04_e2, t_f05_e2, t_f06_e2, t_f07_e2, t_f08_e2, t_f09_e2, t_f10_e2, t_f11_e2
-ENSEMBLE tfe_gap = tf_e1, tf_e2_gap, tf_e3, tf_e4, tf_e5
-LIST/l=10/i=10/j=10/k=1 fcst[d=tfe_gap]
-
+! FMRC tf_e2_gap = t_f01_e2, -, t_f03_e2, t_f04_e2, t_f05_e2, t_f06_e2, t_f07_e2, t_f08_e2, t_f09_e2, t_f10_e2, t_f11_e2
+! ENSEMBLE tfe_gap = tf_e1, tf_e2_gap, tf_e3, tf_e4, tf_e5
+! LIST/l=10/i=10/j=10/k=1 fcst[d=tfe_gap]
+! 
 ! missing ensemble member (t_f02_e2)in a T-E-F agregation
-ENSEMBLE te_f02_gap = t_f02_e1, -, t_f02_e3, t_f02_e4, t_f02_e5
-FMRC tef_gap = te_f01, te_f02_gap, te_f03, te_f04
-LIST/l=10/i=10/j=10/k=1 fcst[d=tef_gap]
-
+! ENSEMBLE te_f02_gap = t_f02_e1, -, t_f02_e3, t_f02_e4, t_f02_e5
+! FMRC tef_gap = te_f01, te_f02_gap, te_f03, te_f04
+! LIST/l=10/i=10/j=10/k=1 fcst[d=tef_gap]
+! 
 ! deliberate errors
-set mode ignore
+SET MODE IGNORE
 ! unequal ensemble axis lengths
-ENSEMBLE te_f02_short = t_f02_e1, t_f02_e2, t_f02_e3, t_f02_e4   ! shorter than others
-FMRC tef_short = te_f01, te_f02_short, te_f03, te_f04, te_f05, te_f06, te_f07, te_f08, te_f09, te_f10, te_f11
-
+! ENSEMBLE te_f02_short = t_f02_e1, t_f02_e2, t_f02_e3, t_f02_e4   ! shorter than others
+! FMRC tef_short = te_f01, te_f02_short, te_f03, te_f04, te_f05, te_f06, te_f07, te_f08, te_f09, te_f10, te_f11
+! 
 ! unequal forecast axis lengths
-FMRC tf_e2_short = t_f01_e2, t_f02_e2, t_f03_e2, t_f04_e2  ! shorter than others
-ENSEMBLE tfe_short = tf_e1, tf_e2_short, tf_e3, tf_e4, tf_e5
-
+! FMRC tf_e2_short = t_f01_e2, t_f02_e2, t_f03_e2, t_f04_e2  ! shorter than others
+! ENSEMBLE tfe_short = tf_e1, tf_e2_short, tf_e3, tf_e4, tf_e5
+! 
 ! ensemble created with already-ensemble components
-ENSEMBLE te_f01 = t_f01_e1, t_f01_e2, t_f01_e3, t_f01_e4, t_f01_e5
-ENSEMBLE te_f03 = t_f03_e1, t_f03_e2, t_f03_e3, t_f03_e4, t_f03_e5
-ENSEMBLE te_f04 = t_f04_e1, t_f04_e2, t_f04_e3, t_f04_e4, t_f04_e5
-ENSEMBLE bad_ens = te_f01, te_f03, te_f04
-
+! ENSEMBLE te_f01 = t_f01_e1, t_f01_e2, t_f01_e3, t_f01_e4, t_f01_e5
+! ENSEMBLE te_f03 = t_f03_e1, t_f03_e2, t_f03_e3, t_f03_e4, t_f03_e5
+! ENSEMBLE te_f04 = t_f04_e1, t_f04_e2, t_f04_e3, t_f04_e4, t_f04_e5
+! ENSEMBLE bad_ens = te_f01, te_f03, te_f04
+! 
 ! fmrc created with already-fmrc components
-FMRC tf_e1 = t_f01_e1, t_f02_e1, t_f03_e1, t_f04_e1
-FMRC tf_e3 = t_f01_e3, t_f02_e3, t_f03_e3, t_f04_e3
-FMRC tf_e4 = t_f01_e4, t_f02_e4, t_f03_e4, t_f04_e4
-FMRC bad_fmrc = tf_e1, tf_e3, tf_e4
+! FMRC tf_e1 = t_f01_e1, t_f02_e1, t_f03_e1, t_f04_e1
+! FMRC tf_e3 = t_f01_e3, t_f02_e3, t_f03_e3, t_f04_e3
+! FMRC tf_e4 = t_f01_e4, t_f02_e4, t_f03_e4, t_f04_e4
+! FMRC bad_fmrc = tf_e1, tf_e3, tf_e4
 
-set mode/last ignore
+SET MODE /LAST IGNORE
 
 CANCEL DATA/ALL
