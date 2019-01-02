@@ -2707,7 +2707,7 @@ c	ENDIF
            ENDIF
         ENDIF
 
-* Is there a /U  (ag_dim will be set to unspecified_int4)
+* Is there a /U  (agg_dim will be reset to unspecified_int4 just before aggregating)
 
         IF (qual_given( slash_def_agg_u ) .GT. 0) THEN
            IF (agg_dim .EQ. unspecified_int4) THEN
@@ -2720,6 +2720,7 @@ c	ENDIF
 * First check for /FAXIS= (in case /F not given) 
 * as both /FAXIS= and /TAXIS= can be given for /F
         fline = unspecified_int4
+        fmatch = ' '
         iqual = qual_given(slash_def_agg_faxis) 
         IF ( iqual .GT. 0 ) THEN
            IF ( agg_dim .EQ. unspecified_int4 ) THEN
@@ -2729,31 +2730,45 @@ c	ENDIF
            ENDIF
            CALL EQUAL_STRING(cmnd_buff(qual_start(iqual):qual_end(iqual)), buff1, status)
            IF ( status .NE. ferr_ok ) RETURN
-* ... check if a method of matching was specified
+           IF ( buff1 .EQ. ' ' )
+     .        CALL ERRMSG(ferr_syntax, status,
+     .                    '/FAXIS must have a value', *5000)
+* ... check if a method of matching, and/or @LAG, was specified
            idx = INDEX(buff1, '@')
            IF ( idx .GT. 0 ) THEN
               vaxcode = STR_UPCASE(fmatch, buff1(idx:))
               buff1(idx:) = ' '
-           ELSE
-              fmatch = ' '
            ENDIF
-           fline = TM_GET_LINENUM(buff1)
-           IF ( fline .NE. unspecified_int4 ) THEN
+* ... could have just been /FAXIS=@LAG
+           IF ( buff1 .NE. ' ' ) THEN
+              fline = TM_GET_LINENUM(buff1)
+              IF ( fline .NE. unspecified_int4 ) THEN
 * ... line given by name - don't allow inappropriate units
-              iunit = line_unit_code(fline)
-              IF ( (iunit .NE. 0) .AND. ( (iunit .LT. pun_1st_time) .OR.
-     .                 (iunit .GT. pun_last_time) ) ) GOTO 5517
-           ELSE
+                 iunit = line_unit_code(fline)
+                 IF ( (iunit .NE. 0) .AND.
+     .                ( (iunit .LT. pun_1st_time) .OR.
+     .                  (iunit .GT. pun_last_time) ) )
+     .              CALL ERRMSG(ferr_invalid_command, status,
+     .                          '/FAXIS is not a time axis', *5000)
+              ELSE
 * ... line implied through grid or variable name
-              ax_grid = GRID_FROM_NAME(buff1, cx_last, status)
-              IF ( status .NE. ferr_ok ) RETURN
-              IF ( ax_grid .EQ. unspecified_int4 ) GOTO 5320
-              fline = grid_line(f_dim, ax_grid)
+                 ax_grid = GRID_FROM_NAME(buff1, cx_last, status)
+                 IF ( status .NE. ferr_ok ) RETURN
+                 IF ( ax_grid .EQ. unspecified_int4 ) GOTO 5320
+                 fline = grid_line(f_dim, ax_grid)
+              ENDIF
+           ELSE
+* ... no axis given in /FAXIS value
+              IF ( fmatch .NE. '@LAG' )
+     .           CALL ERRMSG(ferr_syntax, status,
+     .                 'no axis specified in /FAXIS (only @LAG '//
+     .                 'can be specified without an axis)', *5000)
            ENDIF
         ENDIF
 
 * /TAXIS=
         tline = unspecified_int4
+        tmatch = ' '
         iqual = qual_given(slash_def_agg_taxis) 
         IF ( iqual .GT. 0 ) THEN
            IF ( agg_dim .EQ. unspecified_int4 ) THEN
@@ -2763,28 +2778,43 @@ c	ENDIF
            ENDIF
            CALL EQUAL_STRING(cmnd_buff(qual_start(iqual):qual_end(iqual)), buff1, status)
            IF ( status .NE. ferr_ok ) RETURN
-* ... check if a method of matching was specified
+* ... check if a method of matching, and/or @LAG, was specified
            idx = INDEX(buff1, '@')
            IF ( idx .GT. 0 ) THEN
               vaxcode = STR_UPCASE(tmatch, buff1(idx:))
               buff1(idx:) = ' '
-           ELSE
-              tmatch = ' '
            ENDIF
-           tline = TM_GET_LINENUM(buff1)
-           IF ( tline .NE. unspecified_int4 ) THEN
+* ... could have just been /FAXIS=@LAG
+           IF ( buff1 .NE. ' ' ) THEN
+              tline = TM_GET_LINENUM(buff1)
+              IF ( tline .NE. unspecified_int4 ) THEN
 * ... line given by name - don't allow inappropriate units
-              iunit = line_unit_code(tline)
-              IF ( (iunit .NE. 0) .AND. ( (iunit .LT. pun_1st_time) .OR.
-     .                 (iunit .GT. pun_last_time) ) ) GOTO 5517
-           ELSE
+                 iunit = line_unit_code(tline)
+                 IF ( (iunit .NE. 0) .AND. 
+     .                ( (iunit .LT. pun_1st_time) .OR.
+     .                  (iunit .GT. pun_last_time) ) )
+     .              CALL ERRMSG(ferr_invalid_command, status,
+     .                          '/TAXIS is not a time axis', *5000)
+              ELSE
 * ... line implied through grid or variable name
-              ax_grid = GRID_FROM_NAME(buff1, cx_last, status)
-              IF ( status .NE. ferr_ok ) RETURN
-              IF ( ax_grid .EQ. unspecified_int4 ) GOTO 5320
-              tline = grid_line(t_dim, ax_grid)
+                 ax_grid = GRID_FROM_NAME(buff1, cx_last, status)
+                 IF ( status .NE. ferr_ok ) RETURN
+                 IF ( ax_grid .EQ. unspecified_int4 ) GOTO 5320
+                 tline = grid_line(t_dim, ax_grid)
+              ENDIF
+           ELSE
+* ... no axis given in /FAXIS value
+              IF ( fmatch .NE. '@LAG' )
+     .           CALL ERRMSG(ferr_syntax, status,
+     .                 'no axis specified in /TAXIS (only @LAG '//
+     .                 'can be specified without an axis)', *5000)
            ENDIF
         ENDIF
+
+        IF ( (INDEX(fmatch, '@LAG') .GT. 0) .AND.
+     .       (INDEX(tmatch, '@LAG') .GT. 0) )
+     .     CALL ERRMSG(ferr_syntax, status, '@LAG cannot '//
+     .           'be specified in both /FAXIS and /TAXIS', *5000)
 
 * default aggregation orientation
 	IF (agg_dim .EQ. unspecified_int4) agg_dim = t_dim
@@ -2993,8 +3023,6 @@ c ?? if nlab=0, use next avail slot?
      .    'Conflicting /X/Y/Z/T/E/F axis orientations given', *5000 )
  5515	CALL ERRMSG( ferr_invalid_command, status,
      .    'Conflicting /U/T/E/F/TAXIS/EAXIS/FAXIS given', *5000 )
- 5517   CALL ERRMSG( ferr_invalid_command, status,
-     .    '/TAXIS or /FAXIS is not a time axis', *5000 )
  5520	CALL FREE_LINE_DYNMEM (iline)
 	CALL ERRMSG( ferr_grid_definition, status,
      .			'error in start,end,delta', *5000 )
@@ -3147,9 +3175,6 @@ c ?? if nlab=0, use next avail slot?
 
  6100 CALL ERRMSG(ferr_syntax, status, 
      .    'DEFINE DATA valid only with /AGGREGATE: ', *5000)
-
-! 6110 CALL ERRMSG(ferr_aggregate_error, status, 
-!     .    'Aggregate dataset not defined', *5000)
 
  6200	CALL ERRMSG( ferr_invalid_command, status,
      .		'No text given for DEFINE ANNOTATION', *5000 )

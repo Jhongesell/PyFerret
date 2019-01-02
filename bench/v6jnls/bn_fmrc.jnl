@@ -3,21 +3,23 @@
 
 ! *sh* 11/15 MUCH MORE DETAILED BENCHMARK NEEDED!
 
-use "run1.nc"
-use "run2.nc"
-use "run3.nc"
-use "run4.nc"
+USE "run1.nc"
+USE "run2.nc"
+USE "run3.nc"
+USE "run4.nc"
 
-define data/F/agg fourfiles = 1, 2, 3, 4
-show data
-show grid value
-list/width=180/i=1/j=1/L=1:18/n=1:4 value
+DEFINE DATA /HIDE /F /AGG fourfiles = 1, 2, 3, 4
+SHOW DATA
+SHOW GRID value
+LIST _F[gf=value]
+LIST /I=1 /J=1 /ORDER=FT /PREC=6 value
 
-cancel data /all
+CANCEL DATA /ALL
 
-let filelist = { "data/run1.nc", "data/run2.nc", "data/run3.nc", "data/run4.nc" }
-define data/F/agg fourfiles = filelist
-show data
-show grid value
-list/width=180/i=1/j=1/L=1:18/n=1:4 value
+LET filelist = { "data/run1.nc", "data/run2.nc", "data/run3.nc", "data/run4.nc" }
+DEFINE DATA /F /AGG fourfiles = filelist
+SHOW DATA
+SHOW GRID value
+LIST _F[gf=value]
+LIST /I=1 /J=1 /ORDER=FT /PREC=6 value
 

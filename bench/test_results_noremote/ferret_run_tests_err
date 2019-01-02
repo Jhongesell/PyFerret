@@ -4116,96 +4116,96 @@ ooooooooooooooooooooooooooooooooooooooooooo
  TEMPORARY data cleared from memory
 ooooooooooooooooooooooooooooooooooooooooooo
 *** Running ferret script: bn_aggregate_t_noremote.jnl
- LISTing to file tmp/tagg_reg_1.nc
- LISTing to file tmp/tagg_reg_2.nc
- LISTing to file tmp/tagg_reg_3.nc
- LISTing to file tmp/tagg_reg_4.nc
- LISTing to file tmp/tagg_reg_5.nc
- LISTing to file tmp/tagg_reg_6.nc
- LISTing to file tmp/tagg_reg_7.nc
- LISTing to file tmp/tagg_reg_8.nc
- LISTing to file tmp/tagg_reg_9.nc
- LISTing to file tmp/tagg_reg_10.nc
- LISTing to file tmp/tagg_reg_1.nc
- LISTing to file tmp/tagg_reg_1_duplicate.nc
- LISTing to file tmp/tagg_reg_no_T.nc
- LISTing to file tmp/tagg_reg_2_overlarge.nc
+ LISTing to file aggt/tagg_reg_1.nc
+ LISTing to file aggt/tagg_reg_2.nc
+ LISTing to file aggt/tagg_reg_3.nc
+ LISTing to file aggt/tagg_reg_4.nc
+ LISTing to file aggt/tagg_reg_5.nc
+ LISTing to file aggt/tagg_reg_6.nc
+ LISTing to file aggt/tagg_reg_7.nc
+ LISTing to file aggt/tagg_reg_8.nc
+ LISTing to file aggt/tagg_reg_9.nc
+ LISTing to file aggt/tagg_reg_10.nc
+ LISTing to file aggt/tagg_reg_1.nc
+ LISTing to file aggt/tagg_reg_1_duplicate.nc
+ LISTing to file aggt/tagg_reg_no_T.nc
+ LISTing to file aggt/tagg_reg_2_overlarge.nc
            *** NOTE: Not deleted: TDAY
            *** NOTE: Axis is in use by grid (G###)
- LISTing to file tmp/tagg_irreg_1.nc
- LISTing to file tmp/tagg_irreg_2.nc
- LISTing to file tmp/tagg_irreg_3.nc
- LISTing to file tmp/tagg_irreg_4.nc
- LISTing to file tmp/tagg_irreg_5.nc
- LISTing to file tmp/tagg_irreg_6.nc
- LISTing to file tmp/tagg_irreg_7.nc
- LISTing to file tmp/tagg_irreg_8.nc
- LISTing to file tmp/tagg_irreg_9.nc
- LISTing to file tmp/tagg_irreg_10.nc
- LISTing to file tmp/tagg_irreg_1.nc
- LISTing to file tmp/tagg_irreg_1.nc
+ LISTing to file aggt/tagg_irreg_1.nc
+ LISTing to file aggt/tagg_irreg_2.nc
+ LISTing to file aggt/tagg_irreg_3.nc
+ LISTing to file aggt/tagg_irreg_4.nc
+ LISTing to file aggt/tagg_irreg_5.nc
+ LISTing to file aggt/tagg_irreg_6.nc
+ LISTing to file aggt/tagg_irreg_7.nc
+ LISTing to file aggt/tagg_irreg_8.nc
+ LISTing to file aggt/tagg_irreg_9.nc
+ LISTing to file aggt/tagg_irreg_10.nc
+ LISTing to file aggt/tagg_irreg_1.nc
+ LISTing to file aggt/tagg_irreg_1.nc
 Replacing definition of axis TDAY_IR
- LISTing to file tmp/tagg_irreg_2_reg.nc
+ LISTing to file aggt/tagg_irreg_2_reg.nc
            *** NOTE: Not deleted: TDAY_IR
            *** NOTE: Axis is in use by grid (G###)
- LISTing to file tmp/tagg_T0varying_1.nc
+ LISTing to file aggt/tagg_T0varying_1.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_T0varying_2.nc
+ LISTing to file aggt/tagg_T0varying_2.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_T0varying_3.nc
+ LISTing to file aggt/tagg_T0varying_3.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_T0varying_4.nc
+ LISTing to file aggt/tagg_T0varying_4.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_T0varying_5.nc
+ LISTing to file aggt/tagg_T0varying_5.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_disjoint_T0varying_1.nc
+ LISTing to file aggt/tagg_disjoint_T0varying_1.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_disjoint_T0varying_2.nc
+ LISTing to file aggt/tagg_disjoint_T0varying_2.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_disjoint_T0varying_3.nc
+ LISTing to file aggt/tagg_disjoint_T0varying_3.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_disjoint_T0varying_4.nc
+ LISTing to file aggt/tagg_disjoint_T0varying_4.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_disjoint_T0varying_5.nc
+ LISTing to file aggt/tagg_disjoint_T0varying_5.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_disjoint_T0varying_6.nc
+ LISTing to file aggt/tagg_disjoint_T0varying_6.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_disjoint_T0varying_7.nc
+ LISTing to file aggt/tagg_disjoint_T0varying_7.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_disjoint_T0varying_8.nc
+ LISTing to file aggt/tagg_disjoint_T0varying_8.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_disjoint_T0varying_9.nc
+ LISTing to file aggt/tagg_disjoint_T0varying_9.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_disjoint_T0varying_10.nc
+ LISTing to file aggt/tagg_disjoint_T0varying_10.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_disjoint_T0varying_1.nc
+ LISTing to file aggt/tagg_disjoint_T0varying_1.nc
 Replacing definition of axis TDAY_TVAR
- LISTing to file tmp/tagg_disjoint_T0varying_3.nc
- LISTing to file tmp/tagg_disjoint_T0varying_4_wrong.nc
+ LISTing to file aggt/tagg_disjoint_T0varying_3.nc
+ LISTing to file aggt/tagg_disjoint_T0varying_4_wrong.nc
            *** NOTE: Not deleted: TDAY_WRONG
            *** NOTE: Axis is in use by grid (G###)
- LISTing to file tmp/tagg_single_1.nc
- LISTing to file tmp/tagg_single_2.nc
- LISTing to file tmp/tagg_single_3.nc
- LISTing to file tmp/tagg_single_4.nc
- LISTing to file tmp/tagg_single_5.nc
- LISTing to file tmp/tagg_single_6.nc
+ LISTing to file aggt/tagg_single_1.nc
+ LISTing to file aggt/tagg_single_2.nc
+ LISTing to file aggt/tagg_single_3.nc
+ LISTing to file aggt/tagg_single_4.nc
+ LISTing to file aggt/tagg_single_5.nc
+ LISTing to file aggt/tagg_single_6.nc
            *** NOTE: Not deleted: TDAY
            *** NOTE: Axis is in use by grid (G###)
            *** NOTE: /FILES is deprecated.  Use /MEMBERS
            *** NOTE: /FILES is deprecated.  Use /MEMBERS
  **ERROR: invalid command: given aggregation dataset name already in use: myagg2
-define data/agg/t myagg2 = tmp/tagg_reg_1.nc, tmp/tagg_reg_2.nc, tmp/tagg_reg_2.nc
+define data/agg/t myagg2 = aggt/tagg_reg_1.nc, aggt/tagg_reg_2.nc, aggt/tagg_reg_2.nc
  **TMAP ERR: non-existent or not on line
-             tmp/tagg_no_exist.nc
-define data/agg/t myaggbad = tmp/tagg_no_exist.nc, tmp/tagg_reg_2.nc
+             aggt/tagg_no_exist.nc
+define data/agg/t myaggbad = aggt/tagg_no_exist.nc, aggt/tagg_reg_2.nc
  **TMAP ERR: non-existent or not on line
-             tmp/tagg_no_exist.nc
-define data/agg/t myaggbad = tmp/tagg_reg_1.nc, tmp/tagg_no_exist.nc
- **ERROR: improper grid or axis definition: first file of aggregation has no time axis tmp/tagg_reg_no_T.nc
-DEFINE DATA/AGGREGAT/T myTindepagg = tmp/tagg_reg_no_T.nc
- **ERROR: improper grid or axis definition: time axis is not monotonic at L=1 of file tmp/tagg_reg_3.nc
-define data/agg/t myagg3 = tmp/tagg_reg_1.nc, tmp/tagg_reg_2_overlarge.nc,tmp/tagg_reg_3.nc
+             aggt/tagg_no_exist.nc
+define data/agg/t myaggbad = aggt/tagg_reg_1.nc, aggt/tagg_no_exist.nc
+ **ERROR: improper grid or axis definition: first file of aggregation has no time axis aggt/tagg_reg_no_T.nc
+DEFINE DATA/AGGREGAT/T myTindepagg = aggt/tagg_reg_no_T.nc
+ **ERROR: improper grid or axis definition: time axis is not monotonic at L=1 of file aggt/tagg_reg_3.nc
+define data/agg/t myagg3 = aggt/tagg_reg_1.nc, aggt/tagg_reg_2_overlarge.nc,aggt/tagg_reg_3.nc
  **TMAP ERR: non-existent or not on line
              Searched $FER_DESCR and $FER_DATA for 1(.nc ,.cdf,.des). For a Timeseries aggregation, specify the NetCDF file/path names or OPeNDAP dataset names.
 define data/agg/t myagg2num = 1,2
@@ -4213,15 +4213,15 @@ define data/agg/t myagg2num = 1,2
            *** NOTE: /FILES is deprecated.  Use /MEMBERS
            *** NOTE: /FILES is deprecated.  Use /MEMBERS
  **TMAP ERR: Unknown variable code
-             in file tmp/tagg_disjoint_T0varying_4_wrong.nc time axis variable is missing: TDAY_TVAR
-define data/agg/t myagg5_bad = tmp/tagg_disjoint_T0varying_1.nc, tmp/tagg_disjoint_T0varying_2.nc,tmp/tagg_disjoint_T0varying_3.nc, tmp/tagg_disjoint_T0varying_4_wrong.nc,tmp/tagg_disjoint_T0varying_5.nc
+             in file aggt/tagg_disjoint_T0varying_4_wrong.nc time axis variable is missing: TDAY_TVAR
+define data/agg/t myagg5_bad = aggt/tagg_disjoint_T0varying_1.nc, aggt/tagg_disjoint_T0varying_2.nc,aggt/tagg_disjoint_T0varying_3.nc, aggt/tagg_disjoint_T0varying_4_wrong.nc,aggt/tagg_disjoint_T0varying_5.nc
            *** NOTE: /FILES is deprecated.  Use /MEMBERS
  **ERROR: unknown command: garbage
 garbage command syntax
- **ERROR: improper grid or axis definition: time axis is not monotonic at L=1 of file tmp/tagg_single_1.nc
-define data/agg/t MYsing_irreg_agg4 = tmp/tagg_single_1.nc, tmp/tagg_single_1.nc, tmp/tagg_single_2.nc,tmp/tagg_single_4.nc, tmp/tagg_single_5.nc
- **ERROR: improper grid or axis definition: time axis is not monotonic at L=1 of file tmp/tagg_single_5.nc
-define data/agg/t MYsing_irreg_agg4 = tmp/tagg_single_1.nc, tmp/tagg_single_2.nc,tmp/tagg_single_4.nc, tmp/tagg_single_5.nc, tmp/tagg_single_5.nc
+ **ERROR: improper grid or axis definition: time axis is not monotonic at L=1 of file aggt/tagg_single_1.nc
+define data/agg/t MYsing_irreg_agg4 = aggt/tagg_single_1.nc, aggt/tagg_single_1.nc, aggt/tagg_single_2.nc,aggt/tagg_single_4.nc, aggt/tagg_single_5.nc
+ **ERROR: improper grid or axis definition: time axis is not monotonic at L=1 of file aggt/tagg_single_5.nc
+define data/agg/t MYsing_irreg_agg4 = aggt/tagg_single_1.nc, aggt/tagg_single_2.nc,aggt/tagg_single_4.nc, aggt/tagg_single_5.nc, aggt/tagg_single_5.nc
 *** Running ferret script: bn_unquoted_args_noremote.jnl
  LISTing to file tmp/test1.nc
  LISTing to file tmp/test2.nc
@@ -4252,348 +4252,572 @@ load a
 "/archive/ccsp/ipcc_ar4/CM2.1U-D4_1860-2000-AllForc_H1/pp/atmos/ts/monthly/100yr/atmos.0020.t_surf.nc","/archive/ccsp/ipcc_ar4/CM2.1U-D4_1860-2000-AllForc_H1/pp/atmos/ts/monthly/100yr/atmos.0021.t_surf.nc","/archive/ccsp/ipcc_ar4/CM2.1U-D4_1860-2000-AllForc_H1/pp/atmos/ts/monthly/100yr/atmos.0022.t_surf.nc","/archive/ccsp/ipcc_ar4/CM2.1U-D4_1860-2000-AllForc_H1/pp/atmos/ts/monthly/100yr/atmos.0023.t_surf.nc","/archive/ccsp/ipcc_ar4/CM2.1U-D4_1860-2000-AllForc_H1/pp/atmos/ts/monthly/100yr/atmos.0024.t_surf.nc","/archive/ccsp/ipcc_ar4/CM2.1U-D4_1860-2000-AllForc_H1/pp/atmos/ts/monthly/100yr/atmos.0025.t_surf.nc",\}
 *** Running ferret script: bn_show_uvar_grid.jnl
 *** Running ferret script: bn_aggregate_f.jnl
- LISTing to file tmp/fcst_1.nc
- LISTing to file tmp/fcst_2.nc
- LISTing to file tmp/fcst_3.nc
- LISTing to file tmp/fcst_4.nc
- LISTing to file tmp/fcst_5.nc
- LISTing to file tmp/fcst_6.nc
- LISTing to file tmp/fcst_7.nc
- LISTing to file tmp/fcst_8.nc
- LISTing to file tmp/fcst_9.nc
- LISTing to file tmp/fcst_10.nc
- LISTing to file tmp/fcst_11.nc
- LISTing to file tmp/long_fcst_1.nc
- LISTing to file tmp/long_fcst_6.nc
- LISTing to file tmp/one_var_fcst_1.nc
- LISTing to file tmp/one_var_fcst_6.nc
- LISTing to file tmp/consecutive_month_fcst.nc
-Replacing definition of axis MONTHLY
- LISTing to file tmp/irregular_start_time_fcst.nc
+ LISTing to file aggf/fcst_1.nc
+ LISTing to file aggf/long_fcst_1.nc
+ LISTing to file aggf/one_var_fcst_1.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggf/fcst_2.nc
+ LISTing to file aggf/long_fcst_2.nc
+ LISTing to file aggf/one_var_fcst_2.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggf/fcst_3.nc
+ LISTing to file aggf/long_fcst_3.nc
+ LISTing to file aggf/one_var_fcst_3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggf/fcst_4.nc
+ LISTing to file aggf/long_fcst_4.nc
+ LISTing to file aggf/one_var_fcst_4.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggf/fcst_5.nc
+ LISTing to file aggf/long_fcst_5.nc
+ LISTing to file aggf/one_var_fcst_5.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggf/fcst_6.nc
+ LISTing to file aggf/long_fcst_6.nc
+ LISTing to file aggf/one_var_fcst_6.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggf/fcst_7.nc
+ LISTing to file aggf/long_fcst_7.nc
+ LISTing to file aggf/one_var_fcst_7.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggf/fcst_8.nc
+ LISTing to file aggf/long_fcst_8.nc
+ LISTing to file aggf/one_var_fcst_8.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggf/fcst_9.nc
+ LISTing to file aggf/long_fcst_9.nc
+ LISTing to file aggf/one_var_fcst_9.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggf/fcst_10.nc
+ LISTing to file aggf/long_fcst_10.nc
+ LISTing to file aggf/one_var_fcst_10.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggf/fcst_11.nc
+ LISTing to file aggf/long_fcst_11.nc
+ LISTing to file aggf/one_var_fcst_11.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggf/fcst_12.nc
+ LISTing to file aggf/long_fcst_12.nc
+ LISTing to file aggf/one_var_fcst_12.nc
            *** NOTE: Variable "FCST_2" excluded from aggregate: Not found in all member datasets
-           *** NOTE: Variable "FCST_2" excluded from aggregate: Not found in all member datasets
-           *** NOTE: Variable "FCST_2" excluded from aggregate: Not found in all member datasets
-           *** NOTE: Dataset used in aggregation.  Canceling aggregation, bn_aggregate_f.jnl
-           *** NOTE: Dataset used in aggregation.  Canceling aggregation, my_fmrc
-           *** NOTE: Variable "FCST_2" excluded from aggregate: Not found in all member datasets
-           *** NOTE: Variable "FCST_2" excluded from aggregate: Not found in all member datasets
- **ERROR: error defining aggregate dataset: some files have duplicate forecast start times
-DEFINE DATA/AGGREGAT/F my_fmrc = tmp/fcst_1.nc, tmp/fcst_2.nc,tmp/fcst_2.nc,tmp/fcst_3.nc
+ **ERROR: error defining aggregate dataset: duplicate time origin "01-APR-1950" in two forecast datasets
+DEFINE DATA/AGGREGAT/F my_fmrc = XCAT(files, "aggf/fcst_2.nc")
  **TMAP ERR: non-existent or not on line
-             tmp/no_exist.nc
-DEFINE DATA/AGGREGAT/F my_fmrc = XCAT(files,"tmp/no_exist.nc")
- **ERROR: error defining aggregate dataset: forecast start times are irregular or too gappy
-DEFINE DATA/AGGREGAT/F my_fmrc = XCAT(files,"tmp/consecutive_month_fcst.nc")
- **ERROR: error defining aggregate dataset: forecast start times are irregular or too gappy
-DEFINE DATA/AGGREGAT/F my_fmrc = XCAT(files,"tmp/irregular_start_time_fcst.nc")
+             aggf/no_exist.nc
+DEFINE DATA/AGGREGAT/F my_fmrc = XCAT(files, "aggf/no_exist.nc")
 *** Running ferret script: bn_aggregate_tef.jnl
-ls: tmp/f04_e3_t3_1v.nc: No such file or directory
- LISTing to file tmp/f01_e1_t1.nc
- LISTing to file tmp/f01_e1_t1.nc
- LISTing to file tmp/f01_e1_t1.nc
- LISTing to file tmp/f01_e1_t2.nc
- LISTing to file tmp/f01_e1_t3.nc
- LISTing to file tmp/f01_e2_t1.nc
- LISTing to file tmp/f01_e2_t1.nc
- LISTing to file tmp/f01_e2_t1.nc
- LISTing to file tmp/f01_e2_t2.nc
- LISTing to file tmp/f01_e2_t3.nc
- LISTing to file tmp/f01_e3_t1.nc
- LISTing to file tmp/f01_e3_t1.nc
- LISTing to file tmp/f01_e3_t1.nc
- LISTing to file tmp/f01_e3_t2.nc
- LISTing to file tmp/f01_e3_t3.nc
- LISTing to file tmp/f01_e4_t1.nc
- LISTing to file tmp/f01_e4_t1.nc
- LISTing to file tmp/f01_e4_t1.nc
- LISTing to file tmp/f01_e4_t2.nc
- LISTing to file tmp/f01_e4_t3.nc
- LISTing to file tmp/f01_e5_t1.nc
- LISTing to file tmp/f01_e5_t1.nc
- LISTing to file tmp/f01_e5_t1.nc
- LISTing to file tmp/f01_e5_t2.nc
- LISTing to file tmp/f01_e5_t3.nc
- LISTing to file tmp/f02_e1_t1.nc
- LISTing to file tmp/f02_e1_t1.nc
- LISTing to file tmp/f02_e1_t1.nc
- LISTing to file tmp/f02_e1_t2.nc
- LISTing to file tmp/f02_e1_t3.nc
- LISTing to file tmp/f02_e2_t1.nc
- LISTing to file tmp/f02_e2_t1.nc
- LISTing to file tmp/f02_e2_t1.nc
- LISTing to file tmp/f02_e2_t2.nc
- LISTing to file tmp/f02_e2_t3.nc
- LISTing to file tmp/f02_e3_t1.nc
- LISTing to file tmp/f02_e3_t1.nc
- LISTing to file tmp/f02_e3_t1.nc
- LISTing to file tmp/f02_e3_t2.nc
- LISTing to file tmp/f02_e3_t3.nc
- LISTing to file tmp/f02_e4_t1.nc
- LISTing to file tmp/f02_e4_t1.nc
- LISTing to file tmp/f02_e4_t1.nc
- LISTing to file tmp/f02_e4_t2.nc
- LISTing to file tmp/f02_e4_t3.nc
- LISTing to file tmp/f02_e5_t1.nc
- LISTing to file tmp/f02_e5_t1.nc
- LISTing to file tmp/f02_e5_t1.nc
- LISTing to file tmp/f02_e5_t2.nc
- LISTing to file tmp/f02_e5_t3.nc
- LISTing to file tmp/f03_e1_t1.nc
- LISTing to file tmp/f03_e1_t1.nc
- LISTing to file tmp/f03_e1_t1.nc
- LISTing to file tmp/f03_e1_t2.nc
- LISTing to file tmp/f03_e1_t3.nc
- LISTing to file tmp/f03_e2_t1.nc
- LISTing to file tmp/f03_e2_t1.nc
- LISTing to file tmp/f03_e2_t1.nc
- LISTing to file tmp/f03_e2_t2.nc
- LISTing to file tmp/f03_e2_t3.nc
- LISTing to file tmp/f03_e3_t1.nc
- LISTing to file tmp/f03_e3_t1.nc
- LISTing to file tmp/f03_e3_t1.nc
- LISTing to file tmp/f03_e3_t2.nc
- LISTing to file tmp/f03_e3_t3.nc
- LISTing to file tmp/f03_e4_t1.nc
- LISTing to file tmp/f03_e4_t1.nc
- LISTing to file tmp/f03_e4_t1.nc
- LISTing to file tmp/f03_e4_t2.nc
- LISTing to file tmp/f03_e4_t3.nc
- LISTing to file tmp/f03_e5_t1.nc
- LISTing to file tmp/f03_e5_t1.nc
- LISTing to file tmp/f03_e5_t1.nc
- LISTing to file tmp/f03_e5_t2.nc
- LISTing to file tmp/f03_e5_t3.nc
- LISTing to file tmp/f04_e1_t1.nc
- LISTing to file tmp/f04_e1_t1.nc
- LISTing to file tmp/f04_e1_t1.nc
- LISTing to file tmp/f04_e1_t2.nc
- LISTing to file tmp/f04_e1_t3.nc
- LISTing to file tmp/f04_e2_t1.nc
- LISTing to file tmp/f04_e2_t1.nc
- LISTing to file tmp/f04_e2_t1.nc
- LISTing to file tmp/f04_e2_t2.nc
- LISTing to file tmp/f04_e2_t3.nc
- LISTing to file tmp/f04_e3_t1.nc
- LISTing to file tmp/f04_e3_t1.nc
- LISTing to file tmp/f04_e3_t1.nc
- LISTing to file tmp/f04_e3_t2.nc
- LISTing to file tmp/f04_e3_t3.nc
- LISTing to file tmp/f04_e4_t1.nc
- LISTing to file tmp/f04_e4_t1.nc
- LISTing to file tmp/f04_e4_t1.nc
- LISTing to file tmp/f04_e4_t2.nc
- LISTing to file tmp/f04_e4_t3.nc
- LISTing to file tmp/f04_e5_t1.nc
- LISTing to file tmp/f04_e5_t1.nc
- LISTing to file tmp/f04_e5_t1.nc
- LISTing to file tmp/f04_e5_t2.nc
- LISTing to file tmp/f04_e5_t3.nc
- LISTing to file tmp/f05_e1_t1.nc
- LISTing to file tmp/f05_e1_t1.nc
- LISTing to file tmp/f05_e1_t1.nc
- LISTing to file tmp/f05_e1_t2.nc
- LISTing to file tmp/f05_e1_t3.nc
- LISTing to file tmp/f05_e2_t1.nc
- LISTing to file tmp/f05_e2_t1.nc
- LISTing to file tmp/f05_e2_t1.nc
- LISTing to file tmp/f05_e2_t2.nc
- LISTing to file tmp/f05_e2_t3.nc
- LISTing to file tmp/f05_e3_t1.nc
- LISTing to file tmp/f05_e3_t1.nc
- LISTing to file tmp/f05_e3_t1.nc
- LISTing to file tmp/f05_e3_t2.nc
- LISTing to file tmp/f05_e3_t3.nc
- LISTing to file tmp/f05_e4_t1.nc
- LISTing to file tmp/f05_e4_t1.nc
- LISTing to file tmp/f05_e4_t1.nc
- LISTing to file tmp/f05_e4_t2.nc
- LISTing to file tmp/f05_e4_t3.nc
- LISTing to file tmp/f05_e5_t1.nc
- LISTing to file tmp/f05_e5_t1.nc
- LISTing to file tmp/f05_e5_t1.nc
- LISTing to file tmp/f05_e5_t2.nc
- LISTing to file tmp/f05_e5_t3.nc
- LISTing to file tmp/f06_e1_t1.nc
- LISTing to file tmp/f06_e1_t1.nc
- LISTing to file tmp/f06_e1_t1.nc
- LISTing to file tmp/f06_e1_t2.nc
- LISTing to file tmp/f06_e1_t3.nc
- LISTing to file tmp/f06_e2_t1.nc
- LISTing to file tmp/f06_e2_t1.nc
- LISTing to file tmp/f06_e2_t1.nc
- LISTing to file tmp/f06_e2_t2.nc
- LISTing to file tmp/f06_e2_t3.nc
- LISTing to file tmp/f06_e3_t1.nc
- LISTing to file tmp/f06_e3_t1.nc
- LISTing to file tmp/f06_e3_t1.nc
- LISTing to file tmp/f06_e3_t2.nc
- LISTing to file tmp/f06_e3_t3.nc
- LISTing to file tmp/f06_e4_t1.nc
- LISTing to file tmp/f06_e4_t1.nc
- LISTing to file tmp/f06_e4_t1.nc
- LISTing to file tmp/f06_e4_t2.nc
- LISTing to file tmp/f06_e4_t3.nc
- LISTing to file tmp/f06_e5_t1.nc
- LISTing to file tmp/f06_e5_t1.nc
- LISTing to file tmp/f06_e5_t1.nc
- LISTing to file tmp/f06_e5_t2.nc
- LISTing to file tmp/f06_e5_t3.nc
- LISTing to file tmp/f07_e1_t1.nc
- LISTing to file tmp/f07_e1_t1.nc
- LISTing to file tmp/f07_e1_t1.nc
- LISTing to file tmp/f07_e1_t2.nc
- LISTing to file tmp/f07_e1_t3.nc
- LISTing to file tmp/f07_e2_t1.nc
- LISTing to file tmp/f07_e2_t1.nc
- LISTing to file tmp/f07_e2_t1.nc
- LISTing to file tmp/f07_e2_t2.nc
- LISTing to file tmp/f07_e2_t3.nc
- LISTing to file tmp/f07_e3_t1.nc
- LISTing to file tmp/f07_e3_t1.nc
- LISTing to file tmp/f07_e3_t1.nc
- LISTing to file tmp/f07_e3_t2.nc
- LISTing to file tmp/f07_e3_t3.nc
- LISTing to file tmp/f07_e4_t1.nc
- LISTing to file tmp/f07_e4_t1.nc
- LISTing to file tmp/f07_e4_t1.nc
- LISTing to file tmp/f07_e4_t2.nc
- LISTing to file tmp/f07_e4_t3.nc
- LISTing to file tmp/f07_e5_t1.nc
- LISTing to file tmp/f07_e5_t1.nc
- LISTing to file tmp/f07_e5_t1.nc
- LISTing to file tmp/f07_e5_t2.nc
- LISTing to file tmp/f07_e5_t3.nc
- LISTing to file tmp/f08_e1_t1.nc
- LISTing to file tmp/f08_e1_t1.nc
- LISTing to file tmp/f08_e1_t1.nc
- LISTing to file tmp/f08_e1_t2.nc
- LISTing to file tmp/f08_e1_t3.nc
- LISTing to file tmp/f08_e2_t1.nc
- LISTing to file tmp/f08_e2_t1.nc
- LISTing to file tmp/f08_e2_t1.nc
- LISTing to file tmp/f08_e2_t2.nc
- LISTing to file tmp/f08_e2_t3.nc
- LISTing to file tmp/f08_e3_t1.nc
- LISTing to file tmp/f08_e3_t1.nc
- LISTing to file tmp/f08_e3_t1.nc
- LISTing to file tmp/f08_e3_t2.nc
- LISTing to file tmp/f08_e3_t3.nc
- LISTing to file tmp/f08_e4_t1.nc
- LISTing to file tmp/f08_e4_t1.nc
- LISTing to file tmp/f08_e4_t1.nc
- LISTing to file tmp/f08_e4_t2.nc
- LISTing to file tmp/f08_e4_t3.nc
- LISTing to file tmp/f08_e5_t1.nc
- LISTing to file tmp/f08_e5_t1.nc
- LISTing to file tmp/f08_e5_t1.nc
- LISTing to file tmp/f08_e5_t2.nc
- LISTing to file tmp/f08_e5_t3.nc
- LISTing to file tmp/f09_e1_t1.nc
- LISTing to file tmp/f09_e1_t1.nc
- LISTing to file tmp/f09_e1_t1.nc
- LISTing to file tmp/f09_e1_t2.nc
- LISTing to file tmp/f09_e1_t3.nc
- LISTing to file tmp/f09_e2_t1.nc
- LISTing to file tmp/f09_e2_t1.nc
- LISTing to file tmp/f09_e2_t1.nc
- LISTing to file tmp/f09_e2_t2.nc
- LISTing to file tmp/f09_e2_t3.nc
- LISTing to file tmp/f09_e3_t1.nc
- LISTing to file tmp/f09_e3_t1.nc
- LISTing to file tmp/f09_e3_t1.nc
- LISTing to file tmp/f09_e3_t2.nc
- LISTing to file tmp/f09_e3_t3.nc
- LISTing to file tmp/f09_e4_t1.nc
- LISTing to file tmp/f09_e4_t1.nc
- LISTing to file tmp/f09_e4_t1.nc
- LISTing to file tmp/f09_e4_t2.nc
- LISTing to file tmp/f09_e4_t3.nc
- LISTing to file tmp/f09_e5_t1.nc
- LISTing to file tmp/f09_e5_t1.nc
- LISTing to file tmp/f09_e5_t1.nc
- LISTing to file tmp/f09_e5_t2.nc
- LISTing to file tmp/f09_e5_t3.nc
- LISTing to file tmp/f10_e1_t1.nc
- LISTing to file tmp/f10_e1_t1.nc
- LISTing to file tmp/f10_e1_t1.nc
- LISTing to file tmp/f10_e1_t2.nc
- LISTing to file tmp/f10_e1_t3.nc
- LISTing to file tmp/f10_e2_t1.nc
- LISTing to file tmp/f10_e2_t1.nc
- LISTing to file tmp/f10_e2_t1.nc
- LISTing to file tmp/f10_e2_t2.nc
- LISTing to file tmp/f10_e2_t3.nc
- LISTing to file tmp/f10_e3_t1.nc
- LISTing to file tmp/f10_e3_t1.nc
- LISTing to file tmp/f10_e3_t1.nc
- LISTing to file tmp/f10_e3_t2.nc
- LISTing to file tmp/f10_e3_t3.nc
- LISTing to file tmp/f10_e4_t1.nc
- LISTing to file tmp/f10_e4_t1.nc
- LISTing to file tmp/f10_e4_t1.nc
- LISTing to file tmp/f10_e4_t2.nc
- LISTing to file tmp/f10_e4_t3.nc
- LISTing to file tmp/f10_e5_t1.nc
- LISTing to file tmp/f10_e5_t1.nc
- LISTing to file tmp/f10_e5_t1.nc
- LISTing to file tmp/f10_e5_t2.nc
- LISTing to file tmp/f10_e5_t3.nc
- LISTing to file tmp/f11_e1_t1.nc
- LISTing to file tmp/f11_e1_t1.nc
- LISTing to file tmp/f11_e1_t1.nc
- LISTing to file tmp/f11_e1_t2.nc
- LISTing to file tmp/f11_e1_t3.nc
- LISTing to file tmp/f11_e2_t1.nc
- LISTing to file tmp/f11_e2_t1.nc
- LISTing to file tmp/f11_e2_t1.nc
- LISTing to file tmp/f11_e2_t2.nc
- LISTing to file tmp/f11_e2_t3.nc
- LISTing to file tmp/f11_e3_t1.nc
- LISTing to file tmp/f11_e3_t1.nc
- LISTing to file tmp/f11_e3_t1.nc
- LISTing to file tmp/f11_e3_t2.nc
- LISTing to file tmp/f11_e3_t3.nc
- LISTing to file tmp/f11_e4_t1.nc
- LISTing to file tmp/f11_e4_t1.nc
- LISTing to file tmp/f11_e4_t1.nc
- LISTing to file tmp/f11_e4_t2.nc
- LISTing to file tmp/f11_e4_t3.nc
- LISTing to file tmp/f11_e5_t1.nc
- LISTing to file tmp/f11_e5_t1.nc
- LISTing to file tmp/f11_e5_t1.nc
- LISTing to file tmp/f11_e5_t2.nc
- LISTing to file tmp/f11_e5_t3.nc
- LISTing to file tmp/f04_e3_t1_1v.nc
- LISTing to file tmp/f04_e3_t2_1v.nc
- LISTing to file tmp/f04_e3_t3_1v.nc
+ls: aggtef/f04_e3_t3_1v.nc: No such file or directory
+ LISTing to file aggtef/t_f01_e1.nc
+ LISTing to file aggtef/t_f01_e1.nc
+ LISTing to file aggtef/t_f01_e1.nc
+ LISTing to file aggtef/f01_e1_t1.nc
+ LISTing to file aggtef/f01_e1_t1.nc
+ LISTing to file aggtef/f01_e1_t1.nc
+ LISTing to file aggtef/f01_e1_t2.nc
+ LISTing to file aggtef/f01_e1_t3.nc
+ LISTing to file aggtef/t_f01_e2.nc
+ LISTing to file aggtef/t_f01_e2.nc
+ LISTing to file aggtef/t_f01_e2.nc
+ LISTing to file aggtef/f01_e2_t1.nc
+ LISTing to file aggtef/f01_e2_t1.nc
+ LISTing to file aggtef/f01_e2_t1.nc
+ LISTing to file aggtef/f01_e2_t2.nc
+ LISTing to file aggtef/f01_e2_t3.nc
+ LISTing to file aggtef/t_f01_e3.nc
+ LISTing to file aggtef/t_f01_e3.nc
+ LISTing to file aggtef/t_f01_e3.nc
+ LISTing to file aggtef/f01_e3_t1.nc
+ LISTing to file aggtef/f01_e3_t1.nc
+ LISTing to file aggtef/f01_e3_t1.nc
+ LISTing to file aggtef/f01_e3_t2.nc
+ LISTing to file aggtef/f01_e3_t3.nc
+ LISTing to file aggtef/t_f01_e4.nc
+ LISTing to file aggtef/t_f01_e4.nc
+ LISTing to file aggtef/t_f01_e4.nc
+ LISTing to file aggtef/f01_e4_t1.nc
+ LISTing to file aggtef/f01_e4_t1.nc
+ LISTing to file aggtef/f01_e4_t1.nc
+ LISTing to file aggtef/f01_e4_t2.nc
+ LISTing to file aggtef/f01_e4_t3.nc
+ LISTing to file aggtef/t_f01_e5.nc
+ LISTing to file aggtef/t_f01_e5.nc
+ LISTing to file aggtef/t_f01_e5.nc
+ LISTing to file aggtef/f01_e5_t1.nc
+ LISTing to file aggtef/f01_e5_t1.nc
+ LISTing to file aggtef/f01_e5_t1.nc
+ LISTing to file aggtef/f01_e5_t2.nc
+ LISTing to file aggtef/f01_e5_t3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggtef/t_f02_e1.nc
+ LISTing to file aggtef/t_f02_e1.nc
+ LISTing to file aggtef/t_f02_e1.nc
+ LISTing to file aggtef/f02_e1_t1.nc
+ LISTing to file aggtef/f02_e1_t1.nc
+ LISTing to file aggtef/f02_e1_t1.nc
+ LISTing to file aggtef/f02_e1_t2.nc
+ LISTing to file aggtef/f02_e1_t3.nc
+ LISTing to file aggtef/t_f02_e2.nc
+ LISTing to file aggtef/t_f02_e2.nc
+ LISTing to file aggtef/t_f02_e2.nc
+ LISTing to file aggtef/f02_e2_t1.nc
+ LISTing to file aggtef/f02_e2_t1.nc
+ LISTing to file aggtef/f02_e2_t1.nc
+ LISTing to file aggtef/f02_e2_t2.nc
+ LISTing to file aggtef/f02_e2_t3.nc
+ LISTing to file aggtef/t_f02_e3.nc
+ LISTing to file aggtef/t_f02_e3.nc
+ LISTing to file aggtef/t_f02_e3.nc
+ LISTing to file aggtef/f02_e3_t1.nc
+ LISTing to file aggtef/f02_e3_t1.nc
+ LISTing to file aggtef/f02_e3_t1.nc
+ LISTing to file aggtef/f02_e3_t2.nc
+ LISTing to file aggtef/f02_e3_t3.nc
+ LISTing to file aggtef/t_f02_e4.nc
+ LISTing to file aggtef/t_f02_e4.nc
+ LISTing to file aggtef/t_f02_e4.nc
+ LISTing to file aggtef/f02_e4_t1.nc
+ LISTing to file aggtef/f02_e4_t1.nc
+ LISTing to file aggtef/f02_e4_t1.nc
+ LISTing to file aggtef/f02_e4_t2.nc
+ LISTing to file aggtef/f02_e4_t3.nc
+ LISTing to file aggtef/t_f02_e5.nc
+ LISTing to file aggtef/t_f02_e5.nc
+ LISTing to file aggtef/t_f02_e5.nc
+ LISTing to file aggtef/f02_e5_t1.nc
+ LISTing to file aggtef/f02_e5_t1.nc
+ LISTing to file aggtef/f02_e5_t1.nc
+ LISTing to file aggtef/f02_e5_t2.nc
+ LISTing to file aggtef/f02_e5_t3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggtef/t_f03_e1.nc
+ LISTing to file aggtef/t_f03_e1.nc
+ LISTing to file aggtef/t_f03_e1.nc
+ LISTing to file aggtef/f03_e1_t1.nc
+ LISTing to file aggtef/f03_e1_t1.nc
+ LISTing to file aggtef/f03_e1_t1.nc
+ LISTing to file aggtef/f03_e1_t2.nc
+ LISTing to file aggtef/f03_e1_t3.nc
+ LISTing to file aggtef/t_f03_e2.nc
+ LISTing to file aggtef/t_f03_e2.nc
+ LISTing to file aggtef/t_f03_e2.nc
+ LISTing to file aggtef/f03_e2_t1.nc
+ LISTing to file aggtef/f03_e2_t1.nc
+ LISTing to file aggtef/f03_e2_t1.nc
+ LISTing to file aggtef/f03_e2_t2.nc
+ LISTing to file aggtef/f03_e2_t3.nc
+ LISTing to file aggtef/t_f03_e3.nc
+ LISTing to file aggtef/t_f03_e3.nc
+ LISTing to file aggtef/t_f03_e3.nc
+ LISTing to file aggtef/f03_e3_t1.nc
+ LISTing to file aggtef/f03_e3_t1.nc
+ LISTing to file aggtef/f03_e3_t1.nc
+ LISTing to file aggtef/f03_e3_t2.nc
+ LISTing to file aggtef/f03_e3_t3.nc
+ LISTing to file aggtef/t_f03_e4.nc
+ LISTing to file aggtef/t_f03_e4.nc
+ LISTing to file aggtef/t_f03_e4.nc
+ LISTing to file aggtef/f03_e4_t1.nc
+ LISTing to file aggtef/f03_e4_t1.nc
+ LISTing to file aggtef/f03_e4_t1.nc
+ LISTing to file aggtef/f03_e4_t2.nc
+ LISTing to file aggtef/f03_e4_t3.nc
+ LISTing to file aggtef/t_f03_e5.nc
+ LISTing to file aggtef/t_f03_e5.nc
+ LISTing to file aggtef/t_f03_e5.nc
+ LISTing to file aggtef/f03_e5_t1.nc
+ LISTing to file aggtef/f03_e5_t1.nc
+ LISTing to file aggtef/f03_e5_t1.nc
+ LISTing to file aggtef/f03_e5_t2.nc
+ LISTing to file aggtef/f03_e5_t3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggtef/t_f04_e1.nc
+ LISTing to file aggtef/t_f04_e1.nc
+ LISTing to file aggtef/t_f04_e1.nc
+ LISTing to file aggtef/f04_e1_t1.nc
+ LISTing to file aggtef/f04_e1_t1.nc
+ LISTing to file aggtef/f04_e1_t1.nc
+ LISTing to file aggtef/f04_e1_t2.nc
+ LISTing to file aggtef/f04_e1_t3.nc
+ LISTing to file aggtef/t_f04_e2.nc
+ LISTing to file aggtef/t_f04_e2.nc
+ LISTing to file aggtef/t_f04_e2.nc
+ LISTing to file aggtef/f04_e2_t1.nc
+ LISTing to file aggtef/f04_e2_t1.nc
+ LISTing to file aggtef/f04_e2_t1.nc
+ LISTing to file aggtef/f04_e2_t2.nc
+ LISTing to file aggtef/f04_e2_t3.nc
+ LISTing to file aggtef/t_f04_e3.nc
+ LISTing to file aggtef/t_f04_e3.nc
+ LISTing to file aggtef/t_f04_e3.nc
+ LISTing to file aggtef/f04_e3_t1.nc
+ LISTing to file aggtef/f04_e3_t1.nc
+ LISTing to file aggtef/f04_e3_t1.nc
+ LISTing to file aggtef/f04_e3_t2.nc
+ LISTing to file aggtef/f04_e3_t3.nc
+ LISTing to file aggtef/t_f04_e4.nc
+ LISTing to file aggtef/t_f04_e4.nc
+ LISTing to file aggtef/t_f04_e4.nc
+ LISTing to file aggtef/f04_e4_t1.nc
+ LISTing to file aggtef/f04_e4_t1.nc
+ LISTing to file aggtef/f04_e4_t1.nc
+ LISTing to file aggtef/f04_e4_t2.nc
+ LISTing to file aggtef/f04_e4_t3.nc
+ LISTing to file aggtef/t_f04_e5.nc
+ LISTing to file aggtef/t_f04_e5.nc
+ LISTing to file aggtef/t_f04_e5.nc
+ LISTing to file aggtef/f04_e5_t1.nc
+ LISTing to file aggtef/f04_e5_t1.nc
+ LISTing to file aggtef/f04_e5_t1.nc
+ LISTing to file aggtef/f04_e5_t2.nc
+ LISTing to file aggtef/f04_e5_t3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggtef/t_f05_e1.nc
+ LISTing to file aggtef/t_f05_e1.nc
+ LISTing to file aggtef/t_f05_e1.nc
+ LISTing to file aggtef/f05_e1_t1.nc
+ LISTing to file aggtef/f05_e1_t1.nc
+ LISTing to file aggtef/f05_e1_t1.nc
+ LISTing to file aggtef/f05_e1_t2.nc
+ LISTing to file aggtef/f05_e1_t3.nc
+ LISTing to file aggtef/t_f05_e2.nc
+ LISTing to file aggtef/t_f05_e2.nc
+ LISTing to file aggtef/t_f05_e2.nc
+ LISTing to file aggtef/f05_e2_t1.nc
+ LISTing to file aggtef/f05_e2_t1.nc
+ LISTing to file aggtef/f05_e2_t1.nc
+ LISTing to file aggtef/f05_e2_t2.nc
+ LISTing to file aggtef/f05_e2_t3.nc
+ LISTing to file aggtef/t_f05_e3.nc
+ LISTing to file aggtef/t_f05_e3.nc
+ LISTing to file aggtef/t_f05_e3.nc
+ LISTing to file aggtef/f05_e3_t1.nc
+ LISTing to file aggtef/f05_e3_t1.nc
+ LISTing to file aggtef/f05_e3_t1.nc
+ LISTing to file aggtef/f05_e3_t2.nc
+ LISTing to file aggtef/f05_e3_t3.nc
+ LISTing to file aggtef/t_f05_e4.nc
+ LISTing to file aggtef/t_f05_e4.nc
+ LISTing to file aggtef/t_f05_e4.nc
+ LISTing to file aggtef/f05_e4_t1.nc
+ LISTing to file aggtef/f05_e4_t1.nc
+ LISTing to file aggtef/f05_e4_t1.nc
+ LISTing to file aggtef/f05_e4_t2.nc
+ LISTing to file aggtef/f05_e4_t3.nc
+ LISTing to file aggtef/t_f05_e5.nc
+ LISTing to file aggtef/t_f05_e5.nc
+ LISTing to file aggtef/t_f05_e5.nc
+ LISTing to file aggtef/f05_e5_t1.nc
+ LISTing to file aggtef/f05_e5_t1.nc
+ LISTing to file aggtef/f05_e5_t1.nc
+ LISTing to file aggtef/f05_e5_t2.nc
+ LISTing to file aggtef/f05_e5_t3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggtef/t_f06_e1.nc
+ LISTing to file aggtef/t_f06_e1.nc
+ LISTing to file aggtef/t_f06_e1.nc
+ LISTing to file aggtef/f06_e1_t1.nc
+ LISTing to file aggtef/f06_e1_t1.nc
+ LISTing to file aggtef/f06_e1_t1.nc
+ LISTing to file aggtef/f06_e1_t2.nc
+ LISTing to file aggtef/f06_e1_t3.nc
+ LISTing to file aggtef/t_f06_e2.nc
+ LISTing to file aggtef/t_f06_e2.nc
+ LISTing to file aggtef/t_f06_e2.nc
+ LISTing to file aggtef/f06_e2_t1.nc
+ LISTing to file aggtef/f06_e2_t1.nc
+ LISTing to file aggtef/f06_e2_t1.nc
+ LISTing to file aggtef/f06_e2_t2.nc
+ LISTing to file aggtef/f06_e2_t3.nc
+ LISTing to file aggtef/t_f06_e3.nc
+ LISTing to file aggtef/t_f06_e3.nc
+ LISTing to file aggtef/t_f06_e3.nc
+ LISTing to file aggtef/f06_e3_t1.nc
+ LISTing to file aggtef/f06_e3_t1.nc
+ LISTing to file aggtef/f06_e3_t1.nc
+ LISTing to file aggtef/f06_e3_t2.nc
+ LISTing to file aggtef/f06_e3_t3.nc
+ LISTing to file aggtef/t_f06_e4.nc
+ LISTing to file aggtef/t_f06_e4.nc
+ LISTing to file aggtef/t_f06_e4.nc
+ LISTing to file aggtef/f06_e4_t1.nc
+ LISTing to file aggtef/f06_e4_t1.nc
+ LISTing to file aggtef/f06_e4_t1.nc
+ LISTing to file aggtef/f06_e4_t2.nc
+ LISTing to file aggtef/f06_e4_t3.nc
+ LISTing to file aggtef/t_f06_e5.nc
+ LISTing to file aggtef/t_f06_e5.nc
+ LISTing to file aggtef/t_f06_e5.nc
+ LISTing to file aggtef/f06_e5_t1.nc
+ LISTing to file aggtef/f06_e5_t1.nc
+ LISTing to file aggtef/f06_e5_t1.nc
+ LISTing to file aggtef/f06_e5_t2.nc
+ LISTing to file aggtef/f06_e5_t3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggtef/t_f07_e1.nc
+ LISTing to file aggtef/t_f07_e1.nc
+ LISTing to file aggtef/t_f07_e1.nc
+ LISTing to file aggtef/f07_e1_t1.nc
+ LISTing to file aggtef/f07_e1_t1.nc
+ LISTing to file aggtef/f07_e1_t1.nc
+ LISTing to file aggtef/f07_e1_t2.nc
+ LISTing to file aggtef/f07_e1_t3.nc
+ LISTing to file aggtef/t_f07_e2.nc
+ LISTing to file aggtef/t_f07_e2.nc
+ LISTing to file aggtef/t_f07_e2.nc
+ LISTing to file aggtef/f07_e2_t1.nc
+ LISTing to file aggtef/f07_e2_t1.nc
+ LISTing to file aggtef/f07_e2_t1.nc
+ LISTing to file aggtef/f07_e2_t2.nc
+ LISTing to file aggtef/f07_e2_t3.nc
+ LISTing to file aggtef/t_f07_e3.nc
+ LISTing to file aggtef/t_f07_e3.nc
+ LISTing to file aggtef/t_f07_e3.nc
+ LISTing to file aggtef/f07_e3_t1.nc
+ LISTing to file aggtef/f07_e3_t1.nc
+ LISTing to file aggtef/f07_e3_t1.nc
+ LISTing to file aggtef/f07_e3_t2.nc
+ LISTing to file aggtef/f07_e3_t3.nc
+ LISTing to file aggtef/t_f07_e4.nc
+ LISTing to file aggtef/t_f07_e4.nc
+ LISTing to file aggtef/t_f07_e4.nc
+ LISTing to file aggtef/f07_e4_t1.nc
+ LISTing to file aggtef/f07_e4_t1.nc
+ LISTing to file aggtef/f07_e4_t1.nc
+ LISTing to file aggtef/f07_e4_t2.nc
+ LISTing to file aggtef/f07_e4_t3.nc
+ LISTing to file aggtef/t_f07_e5.nc
+ LISTing to file aggtef/t_f07_e5.nc
+ LISTing to file aggtef/t_f07_e5.nc
+ LISTing to file aggtef/f07_e5_t1.nc
+ LISTing to file aggtef/f07_e5_t1.nc
+ LISTing to file aggtef/f07_e5_t1.nc
+ LISTing to file aggtef/f07_e5_t2.nc
+ LISTing to file aggtef/f07_e5_t3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggtef/t_f08_e1.nc
+ LISTing to file aggtef/t_f08_e1.nc
+ LISTing to file aggtef/t_f08_e1.nc
+ LISTing to file aggtef/f08_e1_t1.nc
+ LISTing to file aggtef/f08_e1_t1.nc
+ LISTing to file aggtef/f08_e1_t1.nc
+ LISTing to file aggtef/f08_e1_t2.nc
+ LISTing to file aggtef/f08_e1_t3.nc
+ LISTing to file aggtef/t_f08_e2.nc
+ LISTing to file aggtef/t_f08_e2.nc
+ LISTing to file aggtef/t_f08_e2.nc
+ LISTing to file aggtef/f08_e2_t1.nc
+ LISTing to file aggtef/f08_e2_t1.nc
+ LISTing to file aggtef/f08_e2_t1.nc
+ LISTing to file aggtef/f08_e2_t2.nc
+ LISTing to file aggtef/f08_e2_t3.nc
+ LISTing to file aggtef/t_f08_e3.nc
+ LISTing to file aggtef/t_f08_e3.nc
+ LISTing to file aggtef/t_f08_e3.nc
+ LISTing to file aggtef/f08_e3_t1.nc
+ LISTing to file aggtef/f08_e3_t1.nc
+ LISTing to file aggtef/f08_e3_t1.nc
+ LISTing to file aggtef/f08_e3_t2.nc
+ LISTing to file aggtef/f08_e3_t3.nc
+ LISTing to file aggtef/t_f08_e4.nc
+ LISTing to file aggtef/t_f08_e4.nc
+ LISTing to file aggtef/t_f08_e4.nc
+ LISTing to file aggtef/f08_e4_t1.nc
+ LISTing to file aggtef/f08_e4_t1.nc
+ LISTing to file aggtef/f08_e4_t1.nc
+ LISTing to file aggtef/f08_e4_t2.nc
+ LISTing to file aggtef/f08_e4_t3.nc
+ LISTing to file aggtef/t_f08_e5.nc
+ LISTing to file aggtef/t_f08_e5.nc
+ LISTing to file aggtef/t_f08_e5.nc
+ LISTing to file aggtef/f08_e5_t1.nc
+ LISTing to file aggtef/f08_e5_t1.nc
+ LISTing to file aggtef/f08_e5_t1.nc
+ LISTing to file aggtef/f08_e5_t2.nc
+ LISTing to file aggtef/f08_e5_t3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggtef/t_f09_e1.nc
+ LISTing to file aggtef/t_f09_e1.nc
+ LISTing to file aggtef/t_f09_e1.nc
+ LISTing to file aggtef/f09_e1_t1.nc
+ LISTing to file aggtef/f09_e1_t1.nc
+ LISTing to file aggtef/f09_e1_t1.nc
+ LISTing to file aggtef/f09_e1_t2.nc
+ LISTing to file aggtef/f09_e1_t3.nc
+ LISTing to file aggtef/t_f09_e2.nc
+ LISTing to file aggtef/t_f09_e2.nc
+ LISTing to file aggtef/t_f09_e2.nc
+ LISTing to file aggtef/f09_e2_t1.nc
+ LISTing to file aggtef/f09_e2_t1.nc
+ LISTing to file aggtef/f09_e2_t1.nc
+ LISTing to file aggtef/f09_e2_t2.nc
+ LISTing to file aggtef/f09_e2_t3.nc
+ LISTing to file aggtef/t_f09_e3.nc
+ LISTing to file aggtef/t_f09_e3.nc
+ LISTing to file aggtef/t_f09_e3.nc
+ LISTing to file aggtef/f09_e3_t1.nc
+ LISTing to file aggtef/f09_e3_t1.nc
+ LISTing to file aggtef/f09_e3_t1.nc
+ LISTing to file aggtef/f09_e3_t2.nc
+ LISTing to file aggtef/f09_e3_t3.nc
+ LISTing to file aggtef/t_f09_e4.nc
+ LISTing to file aggtef/t_f09_e4.nc
+ LISTing to file aggtef/t_f09_e4.nc
+ LISTing to file aggtef/f09_e4_t1.nc
+ LISTing to file aggtef/f09_e4_t1.nc
+ LISTing to file aggtef/f09_e4_t1.nc
+ LISTing to file aggtef/f09_e4_t2.nc
+ LISTing to file aggtef/f09_e4_t3.nc
+ LISTing to file aggtef/t_f09_e5.nc
+ LISTing to file aggtef/t_f09_e5.nc
+ LISTing to file aggtef/t_f09_e5.nc
+ LISTing to file aggtef/f09_e5_t1.nc
+ LISTing to file aggtef/f09_e5_t1.nc
+ LISTing to file aggtef/f09_e5_t1.nc
+ LISTing to file aggtef/f09_e5_t2.nc
+ LISTing to file aggtef/f09_e5_t3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggtef/t_f10_e1.nc
+ LISTing to file aggtef/t_f10_e1.nc
+ LISTing to file aggtef/t_f10_e1.nc
+ LISTing to file aggtef/f10_e1_t1.nc
+ LISTing to file aggtef/f10_e1_t1.nc
+ LISTing to file aggtef/f10_e1_t1.nc
+ LISTing to file aggtef/f10_e1_t2.nc
+ LISTing to file aggtef/f10_e1_t3.nc
+ LISTing to file aggtef/t_f10_e2.nc
+ LISTing to file aggtef/t_f10_e2.nc
+ LISTing to file aggtef/t_f10_e2.nc
+ LISTing to file aggtef/f10_e2_t1.nc
+ LISTing to file aggtef/f10_e2_t1.nc
+ LISTing to file aggtef/f10_e2_t1.nc
+ LISTing to file aggtef/f10_e2_t2.nc
+ LISTing to file aggtef/f10_e2_t3.nc
+ LISTing to file aggtef/t_f10_e3.nc
+ LISTing to file aggtef/t_f10_e3.nc
+ LISTing to file aggtef/t_f10_e3.nc
+ LISTing to file aggtef/f10_e3_t1.nc
+ LISTing to file aggtef/f10_e3_t1.nc
+ LISTing to file aggtef/f10_e3_t1.nc
+ LISTing to file aggtef/f10_e3_t2.nc
+ LISTing to file aggtef/f10_e3_t3.nc
+ LISTing to file aggtef/t_f10_e4.nc
+ LISTing to file aggtef/t_f10_e4.nc
+ LISTing to file aggtef/t_f10_e4.nc
+ LISTing to file aggtef/f10_e4_t1.nc
+ LISTing to file aggtef/f10_e4_t1.nc
+ LISTing to file aggtef/f10_e4_t1.nc
+ LISTing to file aggtef/f10_e4_t2.nc
+ LISTing to file aggtef/f10_e4_t3.nc
+ LISTing to file aggtef/t_f10_e5.nc
+ LISTing to file aggtef/t_f10_e5.nc
+ LISTing to file aggtef/t_f10_e5.nc
+ LISTing to file aggtef/f10_e5_t1.nc
+ LISTing to file aggtef/f10_e5_t1.nc
+ LISTing to file aggtef/f10_e5_t1.nc
+ LISTing to file aggtef/f10_e5_t2.nc
+ LISTing to file aggtef/f10_e5_t3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggtef/t_f11_e1.nc
+ LISTing to file aggtef/t_f11_e1.nc
+ LISTing to file aggtef/t_f11_e1.nc
+ LISTing to file aggtef/f11_e1_t1.nc
+ LISTing to file aggtef/f11_e1_t1.nc
+ LISTing to file aggtef/f11_e1_t1.nc
+ LISTing to file aggtef/f11_e1_t2.nc
+ LISTing to file aggtef/f11_e1_t3.nc
+ LISTing to file aggtef/t_f11_e2.nc
+ LISTing to file aggtef/t_f11_e2.nc
+ LISTing to file aggtef/t_f11_e2.nc
+ LISTing to file aggtef/f11_e2_t1.nc
+ LISTing to file aggtef/f11_e2_t1.nc
+ LISTing to file aggtef/f11_e2_t1.nc
+ LISTing to file aggtef/f11_e2_t2.nc
+ LISTing to file aggtef/f11_e2_t3.nc
+ LISTing to file aggtef/t_f11_e3.nc
+ LISTing to file aggtef/t_f11_e3.nc
+ LISTing to file aggtef/t_f11_e3.nc
+ LISTing to file aggtef/f11_e3_t1.nc
+ LISTing to file aggtef/f11_e3_t1.nc
+ LISTing to file aggtef/f11_e3_t1.nc
+ LISTing to file aggtef/f11_e3_t2.nc
+ LISTing to file aggtef/f11_e3_t3.nc
+ LISTing to file aggtef/t_f11_e4.nc
+ LISTing to file aggtef/t_f11_e4.nc
+ LISTing to file aggtef/t_f11_e4.nc
+ LISTing to file aggtef/f11_e4_t1.nc
+ LISTing to file aggtef/f11_e4_t1.nc
+ LISTing to file aggtef/f11_e4_t1.nc
+ LISTing to file aggtef/f11_e4_t2.nc
+ LISTing to file aggtef/f11_e4_t3.nc
+ LISTing to file aggtef/t_f11_e5.nc
+ LISTing to file aggtef/t_f11_e5.nc
+ LISTing to file aggtef/t_f11_e5.nc
+ LISTing to file aggtef/f11_e5_t1.nc
+ LISTing to file aggtef/f11_e5_t1.nc
+ LISTing to file aggtef/f11_e5_t1.nc
+ LISTing to file aggtef/f11_e5_t2.nc
+ LISTing to file aggtef/f11_e5_t3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggtef/t_f12_e1.nc
+ LISTing to file aggtef/t_f12_e1.nc
+ LISTing to file aggtef/t_f12_e1.nc
+ LISTing to file aggtef/f12_e1_t1.nc
+ LISTing to file aggtef/f12_e1_t1.nc
+ LISTing to file aggtef/f12_e1_t1.nc
+ LISTing to file aggtef/f12_e1_t2.nc
+ LISTing to file aggtef/f12_e1_t3.nc
+ LISTing to file aggtef/t_f12_e2.nc
+ LISTing to file aggtef/t_f12_e2.nc
+ LISTing to file aggtef/t_f12_e2.nc
+ LISTing to file aggtef/f12_e2_t1.nc
+ LISTing to file aggtef/f12_e2_t1.nc
+ LISTing to file aggtef/f12_e2_t1.nc
+ LISTing to file aggtef/f12_e2_t2.nc
+ LISTing to file aggtef/f12_e2_t3.nc
+ LISTing to file aggtef/t_f12_e3.nc
+ LISTing to file aggtef/t_f12_e3.nc
+ LISTing to file aggtef/t_f12_e3.nc
+ LISTing to file aggtef/f12_e3_t1.nc
+ LISTing to file aggtef/f12_e3_t1.nc
+ LISTing to file aggtef/f12_e3_t1.nc
+ LISTing to file aggtef/f12_e3_t2.nc
+ LISTing to file aggtef/f12_e3_t3.nc
+ LISTing to file aggtef/t_f12_e4.nc
+ LISTing to file aggtef/t_f12_e4.nc
+ LISTing to file aggtef/t_f12_e4.nc
+ LISTing to file aggtef/f12_e4_t1.nc
+ LISTing to file aggtef/f12_e4_t1.nc
+ LISTing to file aggtef/f12_e4_t1.nc
+ LISTing to file aggtef/f12_e4_t2.nc
+ LISTing to file aggtef/f12_e4_t3.nc
+ LISTing to file aggtef/t_f12_e5.nc
+ LISTing to file aggtef/t_f12_e5.nc
+ LISTing to file aggtef/t_f12_e5.nc
+ LISTing to file aggtef/f12_e5_t1.nc
+ LISTing to file aggtef/f12_e5_t1.nc
+ LISTing to file aggtef/f12_e5_t1.nc
+ LISTing to file aggtef/f12_e5_t2.nc
+ LISTing to file aggtef/f12_e5_t3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggtef/t_f04_e3_1v.nc
+ LISTing to file aggtef/f04_e3_t1_1v.nc
+ LISTing to file aggtef/f04_e3_t2_1v.nc
+ LISTing to file aggtef/f04_e3_t3_1v.nc
+ LISTing to file aggtef/te_f01.nc
+           *** NOTE: Saving E or F axis with time axis uses /RIGID in time
+ LISTing to file aggtef/te_f02.nc
+ LISTing to file aggtef/te_f03.nc
+ LISTing to file aggtef/te_f04.nc
+ LISTing to file aggtef/te_f05.nc
+ LISTing to file aggtef/te_f06.nc
+ LISTing to file aggtef/te_f07.nc
+ LISTing to file aggtef/te_f08.nc
+ LISTing to file aggtef/te_f09.nc
+ LISTing to file aggtef/te_f10.nc
+ LISTing to file aggtef/te_f11.nc
+ LISTing to file aggtef/te_f12.nc
            *** NOTE: Variable "FCST_2" excluded from aggregate: Not found in all member datasets
- **ERROR: error defining aggregate dataset: grid definition of FCST_2 has changed on axis X of agg member 3
-list/x=150E/y=15n/L=10 fcst_2
- **ERROR: error defining aggregate dataset: grid definition of FCST_2 has changed on axis T of agg member 3
-list/x=150E/y=15n/L=10 fcst_2
- **ERROR: error defining aggregate dataset: grid definition of FCST_2 has changed on axis X of agg member 3
-list/x=150E/y=15n/L=10 fcst_2
-           *** NOTE: Variable "FCST" excluded from aggregate: E axis differs among members
-           *** NOTE: Variable "FCST_2" excluded from aggregate: E axis differs among members
- **ERROR: error defining aggregate dataset: No valid datasets or datasets share no variables that can be aggregated.
-DEFINE DATA/AGGREGAT/F tef_short = te_f01, te_f02_short, te_f03, te_f04, te_f05, te_f06, te_f07, te_f08, te_f09, te_f10, te_f11
-           *** NOTE: Variable "FCST" excluded from aggregate: F axis differs among members
-           *** NOTE: Variable "TF_TIMES" excluded from aggregate: F axis differs among members
-           *** NOTE: Variable "FCST_2" excluded from aggregate: F axis differs among members
- **ERROR: error defining aggregate dataset: No valid datasets or datasets share no variables that can be aggregated.
-DEFINE DATA/AGGREGAT/E tfe_short = tf_e1, tf_e2_short, tf_e3, tf_e4, tf_e5
-           *** NOTE: Variable "FCST" excluded from aggregate: Already has E axis
-           *** NOTE: Variable "FCST_2" excluded from aggregate: Already has E axis
-           *** NOTE: Variable "REALIZATION" excluded from aggregate: Already has E axis
-           *** NOTE: Variable "MEMBER_DSET" excluded from aggregate: Already has E axis
-           *** NOTE: Variable "HISTORY" excluded from aggregate: Already has E axis
-           *** NOTE: Variable "CONVENTIONS" excluded from aggregate: Already has E axis
-           *** NOTE: Variable "INVESTIGATOR" excluded from aggregate: Already has E axis
-           *** NOTE: Variable "DESCRIPTION" excluded from aggregate: Already has E axis
- **ERROR: error defining aggregate dataset: No valid datasets or datasets share no variables that can be aggregated.
-DEFINE DATA/AGGREGAT/E bad_ens = te_f01, te_f03, te_f04
- **ERROR: error defining aggregate dataset: some files have duplicate forecast start times
-DEFINE DATA/AGGREGAT/F bad_fmrc = tf_e1, tf_e3, tf_e4
+ LISTing to file aggtef/tef.nc
 *** Running ferret script: bn_dataset_qualifier.jnl
  LISTing to file a.nc
  LISTing to file a.nc
@@ -4745,6 +4969,9 @@ ooooooooooooooooooooooooooooooooooooooooooo
  PERMANENT data cleared from memory
  TEMPORARY data cleared from memory
 ooooooooooooooooooooooooooooooooooooooooooo
+           *** NOTE: Forecast axis coordinates matched to time axis origins using @ASN
+ **ERROR: error defining aggregate dataset: duplicate time origin "01-JAN-2000 00:00:00" in two forecast datasets
+DEFINE DATA /AGGREGATE /HIDE /F testdata = 1,2,3,4
  PERMANENT data cleared from memory
  TEMPORARY data cleared from memory
 ooooooooooooooooooooooooooooooooooooooooooo
@@ -4768,37 +4995,37 @@ list index,edtim,udtim,udate,edate
  **ERROR: Error reading file: Check Date or Time fields.
 list index,edtim,udtim,udate,edate
 *** Running ferret script: bn_aggregate_u.jnl
- LISTing to file tmp/uagg_1.nc
- LISTing to file tmp/uagg_2.nc
- LISTing to file tmp/uagg_3.nc
- LISTing to file tmp/uagg_4.nc
- LISTing to file tmp/uagg_1_t1.nc
- LISTing to file tmp/uagg_1_t2.nc
- LISTing to file tmp/uagg_1_t3.nc
- LISTing to file tmp/uagg_5.nc
+ LISTing to file aggu/uagg_1.nc
+ LISTing to file aggu/uagg_2.nc
+ LISTing to file aggu/uagg_3.nc
+ LISTing to file aggu/uagg_4.nc
+ LISTing to file aggu/uagg_1_t1.nc
+ LISTing to file aggu/uagg_1_t2.nc
+ LISTing to file aggu/uagg_1_t3.nc
+ LISTing to file aggu/uagg_5.nc
            *** NOTE: Skipping variable SST from set 2, already in the Union dataset.
- LISTing to file tmp/f01_e1_tu1.nc
- LISTing to file tmp/f01_e1_tu2.nc
- LISTing to file tmp/f01_e1_tu3.nc
- LISTing to file tmp/f01_e2_tu1.nc
- LISTing to file tmp/f01_e2_tu2.nc
- LISTing to file tmp/f01_e2_tu3.nc
- LISTing to file tmp/f02_e1_tu1.nc
- LISTing to file tmp/f02_e1_tu2.nc
- LISTing to file tmp/f02_e1_tu3.nc
- LISTing to file tmp/f02_e2_tu1.nc
- LISTing to file tmp/f02_e2_tu2.nc
- LISTing to file tmp/f02_e2_tu3.nc
- LISTing to file tmp/f03_e1_tu1.nc
- LISTing to file tmp/f03_e1_tu2.nc
- LISTing to file tmp/f03_e1_tu3.nc
- LISTing to file tmp/f03_e2_tu1.nc
- LISTing to file tmp/f03_e2_tu2.nc
- LISTing to file tmp/f03_e2_tu3.nc
-           *** NOTE: /FILES is deprecated.  Use /MEMBERS
+ LISTing to file aggu/f01_e1_tu1.nc
+ LISTing to file aggu/f01_e1_tu2.nc
+ LISTing to file aggu/f01_e1_tu3.nc
+ LISTing to file aggu/f01_e2_tu1.nc
+ LISTing to file aggu/f01_e2_tu2.nc
+ LISTing to file aggu/f01_e2_tu3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggu/f02_e1_tu1.nc
+ LISTing to file aggu/f02_e1_tu2.nc
+ LISTing to file aggu/f02_e1_tu3.nc
+ LISTing to file aggu/f02_e2_tu1.nc
+ LISTing to file aggu/f02_e2_tu2.nc
+ LISTing to file aggu/f02_e2_tu3.nc
+Replacing definition of axis FTAXIS
+ LISTing to file aggu/f03_e1_tu1.nc
+ LISTing to file aggu/f03_e1_tu2.nc
+ LISTing to file aggu/f03_e1_tu3.nc
+ LISTing to file aggu/f03_e2_tu1.nc
+ LISTing to file aggu/f03_e2_tu2.nc
+ LISTing to file aggu/f03_e2_tu3.nc
            *** NOTE: Skipping variable REALIZATION from set 1, already in the Union dataset.
            *** NOTE: Skipping variable REALIZATION from set 8, already in the Union dataset.
-           *** NOTE: /FILES is deprecated.  Use /MEMBERS
 *** Running ferret script: bn_ez_noupcase.jnl
  LISTing to file abc.dat
  LISTing to file a.nc
@@ -4811,10 +5038,10 @@ cp: nofile.dat: No such file or directory
 *** Running ferret script: bn_agg_member_syntax.jnl
  **ERROR: unknown data set: D=5.3
 stat/br fcst[d=5.3]
- **ERROR: unknown data set: D=12.30
-stat/br fcst[d=12.30]
- **ERROR: unknown data set: D=12.300000
-stat/br fcst[d=12.300000]
+ **ERROR: unknown data set: D=13.30
+stat/br fcst[d=13.30]
+ **ERROR: unknown data set: D=13.300000
+stat/br fcst[d=13.300000]
            *** NOTE: Variable "AIRT" excluded from aggregate: Not found in all member datasets
            *** NOTE: Variable "AIRT" excluded from aggregate: Not found in all member datasets
  **ERROR: unknown data set: D=4.1
@@ -5603,28 +5830,6 @@ ooooooooooooooooooooooooooooooooooooooooooo
            *** NOTE: Variable "AIRT" excluded from aggregate: Not found in all member datasets
            *** NOTE: Variable "AIRT" excluded from aggregate: Not found in all member datasets
            *** NOTE: Variable "AIRT" excluded from aggregate: Not found in all member datasets
- LISTing to file tmp/f01_e1_tu1.nc
- LISTing to file tmp/f01_e1_tu2.nc
- LISTing to file tmp/f01_e1_tu3.nc
- LISTing to file tmp/f01_e2_tu1.nc
- LISTing to file tmp/f01_e2_tu2.nc
- LISTing to file tmp/f01_e2_tu3.nc
- LISTing to file tmp/f02_e1_tu1.nc
- LISTing to file tmp/f02_e1_tu2.nc
- LISTing to file tmp/f02_e1_tu3.nc
- LISTing to file tmp/f02_e2_tu1.nc
- LISTing to file tmp/f02_e2_tu2.nc
- LISTing to file tmp/f02_e2_tu3.nc
- LISTing to file tmp/f03_e1_tu1.nc
- LISTing to file tmp/f03_e1_tu2.nc
- LISTing to file tmp/f03_e1_tu3.nc
- LISTing to file tmp/f03_e2_tu1.nc
- LISTing to file tmp/f03_e2_tu2.nc
- LISTing to file tmp/f03_e2_tu3.nc
-           *** NOTE: /FILES is deprecated.  Use /MEMBERS
-           *** NOTE: Skipping variable REALIZATION from set 1, already in the Union dataset.
-           *** NOTE: Skipping variable REALIZATION from set 8, already in the Union dataset.
-           *** NOTE: /FILES is deprecated.  Use /MEMBERS
 *** Running ferret script: bn_ens_promote_global.jnl
            *** NOTE: Variable "AIRT" excluded from aggregate: Not found in all member datasets
 *** Running ferret script: bn743_bug_fixes.jnl
