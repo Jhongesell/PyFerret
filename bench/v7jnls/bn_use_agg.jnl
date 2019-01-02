@@ -27,11 +27,11 @@ can data/all
 
 ! The more complex example from bn_aggregate_u, aggregate in U, T, E, F.
 
-! If aggregate_tef script has alrady run, leaving the example files 
-! it writes in tmp/, reuse those, otherwise create them.
+! If aggregate_tef script has already run, leaving the example files 
+! it writes in aggtef/, reuse those, otherwise create them.
 
 ! check for those files.
-IF `test_opendap("tmp/f03_e2_t3.nc") NE 0` THEN
+IF `test_opendap("aggtef/f03_e2_t3.nc") NE 0` THEN
    GO bn_aggregate_tef.sub
 ENDIF
 

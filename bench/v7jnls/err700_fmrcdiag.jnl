@@ -2,42 +2,53 @@
 ! these particular datasets (quarterly forecasts of two years of monthly data)
 ! have times at regular intervals but at values (for 25 and 26) that are difficult 
 ! to represent in binary
+
+! JAN-2019 Change to provide F axis as T0 values in datasets are all 01-JAN-2000
+!          Add test of appropriate behavior when F axis is not provided.
 !
+DEFINE AXIS /UNIT="days" /T0=01-JAN-2000 /F="01-OCT-2010":"01-OCT-2011":`365.2425/4` ffax
+
 USE forecast24.nc
 USE forecast25.nc
 USE forecast26.nc
 USE forecast27.nc
-DEFINE DATA/AGGREGATE/F testdata = 1,2,3,4
+DEFINE DATA /AGGREGATE /HIDE /F /FAXIS=ffax testdata = 1,2,3,4
 !
 ! using the values of actual gives perfect forecasts; 
 ! using the values of quirks has a sinusoidal error that get worse with greater lead time
 !
 
-DEFINE SYMBOL TF_CAL_T = `actual._cal_t_ax`
-DEFINE SYMBOL TF_LAG_F = `actual._lag_f_ax`
-DEFINE SYMBOL TF_LAG_T = `actual._lag_t_ax`
-DEFINE SYMBOL TF_CAL_F = `actual._cal_f_ax`
-
 SHOW GRID actual
-LIST /WIDTH=600 /X=120W/Y=50N/Z=50 actual
-SHADE /X=120W/Y=50N/Z=50 actual
+LIST /X=120W /Y=50N /Z=50 /ORDER=FT actual
+SHADE /X=120W /Y=50N /Z=50 actual
 FRAME /FILE=forecast_actual.gif
 
-LET actualfine = actual[GT=($TF_LAG_T)@BIN,GF=($TF_CAL_F)@BIN]
+DEFINE AXIS /UNIT="days" /T0=01-JAN-2000 /F="01-OCT-2010":"01-OCT-2011":`365.2425/12` finefax
+LET actualfine = actual[gf=finefax@XACT]
 SHOW GRID actualfine
-LIST /WIDTH=600 /X=120W/Y=50N/Z=50 actualfine
-SHADE /X=120W/Y=50N/Z=50 actualfine
+LIST /X=120W /Y=50N /Z=50 /ORDER=FT actualfine
+SHADE /X=120W /Y=50N /Z=50 actualfine
 FRAME /FILE=forecast_actualfine.gif
 
-LET diagview = actualfine[gt(TF_TIMES)=($TF_CAL_T)]
-SHOW GRID diagview
-LIST /WIDTH=600 /X=120W/Y=50N/Z=50 diagview
-SHADE /X=120W/Y=50N/Z=50 diagview
-FRAME /FILE=forecast_diagview.gif
+! LET leadview = actualfine[gt(TF_TIMES)=($TF_CAL_T),gf(TF_TIMES)=($TF_LAG_F)]
+! SHOW GRID leadview
+! LIST /WIDTH=600 /X=120W/Y=50N/Z=50 leadview
+! SHADE /X=120W/Y=50N/Z=50 leadview
+! FRAME /FILE=forecast_leadview.gif
 
-LET leadview = actualfine[gt(TF_TIMES)=($TF_CAL_T),gf(TF_TIMES)=($TF_LAG_F)]
-SHOW GRID leadview
-LIST /WIDTH=600 /X=120W/Y=50N/Z=50 leadview
-SHADE /X=120W/Y=50N/Z=50 leadview
-FRAME /FILE=forecast_leadview.gif
+CANCEL VAR actualfine
+CANCEL DATA /ALL
+CANCEL AXIS ffax
 
+SET MODE IGNORE
+
+! all T0 are 01-JAN-2000, so should generate an error message to that effect
+USE forecast24.nc
+USE forecast25.nc
+USE forecast26.nc
+USE forecast27.nc
+DEFINE DATA /AGGREGATE /HIDE /F testdata = 1,2,3,4
+
+CANCEL DATA /ALL
+
+CANCEL MODE IGNORE

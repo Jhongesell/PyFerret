@@ -119,16 +119,15 @@ CANCEL DATA /ALL
 ! CANCEL DATA other_fmrc
 ! SHOW DATA
 
-! TODO: the following crashes
 ! agg where a LET/D variable is used to fill in a missing variable in the first dataset
-! USE aggf/one_var_fcst_1.nc
-! LET/D=one_var_fcst_1.nc fcst_2 = fcst + 2  ! compute same value as file vars
-! SHOW DATA
-! FMRC /HIDE my_fmrc = aggf/one_var_fcst_1.nc, aggf/fcst_2.nc, aggf/fcst_3.nc, \
-!                      aggf/fcst_4.nc, aggf/fcst_5.nc, aggf/fcst_6.nc
-! SHOW DATA /MEMBERS
-! GO bn_aggregate_f.sub
-! CANCEL DATA /ALL
+USE aggf/one_var_fcst_1.nc
+LET/D=one_var_fcst_1.nc fcst_2 = fcst + 2  ! compute same value as file vars
+SHOW DATA
+FMRC /HIDE my_fmrc = aggf/one_var_fcst_1.nc, aggf/fcst_2.nc, aggf/fcst_3.nc, \
+                     aggf/fcst_4.nc, aggf/fcst_5.nc, aggf/fcst_6.nc
+SHOW DATA /MEMBERS
+GO bn_aggregate_f.sub
+CANCEL DATA /ALL
 
 ! agg where a LET/D variable is used to fill in a missing variable in a middle dataset
 USE aggf/one_var_fcst_5.nc
@@ -144,10 +143,9 @@ CANCEL DATA /ALL
 ! deliberate errors
 SET MODE IGNORE
 
-! TODO: the following crashes
 ! error - duplicate file
-! FMRC my_fmrc = XCAT(files, "aggf/fcst_2.nc")
-! SHOW DATA /HIDDEN
+FMRC my_fmrc = XCAT(files, "aggf/fcst_2.nc")
+SHOW DATA /HIDDEN
 
 ! error - unknown dataset
 FMRC my_fmrc = XCAT(files, "aggf/no_exist.nc")

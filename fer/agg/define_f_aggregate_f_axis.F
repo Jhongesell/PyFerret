@@ -175,7 +175,7 @@
            IF ( (torigins(setidx)-torigins(setidx-1)) .LE. epsil ) THEN
 *             @ASN only valid option
               IF ( (axcalf .GE. 0 ) .AND. (fmatch .EQ. ' ') ) GOTO 200
-              dset  = itmp_memb(setidx)
+              dset  = member_sets(NINT(rindices(setidx)))
               taxis = ds_time_axis(dset)
               torigin_str = line_t0(taxis)
               slen = TM_LENSTR1(torigin_str)

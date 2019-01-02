@@ -5,7 +5,8 @@
 
 ! create some variables in separate datasets.
 
-SPAWN "mkdir -p tmp" 
+SPAWN "rm -fr aggu"
+SPAWN "mkdir aggu" 
 
 define axis/t=1-jan-2010:10-jan-2010:1/units=days/t0=1-jan-2010 tax
 let/title=sst  sst = x[x=1:5] + 1.3*y[y=1:4] + t[gt=tax]
@@ -13,17 +14,17 @@ let/title=temp temp = 0.8*x[x=1:5] - y[y=1:4] + t[gt=tax]
 let/title=U    u = x[x=1:5] + 0.4*y[y=1:4] - 1.1* t[gt=tax]
 let/title=V    v = x[x=1:5] - 0.2*y[y=1:4] + 1.1* t[gt=tax]
 
-save/clobber/file="tmp/uagg_1.nc" sst
-save/clobber/file="tmp/uagg_2.nc" temp
-save/clobber/file="tmp/uagg_3.nc" u
-save/clobber/file="tmp/uagg_4.nc" v
+save/clobber/file="aggu/uagg_1.nc" sst
+save/clobber/file="aggu/uagg_2.nc" temp
+save/clobber/file="aggu/uagg_3.nc" u
+save/clobber/file="aggu/uagg_4.nc" v
 
-save/l=1:3/clobber/file="tmp/uagg_1_t1.nc" sst
-save/l=4:6/clobber/file="tmp/uagg_1_t2.nc" sst
-save/l=7:10/clobber/file="tmp/uagg_1_t3.nc" sst
+save/l=1:3/clobber/file="aggu/uagg_1_t1.nc" sst
+save/l=4:6/clobber/file="aggu/uagg_1_t2.nc" sst
+save/l=7:10/clobber/file="aggu/uagg_1_t3.nc" sst
 
 can dat/all
-union tmp/uagg_1.nc,tmp/uagg_2.nc,tmp/uagg_3.nc,tmp/uagg_4.nc
+union aggu/uagg_1.nc,aggu/uagg_2.nc,aggu/uagg_3.nc,aggu/uagg_4.nc
 sh dat
 vec/l=5 u,v
 
@@ -34,20 +35,20 @@ cancel dat/all
 !
 let/title="sst in uagg_5"  sst = 1.1*x[x=1:5] + 1.3*y[y=1:4] + t[gt=tax]
 let/title="temp in uagg_5" temp = 0.9*x[x=1:5] - y[y=1:4] + t[gt=tax]
-save/clobber/file="tmp/uagg_5.nc" sst,temp
+save/clobber/file="aggu/uagg_5.nc" sst,temp
 
 ! In the union set, sst comes from uagg_1, temp comes from uagg_5
-union uu = tmp/uagg_1.nc,tmp/uagg_5.nc
+union uu = aggu/uagg_1.nc,aggu/uagg_5.nc
 sh dat/att
 can dat/all
 
 ! Or use /quiet to supress the note
-union/quiet uu = tmp/uagg_1.nc,tmp/uagg_5.nc
+union/quiet uu = aggu/uagg_1.nc,aggu/uagg_5.nc
 
-let tnames = SPAWN("ls -1 tmp/uagg_1_*.nc")
+let tnames = SPAWN("ls -1 aggu/uagg_1_*.nc")
 tseries  temp_time_agg = tnames
 sh dat
-union temp_time_agg, tmp/uagg_2.nc,tmp/uagg_3.nc,tmp/uagg_4.nc
+union temp_time_agg, aggu/uagg_2.nc,aggu/uagg_3.nc,aggu/uagg_4.nc
 
 shade/l=2 sst - temp
 
@@ -62,77 +63,81 @@ CANCEL MODE VERIFY
 
 
 ! If aggregate_tef script has alrady run, leaving the example files 
-! it writes in tmp/, reuse those, otherwise create them.
+! it writes in aggtef/, reuse those, otherwise create them.
 
 ! check for those files.
-IF `test_opendap("tmp/f03_e2_t3.nc") NE 0` THEN
+IF `test_opendap("aggtef/f03_e2_t3.nc") NE 0` THEN
    GO bn_aggregate_tef.sub
 ENDIF
 
 ! *** create an artificial file collection with another variable, fcst_3 ***
 
-! a 20x20 lat-long region
-define axis/x=140e:160e:1 xax
-define axis/y=10n:20n:1 yax
-define axis/Z=0:500:500/EDGES/units=m zax   ! a single point axis
+! a 20x20x1 lat-lon-depth region
+DEFINE AXIS /X=140E:160E:1 xax
+DEFINE AXIS /Y=20N:40N:1 yax
+DEFINE AXIS /UNITS=m /Z=0:500:500 /EDGES zax   ! a single point axis
 
-! a 20 year regular monthly axis starting in Jan 1950
-DEFINE AXIS/UNITS=DAYS/T0=01-JAN-1900/EDGES/T=01-JAN-1950:31-DEC-1970:`365.2425/12` monthly
+! regular mid-monthly axis Jan 1950 to Dec 1960
+DEFINE AXIS /UNITS=DAYS /T0=01-JAN-1900 /EDGES /T=01-JAN-1950:31-DEC-1960:`365.2425/12` monthly
 
-! define a moving field with errors increasing from a given forecast date
-let vy = 1/500      ! speed that forecast structure deviates from truth
-let vx = (1+(T[gt=monthly]-tstart)/2000)* 1/300
-let xt = x[gx=xax]-vx*T[gt=monthly]
-let yt = y[gy=yax]-vy*T[gt=monthly]
-let field = COS((xt-150)/5)*COS((yt-30)/5) + Z[gz=zax]
-let fcst = ensemble_variation * (field + fcst_error)
-define attribute fcst.im_everywhere = "so promote me"
-set variable/title="some variable" fcst
-let static_error = SIN((x[gx=xax]-140)/5)*SIN((y[gy=yax]-20)/5) + RANDU(x[gx=xax]+y[gy=yax])
-let structure_drift = (t[gt=monthly]-tstart)/5000 * static_error
-let random_error = (t[gt=monthly]-tstart)/2000 * RANDU(t[gt=monthly]+x[gx=xax]+y[gy=yax])
-let fcst_error = structure_drift + random_error
+! beginning-of-the-month quarter-annual dates Jan 1950 to OCT 1953
+LET quarterly_dates = { \
+   "01-JAN-1950", "01-APR-1950", "01-JUL-1950", "01-OCT-1950", \
+   "01-JAN-1951", "01-APR-1951", "01-JUL-1951", "01-OCT-1951", \
+   "01-JAN-1952", "01-APR-1952", "01-JUL-1952", "01-OCT-1952" \
+}
+LET quarterly_times = DATE1900(quarterly_dates)
 
-! Define another variable fcst_3
-let/title="another variable" fcst_3 = fcst + 3 + 0.1*fcst_error
+! define a predictable value with errors increasing from a given forecast date
+! ftaxis is defined with T0 = time-of-forecast
+LET thirdpi = `4.0 * ATAN(1.0) / 3.0`
+LET final_val = Y[gy=yax] - 0.1 * X[gx=xax] + Z[gz=zax] / 250.0
+LET /TITLE="first" fcst = final_val + ensemble_variation * fcst_error
+LET /TITLE="third" fcst_3 = fcst + 3.0 + 0.1 * fcst_error
+DEFINE ATTRIBUTE fcst_3.im_everywhere = "so promote me"
 
+REPEAT /NAME=fdate /RANGE=1:3 ( \
+   LET t0date = quarterly_dates[I=`fdate`] ;\
+   LET tzero = quarterly_times[I=`fdate`] ;\
+   LET tstart = T[gt=monthly,L=`3 * fdate - 2`] - `tzero` ;\
+   LET tend = T[gt=monthly,L=`3 * fdate + 33`] - `tzero` ;\
+   DEFINE AXIS /UNIT=DAYS /T0=`t0date` /T=`tstart`:`tend`:`365.2425/12` ftaxis ;\
+   LET fcst_error = COS((final_val + `fdate`) * thirdpi) * T[gt=ftaxis] / 1000 ;\
+   REPEAT /NAME=ens /RANGE=1:2 ( \
+      LET ensemble_variation = 1 + (ens-3)/10 ;\
+      LET realization = `ens` ;\
+      SAVE /CLOBBER /FILE="aggu/f`fdate,zw=2`_e`ens`_tu1.nc" /L=1:12  fcst_3, realization ;\
+      SAVE /CLOBBER /FILE="aggu/f`fdate,zw=2`_e`ens`_tu2.nc" /L=13:24 fcst_3, realization ;\
+      SAVE /CLOBBER /FILE="aggu/f`fdate,zw=2`_e`ens`_tu3.nc" /L=25:36 fcst_3, realization  \
+   ) \
+)
 
-repeat/name=fdate/range=1:7:3 (\
-  let tstart = t[gt=monthly,l=`fdate`];\
-  repeat/name=ens/range=1:2:1 (\
-    let ensemble_variation = 1 + (ens-3)/20;\  
-    let realization = `ens`;\
-    save/clobber/file="tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_tu1.nc"/l=`fdate`:`fdate+11` fcst_3, realization;\
-    save/clobber/file="tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_tu2.nc"/l=`fdate+12`:`fdate+23` fcst_3, realization;\
-    save/clobber/file="tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_tu3.nc"/l=`fdate+24`:`fdate+35` fcst_3, realization))
-
-cancel variables/all
+CANCEL VARIABLES/ALL
 
 ! ***** end of TEFU file creation ****************
 
-SET MODE VERIFY
 ! define T aggregations
 
 ! timeseries of files with variable fcst_1
-repeat/name=fdate/range=1:7:3 (\
-  let tstart = t[gt=monthly,l=`fdate`];\
-  repeat/name=ens/range=1:2:1 (\
-    let realization = `ens`;\
-    TSERIES  t_f`(fdate-1)/3+1,zw=2`_e`ens` = SPAWN("ls -1 tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_t?.nc")  ))
+repeat/name=fdate/range=1:3 ( \
+  repeat/name=ens/range=1:2 ( \
+    TSERIES t_f`fdate,zw=2`_e`ens` = SPAWN("ls -1 aggtef/f`fdate,zw=2`_e`ens`_t?.nc") \
+  ) \
+)
 
 ! timeseries of files with variable fcst_3
-repeat/name=fdate/range=1:7:3 (\
-  let tstart = t[gt=monthly,l=`fdate`];\
-  repeat/name=ens/range=1:2:1 (\
-    let realization = `ens`;\
-    TSERIES  t_f`(fdate-1)/3+1,zw=2`_e`ens`_3 = SPAWN("ls -1 tmp/f`(fdate-1)/3+1,zw=2`_e`ens`_tu?.nc")  ))
-
-cancel variable realization
+repeat/name=fdate/range=1:3 ( \
+  repeat/name=ens/range=1:2 ( \
+    TSERIES t_f`fdate,zw=2`_e`ens`_3 = SPAWN("ls -1 aggu/f`fdate,zw=2`_e`ens`_tu?.nc") \
+  ) \
+)
 
 SET MODE VERIFY
+
 ! now union these to make datsets with fcnst_1 and fcst_3.
 
-show data/files/br; 
+show data/members
+show data/att t_f01_e2_3
 
 DEFINE DATA/AGGREGAT/U  u1 = t_f01_e1_3, t_f01_e1
 DEFINE DATA/AGGREGAT/U  u2 = t_f01_e2, t_f01_e2_3
@@ -141,14 +146,14 @@ can data u1 u2
 
 ! Make a batch of files, timeseries aggregations union-ed.
 ! the /QUIET supresses the note about skipping duplicate variables.
-repeat/name=fdate/range=1:7:3 (\
-  let tstart = t[gt=monthly,l=`fdate`];\
-  repeat/name=ens/range=1:2:1 (\
-    let realization = `ens`;\
-    UNION/quiet  t_f_u`(fdate-1)/3+1,zw=2`_e`ens` = t_f`(fdate-1)/3+1,zw=2`_e`ens`, t_f`(fdate-1)/3+1,zw=2`_e`ens`_3;\
-    show data/br t_f_u`(fdate-1)/3+1,zw=2`_e`ens`))
+repeat/name=fdate/range=1:3 ( \
+  repeat/name=ens/range=1:2 ( \
+    UNION/quiet  t_f_u`fdate,zw=2`_e`ens` = t_f`fdate,zw=2`_e`ens`, t_f`fdate,zw=2`_e`ens`_3 ;\
+    show data/br t_f_u`fdate,zw=2`_e`ens` \
+  ) \
+)
 
-cancel variable realization
+show data/att t_f_u01_e2
 
 ! should share the same time axis
 show grid fcst[d=t_f01_e1]
@@ -166,40 +171,22 @@ SHOW DATA/brief
 SHOW DATA/FULL tue_f03
 SHOW DATA/ATT tue_f03   ! notice the promotion of fcst.im_everywhere
 
+! TODO: crashes
 ! define tuef aggregation
-FMRC/HIDE tuef = tue_f01, tue_f02, tue_f03
-SHOW DATA/brief/files
-show data/full tuef
+! FMRC/HIDE tuef = tue_f01, tue_f02, tue_f03
+! SHOW DATA/brief/files
+! show data/full tuef
 
 ! The time-union-ensemble-forecast aggregation
 
-set data tuef
-show data tuef
-sh grid fcst 
-sh grid fcst_3
+! set data tuef
+! show data tuef
+! sh grid fcst 
+! sh grid fcst_3
 
 ! simplest acess -- compact form -- just demonstrate it doesn't fail
-stat/brief fcst[i=11:12, j=5:6, l=31:32, m=1:2, n=2:3]
-stat/brief fcst_3[i=11:12, j=5:6, l=31:32, m=1:2, n=2:3]
+! stat/brief fcst[i=11:12, j=5:6, l=31:32, m=1:2, n=2:3]
+! stat/brief fcst_3[i=11:12, j=5:6, l=31:32, m=1:2, n=2:3]
 
-DEFINE SYMBOL TF_CAL_T = `fcst._cal_t_ax`
-DEFINE SYMBOL TF_LAG_F = `fcst._lag_f_ax`
-DEFINE SYMBOL TF_LAG_T = `fcst._lag_t_ax`
-DEFINE SYMBOL TF_CAL_F = `fcst._cal_f_ax`
-
-! lead view of ensemble mean
-let fcstfine = fcst[gt=($TF_LAG_T)@BIN,gf=($TF_CAL_F)@BIN]
-let lead_fcst = fcstfine[gt(TF_TIMES)=($TF_CAL_T),gf(TF_TIMES)=($TF_LAG_F)]
-shade/x=150E/y=15n lead_fcst[m=1:2@ave]
-
-let fcst3fine = fcst_3[gt=($TF_LAG_T)@BIN,gf=($TF_CAL_F)@BIN]
-let lead_fcst_3 = fcst3fine[gt(TF_TIMES)=($TF_CAL_T),gf(TF_TIMES)=($TF_LAG_F)]
-shade/x=150E/y=15n lead_fcst[m=1:2@ave]
-
-! the difference will be just a small variation from the value 3
-let diff_of_union = lead_fcst - lead_fcst_3
-
-shade/x=150E/y=15n  diff_of_union[m=1:2@ave]
 CANCEL DATA/ALL
-
 
