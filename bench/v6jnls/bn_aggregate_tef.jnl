@@ -19,15 +19,13 @@ ENDIF
 ! define T aggregations
 REPEAT /NAME=fdate /RANGE=1:12 ( \
   REPEAT /NAME=ens /RANGE=1:5 ( \
-    TSERIES t_f`fdate,zw=2`_e`ens` = SPAWN("ls -1 aggtef/f`fdate,zw=2`_e`ens`_t?.nc") ;\
-    SAVE /CLOBBER /FILE="aggtef/t_f`fdate,zw=2`_e`ens`.nc" fcst, fcst_2  \
+    TSERIES t_f`fdate,zw=2`_e`ens` = SPAWN("ls -1 aggtef/f`fdate,zw=2`_e`ens`_t?.nc") \
   ) \
 )
 
 REPEAT /NAME=fdate /RANGE=4:4 ( \
   REPEAT /NAME=ens /RANGE=3:3 ( \
-    TSERIES t_f`fdate,zw=2`_e`ens`_1v = SPAWN("ls -1 aggtef/f`fdate,zw=2`_e`ens`_t?_1v.nc") ;\
-    SAVE /CLOBBER /FILE="aggtef/t_f`fdate,zw=2`_e`ens`_1v.nc" fcst \
+    TSERIES t_f`fdate,zw=2`_e`ens`_1v = SPAWN("ls -1 aggtef/f`fdate,zw=2`_e`ens`_t?_1v.nc") \
   ) \
 )
 
@@ -65,11 +63,11 @@ SHOW DATA/ATT te_f04_1v  ! note atts im_everwhere vs im_not_everwhere
 ! define tef aggregation
 ! FMRC/HIDE tef = te_f01, te_f02, te_f03, te_f04, te_f05, te_f06, te_f07, te_f08, te_f09, te_f10, te_f11, te_f12
 
-! For now, use files saved TE aggregations
+! For now, use generated TE aggregation files
 CANCEL DATA /ALL
 LET files = SPAWN("ls -1 aggtef/te_f??.nc")
 FMRC /HIDE tef = files
-SAVE /FILE="aggtef/tef.nc" fcst, fcst_2
+SAVE /CLOBBER /FILE="aggtef/tef.nc" fcst, fcst_2
 
 SHOW DATA /BRIEF /MEMBERS
 SHOW DATA /FULL tef
@@ -88,9 +86,17 @@ LET err = fcst[M=1:5@AVE] - fcst[M=3]
 STAT /BRIEF /X=150E /Y=25N err
 
 ! define fcst_2 as a LET/D variable and then do same calc
-! LET/D=t_f04_e3_1v fcst_2 = fcst + 2
-! SHOW DATA /BRIEF t_f04_e3_1v
-! ENSEMBLE te_f04_letd = t_f04_e1, t_f04_e2, t_f04_e3_1v, t_f04_e4, t_f04_e5
+USE "aggtef/t_f04_e1.nc"
+USE "aggtef/t_f04_e2.nc"
+USE "aggtef/t_f04_e3_1v.nc"
+LET/D="aggtef/t_f04_e3_1v.nc" fcst_2 = fcst + 2
+USE "aggtef/t_f04_e4.nc"
+USE "aggtef/t_f04_e5.nc"
+SHOW DATA
+
+ENSEMBLE /HIDE te_f04_letd = aggtef/t_f04_e1, aggtef/t_f04_e2, aggtef/t_f04_e3_1v, aggtef/t_f04_e4, aggtef/t_f04_e5
+SHOW DATA
+
 ! FMRC /HIDE tef_letd = te_f01, te_f02, te_f03, te_f04_letd, te_f05, te_f06, te_f07, te_f08, te_f09, te_f10, te_f11, te_f12
 ! let fcst2fine = fcst_2[gt=($TF_LAG_T)@BIN,gf=($TF_CAL_F)@BIN]
 ! let diag_fcst_2 = fcst2fine[gt(TF_TIMES)=($TF_CAL_T),gf(TF_TIMES)=($TF_LAG_F)]

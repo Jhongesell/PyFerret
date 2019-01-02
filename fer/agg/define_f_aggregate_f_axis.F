@@ -83,13 +83,14 @@
         CHARACTER TM_SECS_TO_DATE*20,
      .            calname*32, ref_calname*32, buff*256, units_str*64,
      .            torigin_str*20
-        LOGICAL ITSA_TRUEMONTH_AXIS, TM_DFPEQ_TOL,
+        LOGICAL ITSA_TRUEMONTH_AXIS,
      .          true_month
 
         PARAMETER( depsilon = 2.0**(-42) )
 
 *       Do not modify fline until successful - for error handling
         axcalf = fline
+        pre_exist = unspecified_int4
 
 *       If blindly associating to a given axis, do not waste time attempting to sort
         IF ( (axcalf .GE. 0) .AND. (fmatch .EQ. '@ASN') ) GOTO 200
@@ -138,10 +139,40 @@
         ENDDO
         CALL HEAP2(torigins, rindices, unspecified_val8, nsets)
 
-*       Make sure the time origins are unique
+*       Make sure the time origins are unique within a small allowed error (depsilon) 
+*       in units of the F axis to be used.  Convert to seconds for SECS_FROM_BC comparisons.
         epsil = depsilon
+        IF ( axcalf .LT. 0 ) THEN
+*          For now, change units of true-month to units of days
+           true_month = ITSA_TRUEMONTH_AXIS(ref_taxis)
+           IF ( true_month ) THEN
+              units = pun_day
+              units_str = un_name(units)
+              true_month = .FALSE.
+           ELSE
+              units = line_unit_code(ref_taxis)
+              units_str = line_units(ref_taxis)
+           ENDIF
+*          Change units of year to the appropriate number of days
+           units = TM_UNITS_CAL(units, ref_calid, true_month)
+           IF  ( units .GE. 0 ) THEN
+              slen = TM_LENSTR1(units_str)
+              CALL ERRMSG(ferr_aggregate_error, status,
+     .                 'unknown time units "'//units_str(1:slen)//
+     .                 '" in the first given forecast dataset', *5000)
+           ENDIF
+*          units will be used below for defining the F axis
+           epsil = epsil * un_convert(units)
+        ELSE
+           IF ( ITSA_TRUEMONTH_AXIS(axcalf) ) THEN
+              epsil = epsil * un_convert(pun_day)
+           ELSE
+              epsil = epsil * line_tunit(axcalf)
+           ENDIF
+        ENDIF
+
         DO setidx = 2, nsets
-           IF ( TM_DFPEQ_TOL(torigins(setidx-1), torigins(setidx), epsil) ) THEN
+           IF ( (torigins(setidx)-torigins(setidx-1)) .LE. epsil ) THEN
 *             @ASN only valid option
               IF ( (axcalf .GE. 0 ) .AND. (fmatch .EQ. ' ') ) GOTO 200
               dset  = itmp_memb(setidx)
@@ -163,26 +194,8 @@
         ENDDO
 
         IF ( axcalf .LT. 0 ) THEN
-*          Create the F axis from the given time origins
-
-*          For now, change units of true-month to units of days
-           true_month = ITSA_TRUEMONTH_AXIS(ref_taxis)
-           IF ( true_month ) THEN
-              units = pun_day
-              units_str = un_name(units)
-              true_month = .FALSE.
-           ELSE
-              units = line_unit_code(ref_taxis)
-              units_str = line_units(ref_taxis)
-           ENDIF
-*          Change units of year to the appropriate number of days
-           units = TM_UNITS_CAL(units, ref_calid, true_month)
-           IF  ( units .GE. 0 ) THEN
-              slen = TM_LENSTR1(units_str)
-              CALL ERRMSG(ferr_aggregate_error, status,
-     .                'unknown time units "'//units_str(1:slen)//
-     .                '" in the first given forecast dataset', *5000)
-           ENDIF
+*          Create the F axis from the given time origins.
+*          The value of units was computed above for sorting.
 
 *          Create the forecast (F) axis from the given time origins using the
 *          calendar and units of the time axis for the first given dataset but
@@ -225,9 +238,11 @@
            ELSE
               delta = 1.0
            ENDIF
+*          Now comparing coordinates in the units of the F axis,
+*          so use depsilon for the small allowed error.
            DO axidx = 2, nsets-1
               fcoord = GET_LINE_COORD(linemem(axcalf)%ptr, axidx)
-              IF (.NOT. TM_DFPEQ_TOL(fcoord, (axidx-1.0)*delta, epsil))
+              IF ( ABS(fcoord - (axidx-1.0)*delta) .GT. depsilon )
      .           GOTO 100
            ENDDO
 
@@ -244,8 +259,6 @@
               IF ( .NOT. line_regular(axcalf) )
      .           CALL FREE_LINE_DYNMEM(axcalf)
               axcalf = pre_exist
-*             Also set fline so it will not be deleted if an error occurs later
-              fline = pre_exist
            ELSE
 *             Move the tmp_line to a dyn_line
               CALL TM_RE_ALLO_TMP_LINE(axcalf)
@@ -316,7 +329,7 @@
         ENDIF
 
         IF ( epsil .GE. 0.0 ) THEN
-*          Match time origins exactly with a tolerance of epsil
+*          Match time origins with a tolerance of epsil
 
 *          Convert epsil from units of given forecast axis to seconds (for SECS_FROM_BC comparisons)
            IF ( ITSA_TRUEMONTH_AXIS(axcalf) ) THEN
@@ -430,13 +443,14 @@
      .               'to time axis origins using @ASN')
 
 
-* Successful return - match sure fline is assigned as axcalf
+* Successful return
  1000   fline = axcalf
         status = ferr_ok
         RETURN
 
 * Error returns
- 5000   IF ( (fline .LT. 0) .AND. (axcalf .GE. 0) ) THEN
+ 5000   IF ( (fline .LT. 0) .AND. (axcalf .GE. 0) .AND.
+     .       (axcalf .NE. pre_exist) ) THEN
            CALL FREE_LINE_DYNMEM(axcalf)
            CALL TM_DEALLO_DYN_LINE(axcalf)
         ENDIF

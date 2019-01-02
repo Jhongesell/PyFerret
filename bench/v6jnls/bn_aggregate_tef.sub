@@ -46,6 +46,9 @@ REPEAT /NAME=fdate /RANGE=1:12 ( \
       LET ensemble_variation = 1 + (ens-3)/10 ;\
       LET realization = `ens` ;\
       LET description = "Data in tseries aggregations T=1, Fdate=`fdate`, Ens=`ens`" ;\
+      SAVE /CLOBBER /FILE="aggtef/t_f`fdate,zw=2`_e`ens`.nc" fcst, fcst_2, realization ;\
+      SAVE /APPEND  /FILE="aggtef/t_f`fdate,zw=2`_e`ens`.nc" /ASGLOBAL investigator ;\
+      SAVE /APPEND  /FILE="aggtef/t_f`fdate,zw=2`_e`ens`.nc" /ASGLOBAL description ;\
       SAVE /CLOBBER /FILE="aggtef/f`fdate,zw=2`_e`ens`_t1.nc" /L=1:12  fcst, fcst_2, realization ;\
       SAVE /APPEND  /FILE="aggtef/f`fdate,zw=2`_e`ens`_t1.nc" /ASGLOBAL investigator ;\
       SAVE /APPEND  /FILE="aggtef/f`fdate,zw=2`_e`ens`_t1.nc" /ASGLOBAL description ;\
@@ -66,7 +69,7 @@ REPEAT /NAME=fdate /RANGE=4:4 ( \
    REPEAT /NAME=ens /RANGE=3:3 ( \
       LET ensemble_variation = 1 + (ens-3)/20 ;\
       LET realization = `ens` ;\
-      LET description = "Data in tseries aggregations T=1, Fdate=`fdate`, Ens=`ens`" ;\
+      SAVE /CLOBBER /FILE="aggtef/t_f`fdate,zw=2`_e`ens`_1v.nc" fcst, realization ;\
       SAVE /CLOBBER /FILE="aggtef/f`fdate,zw=2`_e`ens`_t1_1v.nc" /L=1:12  fcst, realization ;\
       SAVE /CLOBBER /FILE="aggtef/f`fdate,zw=2`_e`ens`_t2_1v.nc" /L=13:24 fcst, realization ;\
       SAVE /CLOBBER /FILE="aggtef/f`fdate,zw=2`_e`ens`_t3_1v.nc" /L=25:36 fcst, realization \
@@ -74,4 +77,5 @@ REPEAT /NAME=fdate /RANGE=4:4 ( \
 )
 
 CANCEL VARIABLES/ALL
+CANCEL AXIS xax, yax, zax, monthly, ftaxis
 

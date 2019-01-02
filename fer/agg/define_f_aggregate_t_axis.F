@@ -85,13 +85,14 @@
      .          nsteps, ntsteps, igrid, iaxis, idx, previdx
         CHARACTER TM_SECS_TO_DATE*20,
      .          calname*32, buff*256, units_str*64, origin_str*20
-        LOGICAL ITSA_TRUEMONTH_AXIS, TM_DFPEQ_TOL,
+        LOGICAL ITSA_TRUEMONTH_AXIS, 
      .          true_month, irreg_bnds, bad_bnds
 
         PARAMETER( depsilon = 2.0**(-42) )
 
         wkspc = unspecified_int4
         axcalt = tline
+        pre_exist = unspecified_int4
 
         IF ( axcalt .LT. 0 ) THEN
            epsil = depsilon
@@ -174,6 +175,15 @@
      .        CALL ERRMSG(ferr_aggregate_error, status,
      .                'out of memory for forecasted-time axis', *5000)
 
+*          Convert epsil and bnd_epsil from units of this time axis to seconds (for SECS_FROM_BC comparisons)
+           IF ( ITSA_TRUEMONTH_AXIS(axcalt) ) THEN
+              epsil = epsil * un_convert(pun_day)
+              bnd_epsil = bnd_epsil * un_convert(pun_day)
+           ELSE
+              epsil = epsil * line_tunit(axcalt)
+              bnd_epsil = bnd_epsil * line_tunit(axcalt)
+           ENDIF
+
 *          Get additional memory for the cell upper bounds until axis is complete
            wksize = nsets * nsteps
            CALL CREATE_DYN_WRKSPC(wksize, wkspc, status)
@@ -239,22 +249,21 @@
                  thibnd = thibnd + setorigin
 
 *                If the coordinate is not in the middle of the cell, cannot be regular
-                 IF ( .NOT. TM_DFPEQ_TOL(tcoord-tlobnd,
-     .                thibnd-tcoord, bnd_epsil) ) irreg_bnds = .TRUE.
+                 IF ( ABS(tcoord-0.5*(tlobnd+thibnd)) .GT. bnd_epsil ) 
+     .              irreg_bnds = .TRUE.
 
 *                Match or add this forecasted time (in units of SECS_FROM_BC)
                  DO WHILE ( axidx .LE. ntsteps )
                     ocoord = GET_LINE_COORD(linemem(axcalt)%ptr,axidx)
 *                   If matches an existing value, no changes needed
-                    IF ( TM_DFPEQ_TOL(ocoord, tcoord, epsil) ) THEN
+                    IF ( ABS(ocoord - tcoord) .LE. epsil ) THEN
 *                      Lower limits in lineedg, upper limits in workmem
                        olobnd = GET_LINE_COORD(lineedg(axcalt)%ptr, axidx)
                        ohibnd = GET_LINE_COORD(workmem(wkspc)%ptr, axidx)
 *                      If the bounds do not match, cannot use the bounds for the given axes
-                       IF ( .NOT. (
-     .                     TM_DFPEQ_TOL(olobnd, tlobnd, bnd_epsil) .AND.
-     .                     TM_DFPEQ_TOL(ohibnd, thibnd, bnd_epsil) ) )
-     .                     bad_bnds = .TRUE.
+                       IF ( (ABS(olobnd - tlobnd) .GT. bnd_epsil) .OR.
+     .                      (ABS(ohibnd - thibnd) .GT. bnd_epsil) )
+     .                    bad_bnds = .TRUE.
                        GOTO 340
                     ENDIF
 *                   if new value is smaller, insert it here
@@ -299,7 +308,7 @@
 *             lower limit of current cell
               tlobnd = GET_LINE_COORD(lineedg(axcalt)%ptr, axidx)
 
-              IF ( TM_DFPEQ_TOL(tlobnd, ohibnd, bnd_epsil) ) THEN
+              IF ( ABS(tlobnd - ohibnd) .LE. bnd_epsil ) THEN
 *                Assign the average in case there is any difference
                  CALL PUT_LINE_COORD(lineedg(axcalt)%ptr, axidx, 0.5*(ohibnd+tlobnd))
               ELSEIF ( ohibnd .GT. tlobnd ) THEN
@@ -344,7 +353,8 @@
               GOTO 350
            ENDIF
 
-  360      IF ( .NOT. bad_bnds ) THEN
+  360      line_dim(axcalt) = ntsteps
+           IF ( .NOT. bad_bnds ) THEN
 *             Bounds now mesh together - only need the last upper bound from workmem
               ohibnd = GET_LINE_COORD(workmem(wkspc)%ptr, ntsteps)
               CALL PUT_LINE_COORD(lineedg(axcalt)%ptr, ntsteps+1, ohibnd)
@@ -352,9 +362,67 @@
            CALL FREE_WS_DYNMEM(wkspc)
            wkspc = unspecified_int4
 
-           line_dim(axcalt) = ntsteps
-*          convert the time in UNITS_FROM_BC to the appropriate time origin
-           DO axidx = 1,ntsteps
+*          If any coordinate was not in the center of its cell, then
+*          the axes cannot be regular regardless of coordinate spacing
+           IF ( irreg_bnds ) GOTO 380
+
+*          Check if this is a regular axis
+           ocoord = GET_LINE_COORD(linemem(axcalt)%ptr, 1)
+           IF ( ntsteps .GT. 1 ) THEN
+              tcoord = GET_LINE_COORD(linemem(axcalt)%ptr, ntsteps)
+              delta = (tcoord - ocoord) / (ntsteps - 1.0)
+              IF ( ntsteps .GT. 2 ) THEN
+                 DO axidx = 2,ntsteps-1
+                    tcoord = GET_LINE_COORD(linemem(axcalt)%ptr, axidx)
+                    IF ( ABS(ocoord+(axidx-1.0)*delta - tcoord)
+     .                    .GT. epsil ) GOTO 380
+                 ENDDO
+              ENDIF
+*             Coordinates at cell midpoints already verified (irreg_bnds if .FALSE.)
+*              IF ( .NOT. bad_bnds ) THEN
+*                Check if the provided cell bounds are at the "midpoints".
+*                 DO axidx = 1,ntsteps+1
+*                    tlobnd = GET_LINE_COORD(lineedg(axcalt)%ptr, axidx)
+*                    IF ( ABS(ocoord+(axidx-1.5)*delta - tlobnd) .GT. bnd_epsil ) GOTO 380
+*                 ENDDO
+*              ENDIF
+           ELSEIF ( (ntsteps .EQ. 1) .AND. .NOT. bad_bnds ) THEN
+              tlobnd = GET_LINE_COORD(lineedg(axcalt)%ptr, 1)
+              thibnd = GET_LINE_COORD(lineedg(axcalt)%ptr, 2)
+*             Coordinates at cell midpoints already verified (irreg_bnds if .FALSE.)
+*             IF ( ABS(ocoord - 0.5 * (tlobnd + thibnd)) .GT. bnd_epsil ) GOTO 380
+              delta = thibnd - tlobnd
+           ELSE
+*             Single coordinate with cell bounds; signal to
+*             just use a delta of one in the units of the axis
+              delta = -1.0
+           ENDIF
+
+*          If we got here, the axis is regular (including bounds)
+           CALL FREE_LINE_DYNMEM(axcalt)
+           line_regular(axcalt) = .TRUE.
+*          Convert the time origin and delta from UNITS_FROM_BC 
+*          to the appropriate time unit and origin
+           IF ( ITSA_TRUEMONTH_AXIS(axcalt) ) THEN
+              line_start(axcalt) = (ocoord-origin)/un_convert(pun_day)
+              IF ( delta .GE. 0 ) THEN
+                 line_delta(axcalt) = delta/un_convert(pun_day)
+              ELSE
+                 line_delta(axcalt) = 1.0
+              ENDIF
+           ELSE
+              line_start(axcalt) = (ocoord-origin)/line_tunit(axcalt)
+              IF ( delta .GE. 0 ) THEN
+                 line_delta(axcalt) = delta/line_tunit(axcalt)
+              ELSE
+                 line_delta(axcalt) = 1.0
+              ENDIF
+           ENDIF
+           GOTO 390
+
+*          If we got here, treat the axis as irregular.  Convert all time
+*          values from UNITS_FROM_BC to the appropriate time unit and origin
+  380      DO axidx = 1,ntsteps
               ocoord = GET_LINE_COORD(linemem(axcalt)%ptr, axidx)
               ocoord = ocoord - origin
               IF ( ITSA_TRUEMONTH_AXIS(axcalt) ) THEN
@@ -375,58 +443,26 @@
                  ENDIF
                  CALL PUT_LINE_COORD(lineedg(axcalt)%ptr, axidx, ocoord)
               ENDDO
-*             If any coordinate was not in the center of its cell, then
-*             the axes cannot be a regular regardless of coordinate spacing
-              IF ( irreg_bnds ) GOTO 380
            ELSE
 *             Cannot use existing cell bounds; use the "midpoints"
               CALL TM_IRREGAX_MID(linemem(axcalt)%ptr,
      .                            lineedg(axcalt)%ptr, ntsteps)
            ENDIF
 
-*          Check if this is a regular axis
-           ocoord = GET_LINE_COORD(linemem(axcalt)%ptr, 1)
-           IF ( ntsteps .GT. 1 ) THEN
-              tcoord = GET_LINE_COORD(linemem(axcalt)%ptr, ntsteps)
-              delta = (tcoord - ocoord) / (ntsteps - 1.0)
-           ELSE
-              delta = 1.0
-           ENDIF
-           DO axidx = 2,ntsteps-1
-              tcoord = GET_LINE_COORD(linemem(axcalt)%ptr, axidx)
-              IF ( .NOT. TM_DFPEQ_TOL(tcoord,
-     .             ocoord + (axidx-1.0) * delta, epsil) ) GOTO 380
-           ENDDO
-           IF ( .NOT. bad_bnds ) THEN
-*             Check if the provided cell bounds are at the "midpoints"
-              DO axidx = 1,ntsteps+1
-                 tlobnd = GET_LINE_COORD(lineedg(axcalt)%ptr, axidx)
-                 IF ( .NOT. TM_DFPEQ_TOL(tlobnd,
-     .             ocoord + (axidx-1.5) * delta, bnd_epsil) ) GOTO 380
-              ENDDO
-           ENDIF
-
-*          If we got here, the axis is regular (including bounds)
-           CALL FREE_LINE_DYNMEM(axcalt)
-           line_regular(axcalt) = .TRUE.
-           line_start(axcalt)   = ocoord
-           line_delta(axcalt)   = delta
-
 *          If the axis is an exact duplicate of a pre-existing axis, use that axis instead
 *          (shared axes are needed in order to E-aggregate multiple FMRCs)
-  380      pre_exist = TM_FIND_LIKE_DYN_LINE(axcalt)
+  390      pre_exist = TM_FIND_LIKE_DYN_LINE(axcalt)
            IF ( pre_exist .NE. unspecified_int4 ) THEN
               IF ( .NOT. line_regular(axcalt) )
      .           CALL FREE_LINE_DYNMEM(axcalt)
               CALL TM_DEALLO_DYN_LINE(axcalt)
               axcalt = pre_exist
-*             Also set tline so it will not be deleted if an error occurs later
-              tline = pre_exist
            ELSE
 *             New axis; move the tmp_line to a dyn_line
               CALL TM_RE_ALLO_TMP_LINE(axcalt)
            ENDIF
 
+*          axcalt successfully created/assigned
         ENDIF
 
 *       Map the forecasted times to the created or provided T axis
@@ -734,12 +770,13 @@
      .               'to given time axis using @ASN')
 
 
-* Successful return - match sure tline is assigned as axcalt
+* Successful return
  1000   tline = axcalt
         status = ferr_ok
         RETURN
 
- 5000   IF ( (tline .LT. 0) .AND. (axcalt .GE. 0) ) THEN
+ 5000   IF ( (tline .LT. 0) .AND. (axcalt .GE. 0) .AND.
+     .       (axcalt .NE. pre_exist) ) THEN
            CALL FREE_LINE_DYNMEM(axcalt)
            CALL TM_DEALLO_DYN_LINE(axcalt)
         ENDIF
