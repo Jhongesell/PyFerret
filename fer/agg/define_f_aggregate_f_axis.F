@@ -48,7 +48,7 @@
 *   memb_filenames - array of dataset filenames (input-output)
 *   fline          - time-of-forecast (F) axis to use/used (input/output)
 *   fmatch         - method of matching times to fline (input, can be empty);
-*                    eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
+*                    eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001', '@LAG', '@ASN@LAG', ...
 *   findices       - index of each dataset on the time-of-forecast (F) axis (output)
 *   status         - return status (output)
 
@@ -93,7 +93,8 @@
         pre_exist = unspecified_int4
 
 *       If blindly associating to a given axis, do not waste time attempting to sort
-        IF ( (axcalf .GE. 0) .AND. (fmatch .EQ. '@ASN') ) GOTO 200
+        IF ( (axcalf .GE. 0) .AND. ((fmatch .EQ. '@ASN')
+     .              .OR. (fmatch .EQ. '@ASN@LAG')) ) GOTO 200
 
 *       Extract the T0 time from each dataset for sorting
         DO setidx = 1, nsets
@@ -139,7 +140,7 @@
         ENDDO
         CALL HEAP2(torigins, rindices, unspecified_val8, nsets)
 
-*       Make sure the time origins are unique within a small allowed error (depsilon) 
+*       Make sure the time origins are unique within a small allowed error (depsilon)
 *       in units of the F axis to be used.  Convert to seconds for SECS_FROM_BC comparisons.
         epsil = depsilon
         IF ( axcalf .LT. 0 ) THEN
@@ -174,7 +175,8 @@
         DO setidx = 2, nsets
            IF ( (torigins(setidx)-torigins(setidx-1)) .LE. epsil ) THEN
 *             @ASN only valid option
-              IF ( (axcalf .GE. 0 ) .AND. (fmatch .EQ. ' ') ) GOTO 200
+              IF ( (axcalf .GE. 0) .AND. ((fmatch .EQ. ' ')
+     .              .OR. (fmatch .EQ. '@LAG')) ) GOTO 200
               dset  = member_sets(NINT(rindices(setidx)))
               taxis = ds_time_axis(dset)
               torigin_str = line_t0(taxis)
@@ -192,6 +194,7 @@
         DO setidx = 1, nsets
            itmp_names(setidx) = memb_filenames(NINT(rindices(setidx)))
         ENDDO
+
 
         IF ( axcalf .LT. 0 ) THEN
 *          Create the F axis from the given time origins.
@@ -279,11 +282,10 @@
 
 *          Successfully created F axis - done
            GOTO 1000
-
         ENDIF
 
-*       Map the datasets to the provided F axis
 
+*       Map the datasets to the provided F axis
   200   axlen = line_dim(axcalf)
         IF ( axlen .LT. nsets )
      .     CALL ERRMSG(ferr_aggregate_error, status,
@@ -291,16 +293,21 @@
      .                 'the size of the provided F axis', *5000)
 
 *       The allowed difference for an exact match (epsil) is in units of the given time axis
-        IF ( fmatch .EQ. '@ASN' ) THEN
+        IF ((fmatch .EQ. '@ASN').OR.(fmatch .EQ. '@ASN@LAG')) THEN
            GOTO 900
-        ELSEIF ( fmatch .EQ. '@BIN' ) THEN
+        ELSEIF ((fmatch .EQ. '@BIN').OR.(fmatch .EQ. '@BIN@LAG')) THEN
            epsil = -1.0
-        ELSEIF ( fmatch .EQ. '@XACT' ) THEN
+        ELSEIF ((fmatch .EQ. '@XACT').OR.(fmatch .EQ. '@XACT@LAG')) THEN
            epsil = depsilon
         ELSEIF ( fmatch(1:6) .EQ. '@XACT:' ) THEN
-           READ(fmatch(7:), *, ERR=5010) epsil
+           idx = INDEX(fmatch, '@LAG')
+           IF ( idx .GT. 7 ) THEN
+              READ(fmatch(7:idx-1), *, ERR=5010) epsil
+           ELSE
+              READ(fmatch(7:), *, ERR=5010) epsil
+           ENDIF
            IF ( epsil .LT. 0.0 ) GOTO 5010
-        ELSEIF ( fmatch .EQ. ' ' ) THEN
+        ELSEIF ((fmatch .EQ. ' ').OR.(fmatch .EQ. '@LAG')) THEN
            epsil = depsilon
 *          Default is to try @XACT; if not successful, try @BIN; if not successful, use @ASN
         ELSE
@@ -311,7 +318,7 @@
         calid = TM_GET_CALENDAR_ID(calname)
         IF ( calid .LE. 0 ) THEN
 *          @ASN only valid option
-           IF ( fmatch .EQ. ' ' ) GOTO 900
+           IF ((fmatch .EQ. ' ').OR.(fmatch .EQ. '@LAG')) GOTO 900
            slen = TM_LENSTR1(calname)
            CALL ERRMSG(ferr_aggregate_error, status,
      .                 'unknown calendar "'//calname(1:slen)//
@@ -321,12 +328,13 @@
         forigin = SECS_FROM_BC(torigin_str, calid, status)
         IF ( status .NE. ferr_ok ) THEN
 *          @ASN only valid option
-           IF ( fmatch .EQ. ' ' ) GOTO 900
+           IF ((fmatch .EQ. ' ').OR.(fmatch .EQ. '@LAG')) GOTO 900
            slen = TM_LENSTR1(torigin_str)
            CALL ERRMSG(ferr_aggregate_error, status,
      .                 'invalid time origin "'//torigin_str(1:slen)//
      .                 '" for provided F axis', *5000)
         ENDIF
+
 
         IF ( epsil .GE. 0.0 ) THEN
 *          Match time origins with a tolerance of epsil
@@ -359,7 +367,7 @@
                     DO idx = 1, nsets
                        memb_filenames(idx) = itmp_names(idx)
                     ENDDO
-                    IF ( fmatch .EQ. ' ' )
+                    IF ((fmatch .EQ. ' ').OR.(fmatch .EQ. '@LAG'))
      .                 CALL WARN('Forecast axis coordinates matched'//
      .                           ' to time axis origins using @XACT')
                     GOTO 1000
@@ -369,7 +377,7 @@
                  GOTO 300
               ENDIF
            ENDDO
-  300      IF ( fmatch .NE. ' ' ) THEN
+  300      IF ( (fmatch .NE. ' ').AND.(fmatch .NE. '@LAG') ) THEN
 *             @XACT specified and failed - error return
               torigin_str = TM_SECS_TO_DATE(torigins(setidx), calid)
               slen = TM_LENSTR1(torigin_str)
@@ -410,7 +418,7 @@
                  DO idx = 1, nsets
                     memb_filenames(idx) = itmp_names(idx)
                  ENDDO
-                 IF ( fmatch .EQ. ' ' )
+                 IF ((fmatch .EQ. ' ').OR.(fmatch .EQ. '@LAG'))
      .              CALL WARN('Forecast axis coordinates matched'//
      .                        ' to time axis origins using @BIN')
                  GOTO 1000
@@ -420,7 +428,7 @@
               GOTO 400
            ENDIF
         ENDDO
-  400   IF ( fmatch .NE. ' ' ) THEN
+  400   IF ( (fmatch .NE. ' ').AND.(fmatch .NE. '@LAG') ) THEN
 *          @BIN specified and failed
            torigin_str = TM_SECS_TO_DATE(torigins(setidx), calid)
            slen = TM_LENSTR1(torigin_str)
@@ -438,7 +446,7 @@
   900   DO setidx = 1,nsets
            findices(setidx) = setidx
         ENDDO
-        IF ( fmatch .EQ. ' ' )
+        IF ((fmatch .EQ. ' ').OR.(fmatch .EQ. '@LAG'))
      .     CALL WARN('Forecast axis coordinates matched '//
      .               'to time axis origins using @ASN')
 

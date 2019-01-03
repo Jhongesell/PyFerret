@@ -48,7 +48,7 @@
 *       findices       - index of each dataset on the time-of-forecast (F) axis (input)
 *       tline          - forecasted-times (T) axis to use/used (input/output)
 *       tmatch         - method of matching times to tline (input, can be empty);
-*                        eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
+*                        eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001', '@LAG', '@ASN@LAG', ...
 *       t1indices      - index of each first-forecasted-time on the forecasted-time (T) axis (output)
 *       tdims          - number of forecasted times for each forecast dataset (output)
 *       status         - return status (output)
@@ -85,7 +85,7 @@
      .          nsteps, ntsteps, igrid, iaxis, idx, previdx
         CHARACTER TM_SECS_TO_DATE*20,
      .          calname*32, buff*256, units_str*64, origin_str*20
-        LOGICAL ITSA_TRUEMONTH_AXIS, 
+        LOGICAL ITSA_TRUEMONTH_AXIS,
      .          true_month, irreg_bnds, bad_bnds
 
         PARAMETER( depsilon = 2.0**(-42) )
@@ -249,7 +249,7 @@
                  thibnd = thibnd + setorigin
 
 *                If the coordinate is not in the middle of the cell, cannot be regular
-                 IF ( ABS(tcoord-0.5*(tlobnd+thibnd)) .GT. bnd_epsil ) 
+                 IF ( ABS(tcoord-0.5*(tlobnd+thibnd)) .GT. bnd_epsil )
      .              irreg_bnds = .TRUE.
 
 *                Match or add this forecasted time (in units of SECS_FROM_BC)
@@ -401,7 +401,7 @@
 *          If we got here, the axis is regular (including bounds)
            CALL FREE_LINE_DYNMEM(axcalt)
            line_regular(axcalt) = .TRUE.
-*          Convert the time origin and delta from UNITS_FROM_BC 
+*          Convert the time origin and delta from UNITS_FROM_BC
 *          to the appropriate time unit and origin
            IF ( ITSA_TRUEMONTH_AXIS(axcalt) ) THEN
               line_start(axcalt) = (ocoord-origin)/un_convert(pun_day)
@@ -465,8 +465,8 @@
 *          axcalt successfully created/assigned
         ENDIF
 
-*       Map the forecasted times to the created or provided T axis
 
+*       Map the forecasted times to the created or provided T axis
         axlen = line_dim(axcalt)
         IF ( axlen .LT. 1 )
      .     CALL ERRMSG(ferr_aggregate_error, status,
@@ -494,16 +494,21 @@
 *       The allowed difference for an exact match (epsil) is in units of the given time axis
         IF ( tline .LT. 0 ) THEN
             epsil = depsilon
-        ELSEIF ( tmatch .EQ. '@ASN' ) THEN
+        ELSEIF ((tmatch .EQ. '@ASN').OR.(tmatch .EQ. '@ASN@LAG')) THEN
             GOTO 900
-        ELSEIF ( tmatch .EQ. '@BIN' ) THEN
+        ELSEIF ((tmatch .EQ. '@BIN').OR.(tmatch .EQ. '@BIN@LAG')) THEN
             epsil = -1.0
-        ELSEIF ( tmatch .EQ. '@XACT') THEN
+        ELSEIF ((tmatch .EQ. '@XACT').OR.(tmatch .EQ. '@XACT@LAG')) THEN
             epsil = depsilon
         ELSEIF ( tmatch(1:6) .EQ. '@XACT:' ) THEN
-           READ(tmatch(7:), *, ERR=5010) epsil
+           idx = INDEX(tmatch, '@LAG')
+           IF ( idx .GT. 7 ) THEN
+              READ(tmatch(7:idx-1), *, ERR=5010) epsil
+           ELSE
+              READ(tmatch(7:), *, ERR=5010) epsil
+           ENDIF
            IF ( epsil .LT. 0.0 ) GOTO 5010
-        ELSEIF ( tmatch .EQ. ' ' ) THEN
+        ELSEIF ((tmatch .EQ. ' ').OR.(tmatch .EQ. '@LAG')) THEN
            epsil = depsilon
 *          Default is to try @XACT; if not successful, try @BIN; if not successful, use @ASN
         ELSE
@@ -525,7 +530,8 @@
            iaxis = ds_time_axis(member_sets(setidx))
            IF ( iaxis .LE. 0 ) THEN
 *             @ASN only valid option (assumes a single time step)
-              IF ( (tline .GE. 0) .AND. (tmatch .EQ. ' ') ) GOTO 900
+              IF ( (tline .GE. 0) .AND. ((tmatch .EQ. ' ')
+     .                    .OR. (tmatch .EQ. '@LAG')) ) GOTO 900
               flen = TM_LENSTR1(memb_filenames(setidx))
               CALL ERRMSG(ferr_aggregate_error, status,
      .                    'No valid time axis for forecast dataset '//
@@ -535,7 +541,8 @@
            calid = TM_GET_CALENDAR_ID(calname)
            IF ( calid .LE. 0 ) THEN
 *             @ASN only valid option
-              IF ( (tline .GE. 0) .AND. (tmatch .EQ. ' ') ) GOTO 900
+              IF ( (tline .GE. 0) .AND. ((tmatch .EQ. ' ')
+     .                    .OR. (tmatch .EQ. '@LAG')) ) GOTO 900
               slen = TM_LENSTR1(calname)
               flen = TM_LENSTR1(memb_filenames(setidx))
               CALL ERRMSG(ferr_aggregate_error, status,
@@ -547,7 +554,8 @@
            setorigin = SECS_FROM_BC(origin_str, calid, status)
            IF ( status .NE. ferr_ok ) THEN
 *             @ASN only valid option
-              IF ( (tline .GE. 0) .AND. (tmatch .EQ. ' ') ) GOTO 900
+              IF ( (tline .GE. 0) .AND. ((tmatch .EQ. ' ')
+     .                    .OR. (tmatch .EQ. '@LAG')) ) GOTO 900
               slen = TM_LENSTR1(origin_str)
               flen = TM_LENSTR1(memb_filenames(setidx))
               CALL ERRMSG(ferr_aggregate_error, status,
@@ -555,6 +563,7 @@
      .                    '" for forecast dataset '//
      .                    memb_filenames(setidx)(1:flen), *5000)
            ENDIF
+
 
            IF ( epsil .GE. 0.0 ) THEN
 *             Try matching with @XACT, or with generated axcalt
@@ -572,7 +581,8 @@
 *                match to a time on the created/provided T axis
   400            axidx = axidx + 1
                  IF ( axidx .GT. axlen ) THEN
-                    IF ( (tline .GE. 0) .AND. (tmatch .EQ. ' ') ) THEN
+                    IF ( (tline .GE. 0) .AND. ((tmatch .EQ. ' ')
+     .                          .OR. (tmatch .EQ. '@LAG')) ) THEN
 *                      @XACT failed; try @BIN - any previous set assignments made with @XACT
 *                      will be the same with @BIN, so no need to exit the setidx DO loop
                        epsil = -1.0
@@ -610,7 +620,8 @@
                  ELSE
 *                   At this time, time coordinates must be consecutive on the created/provided time axis
                     IF ( ABS(ocoord - tcoord) .GT. epsil ) THEN
-                       IF ( (tline .GE. 0) .AND. (tmatch .EQ. ' ') ) THEN
+                       IF ( (tline .GE. 0) .AND. ((tmatch .EQ. ' ')
+     .                             .OR. (tmatch .EQ. '@LAG')) ) THEN
 *                         @XACT failed; try @BIN - any previous set assignments made with @XACT
 *                         will be the same with @BIN, so no need to exit the setidx DO loop
                           epsil = -1.0
@@ -631,6 +642,7 @@
 *             Success with @XACT on this dataset - go on to the next dataset
            ENDIF
 
+
   500      IF ( epsil .LT. 0.0 ) THEN
 *             Try matching with @BIN (either @BIN specified or default matching and @XACT failed)
 
@@ -647,10 +659,9 @@
 *                match to a time on the created/provided T axis
   600            axidx = axidx + 1
                  IF ( axidx .GT. axlen ) THEN
-                    IF ( tmatch .EQ. ' ' ) THEN
-*                      @BIN failed; use @ASN
-                       GOTO 900
-                    ENDIF
+*                   @BIN failed; use @ASN if default matching
+                    IF ( (tmatch .EQ. ' ') .OR. (tmatch .EQ. '@LAG') )
+     .                 GOTO 900
                     origin_str = TM_SECS_TO_DATE(tcoord, calid)
                     slen = TM_LENSTR1(origin_str)
                     flen = TM_LENSTR1(memb_filenames(setidx))
@@ -687,10 +698,9 @@
                  ELSE
 *                   At this time, time coordinates must be consecutive on the created/provided time axis
                     IF ((tcoord.LT.olobnd).OR.(tcoord.GE.ohibnd)) THEN
-                       IF ( tmatch .EQ. ' ' ) THEN
-*                         @BIN failed; use @ASN
-                          GOTO 900
-                       ENDIF
+*                      @BIN failed; use @ASN if default matching
+                       IF ((tmatch .EQ. ' ') .OR. (tmatch .EQ. '@LAG'))
+     .                    GOTO 900
                        origin_str = TM_SECS_TO_DATE(tcoord, calid)
                        slen = TM_LENSTR1(origin_str)
                        flen = TM_LENSTR1(memb_filenames(setidx))
@@ -709,7 +719,8 @@
         ENDDO
 
 *       Success - all dataset time axes assigned with @XACT or @BIN
-        IF ( (tline .GE. 0) .AND. (tmatch .EQ. ' ') ) THEN
+        IF ( (tline .GE. 0) .AND. ((tmatch .EQ. ' ')
+     .              .OR. (tmatch .EQ. '@LAG')) ) THEN
            IF ( epsil .GE. 0.0 ) THEN
               CALL WARN('Dataset time axes matched '//
      .                  'to given time axis using @XACT')
@@ -765,10 +776,9 @@
 *          First forecast of next dataset starts after the first forecast of this dataset
            axidx = axidx + 1
         ENDDO
-        IF ( tmatch .EQ. ' ' )
+        IF ( (tmatch .EQ. ' ') .OR. (tmatch .EQ. '@LAG') )
      .     CALL WARN('Dataset time axes matched '//
      .               'to given time axis using @ASN')
-
 
 * Successful return
  1000   tline = axcalt

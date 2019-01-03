@@ -91,10 +91,10 @@
 *       agg_hide          - flag whether to hide the component datasets (input)
 *       tline             - the forecasted-time axis to use (input, can be invalid)
 *       tmatch            - method of matching times to tline (input, can be empty);
-*                           eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
+*                           eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001', '@LAG', '@ASN@LAG', ...
 *       fline             - the time-of-forecast axis to use (input, can be invalid)
 *       fmatch            - method of matching times to fline (input, can be empty);
-*                           eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001'
+*                           eg, '@ASN', '@BIN', '@XACT', '@XACT:0.001', '@LAG', '@ASN@LAG', ...
 *       status            - return status (output)
 
         IMPLICIT NONE
@@ -201,6 +201,8 @@
      .           memb_filenames, axcalf, findices, axcalt,
      .           tmatch, t1indices, tdims, status)
         IF (status .NE. ferr_ok) GOTO 5500
+
+* TODO: deal with @LAG, if given on /FAXIS or /TAXIS (but not both)
 
 * Create forecast datasets corresponding to the given forecast dataset
 * except defined for the full forecasted time axis axcalt.  Do this by
